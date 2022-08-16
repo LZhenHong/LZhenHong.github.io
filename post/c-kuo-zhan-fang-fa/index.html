@@ -1,0 +1,219 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>C# 扩展方法 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    C# 扩展方法
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2022-07-10 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/6UE3OY6zn/" class="post-tags">
+                            # C#
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>为什么想要把 C# 的方法扩展单独拿出来讲一下呢？</p>
+<p>因为当我们学习一门新的编程语言时，很多时候都会拿这门编程语言跟我们熟悉的编程做对比。因为编程语言的设计者不同，编程思想和理念是存在很多差别的，就算是同样相同的面向对象的编程语言，也会在细节上存在各种差异。</p>
+<!-- more -->
+<p>我个人的编程经历是从 C 语言入门，然后就开始学习 Objective-C，在随后很长一段时间里都是和 OC 打交道，作为第一门面向对象的编程语言，OC 很大程度上影响了我的编程习惯和风格，以至于在学习其他编程语言时都会跟 OC 做对比，或者代入 OC 的编程习惯。</p>
+<p>当我在 C# 中看到<strong>扩展方法</strong>时，很快就联想到 OC 里面的类扩展。他们都可以在不修改类源码的前提下，扩展类的实例方法，但是在实现方式上存在差异。因此想简单记录下 C# 的扩展方法使用以及与 OC 类扩展的异同点。</p>
+<h1 id="扩展实现">扩展实现</h1>
+<p>先了解一下 C# 中如何实现扩展方法：</p>
+<pre><code class="language-c#">using System;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace Extension
+{
+    public static class StringExt
+    {
+        /// &lt;summary&gt;
+        /// 将字符串转换成 MD5
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;加密后的 MD5 值&lt;/returns&gt;
+        public static string MD5(this string text)
+        {
+            var md5 = new MD5CryptoServiceProvider();
+            byte[] bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(text));
+            string md5Hash = BitConverter.ToString(bytes).Replace(&quot;-&quot;, &quot;&quot;).ToLower();
+            return md5Hash;
+        }
+    }
+}
+</code></pre>
+<p>这种方式看起来的和我们自定义普通的静态工具类看起来没有什么区别，但是注意在方法的参数前面有一个 <code>this</code> 的修饰词，这个 <code>this</code> 关键字就是 C# 定义扩展方法的魔法。</p>
+<p>如果没有 <code>this</code> 关键字，我们调用这个 MD5 方法的方式是 <code>StringExt.MD5(str);</code> 这样的。</p>
+<p>在加上了 <code>this</code> 关键字之后，我们就可以像调用 string 的实例方法一样去调用 MD5 方法 <code>str.MD5();</code>，同样我们也可以像上面一样方式 <code>StringExt.MD5(str);</code> 调用。这样的调用方式看起来更符合直觉，对字符串进行 MD5 就应该像是字符串的实例方法。</p>
+<h1 id="扩展接口">扩展接口</h1>
+<p>如果我们需要为 C# 写一些工具类方法，扩展方法是很理想的实现方式。但是扩展方法的使用场景更强大，上面举的例子是针对于特定的类实现的扩展方法，但是扩展方法还可以针对于接口。例如： <code>System.Linq.Enumerable</code> 中有很多对接口 <code>IEnumerable&lt;T&gt;</code> 的扩展方法 (<code>Where/SortBy/ThenBy </code>等)。</p>
+<p>下面的例子来自《Effective C#》P125：</p>
+<pre><code class="language-c#">public static class Comparable
+{
+    public static bool LessThan&lt;T&gt;(this T left, T right) where T : IComparable&lt;T&gt; =&gt; left.CompareTo(right) &lt; 0;
+}
+</code></pre>
+<p>这里示例是扩展 <code>IComparable</code> 接口，所有实现 <code>IComparable</code> 接口类的实例都可以使用 <code>LessThan</code> 方法，这个就是扩展方法强大的地方。虽然没有 Swift 扩展那么强大，但是也足够我们在扩展类的方法上有了另一种选择。</p>
+<p>用扩展的方式来扩充类方法是最好的实践，我们可以利用 <code>namespace</code> 来区分不同分类的扩展方法。例如：把排序相关的扩展方法放在 Sort 命名空间下，把转换相关的扩展方法放在 Transform 命名空间下，这样使用者就是根据自身的需求来引入不同的命名空间，来扩展现有类的实例方法。在扩展方法的支持下，我们把一个类的实现分成基础类加上不同分类的扩展方法，这样的实现方法可以减少对原始类的修改或者编写新的派生类。</p>
+<h1 id="注意点">注意点</h1>
+<p>扩展方法的实现方法是因为 C# 编译器在编译过程中生成的中间语言 (IL) 会将扩展方法的实例调用转换成对静态方法的调用。所以 <code>str.MD5();</code> 在经过编译器编译之后与 <code>StringExt.MD5(str);</code> 是没有区别的。</p>
+<p>当了解了编译器的实现扩展方法的方式之后，我们对扩展方法的特点也可以描述出来。</p>
+<ol>
+<li>
+<p>可以利用扩展方法为枚举类型编写方法。</p>
+</li>
+<li>
+<p>如果扩展方法是针对于值类型，因为值类型的参数传递是复制，在扩展方法中的修改不会影响原始值，可以使用 <code>ref</code> 关键字解决。</p>
+</li>
+<li>
+<p>不能重写扩展方法 ，当有多个相同方法签名的扩展方法时，C# 编译器会选择第一个被找到的扩展方法。</p>
+</li>
+<li>
+<p>如果扩展方法与该类型中定义的方法具有相同的方法签名，C# 编译器在编译过程中选择方法实现时会优先选择类型中定义的方法，扩展方法不会被调用。</p>
+</li>
+<li>
+<p>不能访问类型中的私有变量，这个跟静态方法的限制是一样的。</p>
+</li>
+</ol>
+<h1 id="相关链接">相关链接</h1>
+<ol>
+<li><a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/extension-methods">扩展方法（C# 编程指南）</a></li>
+<li><a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/how-to-implement-and-call-a-custom-extension-method">如何实现和调用自定义扩展方法（C# 编程指南）</a></li>
+<li>《Effective C#》第 27 条、第 28 条</li>
+</ol>
+<!-- more -->
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/promise-yu-dong-hua/" class="post-title gt-a-link">
+                    Promise 与动画
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

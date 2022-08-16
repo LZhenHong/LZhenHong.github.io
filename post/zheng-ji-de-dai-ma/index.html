@@ -1,0 +1,205 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>整洁的代码 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    整洁的代码
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2022-04-18 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/EThUO2GKi/" class="post-tags">
+                            # Other
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>在说到写代码这件事之前，可以先来聊聊程序员这份职业。我不太清楚大家对于程序员这份职业的理解是什么，我简单说下我对程序员认知的变化吧，或者说我对职业的认知。</p>
+<!-- more -->
+<p>几年前大四要毕业的我磕磕碰碰找了份游戏开发的工作，初入职场的我对程序员这份工作感到很新奇，看似每天如饥似渴的学习着功能开发，做着每天安排的需求，好似每天都在进步。当时对程序员的认知就是每天写着代码，开发着需求，完成安排的工作就好了。久而久之，就会发现每天都在重复做的同样的事情，bug 层出不穷，技术也没有提升，一直都在原地踏步。渐渐的，失去了写代码的兴趣，也对程序员这个职业没有了激情。</p>
+<p>不知道怎么的去年 3 月份突然开窍，写代码这件事是我们程序员的手艺啊，是我们赖以生存的工具，不好好琢磨提升这门手艺，注定会被淘汰。写代码这门手艺的门槛很低，因为代码是不会面向用户的，代码是在底层运行，用户面对的是界面操作，界面好不好看，功能好不好用，是用户关心的，至于代码写的好不好，大概只有程序员关心。因此，不管好代码、烂代码，只要在面对用户没有致命的 bug，也就不会有太大问题，导致很多项目的代码在中后期就没法维护了，或者维护起来很困难。</p>
+<p>程序员写代码，就像木匠雕刻工艺品，厨师烹饪佳肴。不能因为代码藏的深，不直接面对用户，而忽略了这门手艺的修炼。不管在任何行业，做着什么样的工作，磨练手艺都是重要的。</p>
+<p>闲扯了很多，还是继续我们的主题吧。</p>
+<p>在作为程序员工作了五年之后，发现程序员的工作更多时间都是在阅读代码，而不是在写代码。不管是做需求，还是改 bug，或者是想优化结构，代码总是在被修改，修改代码之前就需要理解代码在做的事情，了解上下文。所以，利于阅读和理解的代码就是整洁的代码。</p>
+<h2 id="命名">命名</h2>
+<p>命名这件事放到第一个说，因为它真的太重要了。程序员在写代码期间，每时每刻都在命名，类名、变量名、函数名、接口名等。</p>
+<h3 id="命名准确">命名准确</h3>
+<p>好的命名有助于理解代码段正在做的事情。例如：</p>
+<p><code>int d = 5;</code></p>
+<p>你可以一眼看出来这个变量代表的含义吗，我相信大部分程序员应该是不理解的。要理解这个变量的含义，就需要浏览代码上下文，理解代码段逻辑之后再去推断。</p>
+<p><code>int dayPassedSinceSunday = 5;</code></p>
+<p>这个变量名代表的含义我相信即使不是程序员也能看出来。阅读的人不需要了解上下文做了什么事情，只需要看到这个名称就可以理解。</p>
+<h3 id="少使用魔数">少使用魔数</h3>
+<p>魔数指的是在代码中出现的整数字面量，没有任何含义，它就这样出现，触不及防。</p>
+<pre><code class="language-typescript">for (let i = 0; i &lt; 7; ++i) {
+    // do something with varible i
+}
+</code></pre>
+<p>上面代码中出现的数字 7，就是 magic number，它代表的含义不明，而且可能散落在代码各处，当要修改的时候，完全不知道各处的魔数是否代表同一含义。</p>
+<pre><code class="language-typescript">const MAX_PLAYERS_IN_ROOM = 7;
+for (let i = 0; i &lt; MAX_PLAYERS_IN_ROOM; ++i) {
+    // do something with varible i
+}
+</code></pre>
+<p>上面的数字字面量被常量取代了，数字 7 有了自己的含义。而且即使代码中多处使用了常量 <code>MAX_PLAYERS_IN_ROOM</code>，要修改的时候只需要修改常量定义这一处，不需要每一处去改动。</p>
+<p>这里只是以整数举例，在代码中都不应该直接出现字面量，如字符串、整数、布尔值等等，要为它们赋予含义，统一使用，在以后的阅读和修改都会感受到好处。</p>
+<h2 id="注释">注释</h2>
+<p>代码注释拿出来单独说，是因为每个程序员对写注释的态度都不一样，有些程序员不喜欢写注释，有些程序员注释比代码更详细。</p>
+<p>首先，我们应该要明白几点：</p>
+<ul>
+<li>注释不能优化代码，烂代码不会因为注释变成好代码。</li>
+<li>注释可能告诉你错误的信息，只有代码才是最真实的，因为代码会有很多人去修改、去维护，但是不一定每个程序员都会去维护注释。久而久之，注释可能出现在其他位置，与最开始注释的代码相距甚远。还会出现需求逻辑已经被修改，但是注释描述的是之前的逻辑。</li>
+<li>很多程序员喜欢注释代码，觉得可能会出现需求被改成之前的逻辑。但是现在有 Git、SVN 等版本控制工具，你删掉的代码在任何时候都可以被找回。别人看到注释掉的代码，认为这个代码可能还有其他用处，就导致注释的代码一直留着，无人问津。</li>
+</ul>
+<p>注释跟命名也会有一定联系，好的命名就相当于注释。这种加注释描述的形式：<code>int d = 5; // 距周日过去了多少天</code>，不如准确的命名：<code>int dayPassedSinceSunday = 5;</code>。</p>
+<p>应该加注释的地方是代码表现不出来的地方，代码只能解释“怎么做”，但为什么这么做代码是表现不出来的。一些啰嗦、冗余、抖机灵的注释不应该出现，它会分散读者的视线。</p>
+<h2 id="代码风格">代码风格</h2>
+<p>每位程序员有各自写代码的习惯和风格，但是作为一个团队，代码的风格需要统一。如果在项目中出现多种风格的代码就像是你在语文书中看到数学书中的文字，你需要暂时停下来转化下思维，才能继续读下去。</p>
+<p>在项目启动之前，团队成员需要一起制定项目的代码风格，输出成文档。不管你是否喜欢，既然大家达成共识，就要遵守。统一编写代码的风格，也是利于代码阅读的有效方式。</p>
+<h2 id="设计模式">设计模式</h2>
+<p>设计模式是从实际项目中总结出来的，是某些特定问题下的最佳实践。在合适的时机使用设计模式，可以保证代码的重用性、可扩展性。</p>
+<p>设计模式是程序世界中的被广泛认可的，标准的设计模式实现在其他也了解设计模式的程序员看起来会非常亲切和熟悉，自然也就容易理解和阅读。</p>
+<p>作为程序员，要熟悉、了解常用的设计模式，基础的工厂模式、单例模式、组合模式等等。更详细可看：<a href="https://refactoring.guru/design-patterns">设计模式</a>。</p>
+<h2 id="编程思想">编程思想</h2>
+<p>现在编程世界的语言太多了，C / C# / C++ / Objective-C / Swift / Java / TypeScript / Python / Rust 等等，当熟练掌握了一门编程语言，会发现转向其他语言时，刚写出来的代码都是带着之前编程语言的味道。因为编程语言在设计时是带着设计者的思想，设计者会把自己的编程思想灌注到编程语言，这样就导致编程语言的最佳实践会有很大差异。例如：C 语言是面向过程的语言，C# 是面向对象的语言，这样的差异就会导致在解决同样的问题解决思路完全不一样。</p>
+<p>当时在 Apple 在推出 Swift 之后，刚写 Swift 代码挥发现怎么写怎么别扭，写出来的代码带着浓浓的 OC 味，也很不理解为什么 Swift 会给枚举增加这么多功能，枚举可以定义方法，可以携带关联值。但是在熟悉了语言后，就会发现 Swift 针对于某些问题有完全不同的实现方式，相较于 OC 的实现更为优雅、整洁。而且 Swift 在提升了扩展的等级后，发展出了 POP（面向协议编程），跟面向过程编程和面向对象编程完全不同的思想。</p>
+<p>我们学习一门编程语言，不应该只关注于语言的语法，更应该关注设计者表达的思想。了解设计者的思想之后，就能写出更合理、优雅的代码。</p>
+<h2 id="最后">最后</h2>
+<p>试着回想一下，你是否有过看着过去写的代码觉得很羞耻的感觉，觉得代码写的真垃圾。其实不用太在意，几乎没有人可以在一开始就把代码写的整洁，利于阅读。即使做了提前设计，中途也会因为需求变化，或者其他原因，导致最终实现与初期的设计相距甚远。代码是需要修改和维护的，初期代码实现也繁杂，而且也不能考虑到所有情况，不能一直保持代码的整洁，不过我们需要时刻提醒自己注意代码的整洁，尽可能保证代码优雅。</p>
+<p>就像代码一样，人站在今天审视着过去的自己，很容易对以前产生种种不满，会做出各种假设、如果，而忽视了今天的自己。渐渐的，今天的自己变成昨天的自己，昨天的自己依然做着假设，时间就这样悄然而逝。</p>
+<p>过去已然，未来不明，现在可改。</p>
+<p>也许有一天，你不再是程序员，进入了其他的行业，做着不同的工作。同样，你也不该停下学习的脚步，不管在哪一行，做着什么样的工作，技巧需要练习，技艺需要精进。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/han-shu-shi-bian-cheng-xiao-jie/" class="post-title gt-a-link">
+                    集合函数式编程
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

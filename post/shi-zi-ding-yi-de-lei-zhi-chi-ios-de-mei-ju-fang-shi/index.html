@@ -1,0 +1,291 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>使自定义的类支持 iOS 的枚举方式 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    使自定义的类支持 iOS 的枚举方式
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2017-02-27 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/ieWAKptyA/" class="post-tags">
+                            # ObjC
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>事先可以看一下 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-09-comparison-of-objective-c-enumeration-techniques.html">Comparison of Objective-C Enumeration Techniques</a> 和 <a href="http://nshipster.com/enumerators/">NSFastEnumeration / NSEnumerator</a>，对比了 ObjC 中各种遍历方式。</p>
+<!-- more -->
+<p>在 iOS 中主要有 4 种类型的遍历：</p>
+<ul>
+<li>C 语言风格</li>
+<li>NSEnumerator</li>
+<li>基于 block 的遍历</li>
+<li>NSFastEnumeration</li>
+</ul>
+<h2 id="c-语言风格">C 语言风格</h2>
+<pre><code>NSArray *nums = @[@1, @2, @3];
+for (int i = 0; i &lt; nums.count, ++i) {
+    NSLog(@&quot;%@&quot;, nums[i]);
+}
+</code></pre>
+<p>形如上面这样的利用 for 循环，然后使用下标去访问对象的方式，就是 C 语言风格的遍历。</p>
+<p>要支持这种 C 语言风格遍历就需要实现 <code>objectAtIndexedSubscript:</code> 方法，这是因为编译器会将 <code>someArray[0]</code> 解析成 <code>[someArray objectAtIndexedSubscript:0]</code>。</p>
+<pre><code>@interface TestArray: NSObject
+- (id)objectAtIndexedSubscript:(NSUInteger)idx;
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (id)objectAtIndexedSubscript:(NSUInteger)idx {
+    if (idx &gt;= _numberList.size()) {
+        // 抛出异常
+    }
+    return _numberList[idx];
+}
+@end
+</code></pre>
+<p>如果要支持使用键作为下标来访问值，就需要实现 <code>objectForKeyedSubscript:</code> 方法。</p>
+<h2 id="nsenumerator">NSEnumerator</h2>
+<pre><code>NSArray *numberArray = @[@1, @2, @3];
+NSEnumerator *enumerator = [numberArray objectEnumerator];
+NSNumber *number;
+while (number = [enumerator nextObject]) {
+    // 对 number 对象进行操作
+}
+</code></pre>
+<p>这是 ObjC 原来遍历集合的标准方式，但是这种写法很冗长。虽然现在基本上不用这种方式了，还是来看一下如何支持这种方式的遍历。</p>
+<p>要支持这种遍历方式主要还是实现一个 <code>objectEnumerator</code> 方法返回 <code>NSEnumerator</code> 对象。这里的 <code>NSEnumerator</code> 是抽象类，需要继承 <code>NSEnumerator</code> 然后实现 <code>-nextObject:</code> 方法。</p>
+<pre><code>@interface TestEnumerator: NSEnumerator
+@property (nonatomic, readonly) TestArray *array;
+
+- (instancetype)initWithTestArray:(TestArray *)array;
+@end
+
+@implementation TestEnumerator {
+    NSUInteger _currentIndex;
+}
+
+- (instancetype)initWithTestArray:(TestArray *)array {
+    if (self = [super init]) {
+        _array = array;
+        _currentIndex = 0;
+    }
+    return self;
+}
+
+- (id)nextObject {
+    if (_currentIndex &gt;= [self.array numberOfItems]) {
+        return nil;
+    } else {
+        return array[_currentIndex++]; // 假设 TestArray 实现了 `objectAtIndexedSubscript:` 方法
+    }
+}
+
+// 这里还需要注意的是 NSEnumerator 会自动实现 `-allObjects` 方法，将 `-nextObject` 方法返回的对象填入数组中
+@end
+
+
+@interface TestArray: NSObject
+- (NSEnumerator *)objectEnumerator;
+- (NSUInteger)numberOfItems;
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (NSUInteger)numberOfItems {
+    return _numberList.size();
+}
+
+- (NSEnumerator *)objectEnumerator {
+    return [[TestEnumerator alloc] initWithTestArray:self];
+}
+@end
+</code></pre>
+<p><code>NSEnumerator</code> 也是遵守 <code>NSFastEnumeration</code> 协议，所以可以还可以使用 for-in 循环来遍历 <code>NSEnumerator</code> 对象。</p>
+<h2 id="基于-block-的遍历">基于 block 的遍历</h2>
+<pre><code>NSArray *array = @[@1, @2, @3];
+[array enumerateObjectsUsingBlock:^(id object, NSUInteger idx, BOOL *stop) {
+    NSLog(@&quot;%@&quot;, object);
+}];
+</code></pre>
+<p>这种遍历是现在经常使用的方式，而且这种方式还提供了很多有用的特性。</p>
+<pre><code>- (void)enumerateObjectsWithOptions:(NSEnumerationOptions)opts usingBlock:(void (^)(id obj, NSUInteger idx, BOOL *stop))block
+</code></pre>
+<p>上面这个方法就可以指定 <code>NSEnumerationOptions</code> 参数，可以反向遍历和并行遍历。同时系统会在这个方法的 block 里添加一个 <code>autoreleasepool</code>。</p>
+<p>这里不太懂，苹果官方给出的例子也就是简单的实现了 <code>enumerateObjectsUsingBlock:</code> 方法。苹果官方例子：<a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a>.</p>
+<h2 id="nsfastenumeration">NSFastEnumeration</h2>
+<pre><code>NSArray *array = @[@1, @2, @3];
+for (NSNumber *number in array) {
+    NSLog(@&quot;%@&quot;, number);
+}
+</code></pre>
+<p>利用 for-in 遍历容器对象也是非常常见的遍历方法，并且这种方式也是最快的，要让自定义的对象支持这种遍历模式还是比较麻烦的。</p>
+<p>支持这种遍历模式的对象需要遵守 <code>NSFastEnumeration</code> 协议，并实现方法：</p>
+<pre><code>- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len;
+</code></pre>
+<p>接下来详细解释下这些参数的含义：</p>
+<ul>
+<li>state: 这是个 <code>NSFastEnumerationState</code> 的结构体，申明如下：</li>
+</ul>
+<pre><code>typedef struct {
+    // 在第一次调用 `countByEnumeratingWithState:objects:count:` 方法时，state 为 0，
+    // 这个在遍历的时候用不到，可以用来存储额外信息
+    unsigned long state; 
+    // C 数组，`countByEnumeratingWithState:objects:count:` 方法调用者要去遍历的数组
+    id *itemsPtr;
+    // 用来检测遍历期间数组是否被修改
+    unsigned long *mutationsPtr;
+    // 存储额外信息
+    unsigned long extra[5]; 
+} NSFastEnumerationState;
+</code></pre>
+<ul>
+<li>stackbuf: <code>countByEnumeratingWithState:objects:count:</code> 方法调用者提供的数组，当我们数据结构是不连续的内存时，需要用到这个数组</li>
+<li>len: stackbuf 数组的长度，当使用到 stackbuf 数组时，需要用到 len 来检测</li>
+</ul>
+<p>实现 <code>countByEnumeratingWithState:objects:count:</code> 这个方法，还需要挺多要写的，打算另写一篇来说如何实现。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-09-comparison-of-objective-c-enumeration-techniques.html">Comparison of Objective-C Enumeration Techniques</a></li>
+<li><a href="http://nshipster.com/enumerators/">NSFast​Enumeration / NSEnumerator</a></li>
+<li><a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/2016-zong-jie/" class="post-title gt-a-link">
+                    2016 总结
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

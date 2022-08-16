@@ -1,0 +1,297 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>UIResponder 拾遗：inputView 和 inputAccessoryView | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    UIResponder 拾遗：inputView 和 inputAccessoryView
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-12-08 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>前几天在看响应者链条的时候，看到 <code>UIResponder</code> 有两个很有用的属性，但是自己不熟悉，就是 <code>inputView</code> 和 <code>inputAccessoryView</code>。原来自己练手的时候，需要这样的功能，但是自己不知道这两个属性，导致自己花费了很多时间。所以，就写下这篇，算是对不知道的知识的补充。</p>
+<!-- more -->
+<h2 id="uitextfield-的-inputview-和-inputaccessoryview">UITextField 的 inputView 和 inputAccessoryView</h2>
+<h3 id="uitextfield-的-inputview">UITextField 的 inputView</h3>
+<p>默认情况下，当 <code>UITextField</code> 对象成为第一响应者的时候，系统会唤出系统键盘来接收用户的输入。</p>
+<p>但是在有些时候，我们不希望唤出系统键盘，而是我们自定义的 view 来接收用户的输入，在这种情况下，<code>inputView</code> 就派上用场了。<code>inputView</code> 的作用就是让开发者提供自定义的 view 来获取用户的输入，当 <code>UITextField</code> 对象成为第一响应者的时候，系统会尝试唤出 <code>inputView</code>，如果 <code>inputView</code> 存在，就唤出开发者提供的 <code>inputView</code>；如果 <code>inputView</code> 不存在，也就是说这个属性的值是 nil（<code>inputView</code> 默认就是 nil），系统会唤出系统键盘。</p>
+<p>现在假设当我们点击 <code>UITextField</code> 之后，显示出来的是一个 <code>UIDatePicker</code>。大概的实现代码：</p>
+<pre><code>@interface ViewController ()
+@property (nonatomic, weak) IBOutlet UITextField *textField;
+@property (nonatomic, strong) UIDatePicker *datePicker;
+@end
+
+@implementation ViewController
+
+- (UIDatePicker *)datePicker {
+    if (!_datePicker) {
+        _datePicker = [[UIDatePicker alloc] init];
+        _datePicker.datePickerMode = UIDatePickerModeCountDownTimer;
+    }
+    return _datePicker;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.textField.inputView = self.datePicker;
+}
+
+@end
+</code></pre>
+<h3 id="uitextfield-的-inputaccessoryview">UITextField 的 inputAccessoryView</h3>
+<p>接下来说一下 <code>inputAccessoryView</code> 的作用，这个属性就是在 <code>inputView</code> 或者系统键盘上添加一个辅助的 view，例如下图高亮部分（图片截取自奇点）：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/inputAccessory_Example.png?raw=true' width=200 alt='inputAccessory Example' />
+<div align=left>
+<p>我们自己来添加一个 <code>inputAccessoryView</code>，大概的代码实现：</p>
+<pre><code>@interface ViewController () 
+@property (nonatomic, weak) IBOutlet UITextField *textField;
+@property (nonatomic, strong) UIToolbar *toolBar;
+@end
+
+@implementation ViewController
+
+- (UIToolbar *)toolBar {
+    if (!_toolBar) {
+        _toolBar = [[UIToolbar alloc] init];
+        _toolBar.bounds = (CGRect){CGPointZero, self.view.bounds.size.width, 49};
+        UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                   target:nil
+                                                                                   action:NULL];
+        UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                                                   target:self
+                                                                                   action:@selector(done)];
+        _toolBar.items = @[spaceItem, rightItem];
+    }
+    return _toolBar;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.textField.inputAccessoryView = self.toolBar;
+}
+
+- (void)done {
+    NSString *text = [NSString stringWithFormat:@&quot;%.2lf s&quot;, self.datePicker.countDownDuration];
+    if (self.textField.isFirstResponder) {
+        self.textField.text = text;
+        [self.textField resignFirstResponder];
+    }
+}
+
+@end
+</code></pre>
+<p><code>UITextView</code> 的自定义 <code>inputView</code>／<code>inputAccessoryView</code> 与 <code>UITextField</code> 类似。</p>
+<h2 id="uireponder-的-inputview-和-inputaccessoryview">UIReponder 的 inputView 和 inputAccessoryView</h2>
+<h3 id="uireponder-的-inputview">UIReponder 的 inputView</h3>
+<p>我们看一下  <code>inputView</code> 和 <code>inputAccessoryView</code> 在 <code>UIResponder</code> 的声明：</p>
+<pre><code>// Called and presented when object becomes first responder.  Goes up the responder chain.
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputView NS_AVAILABLE_IOS(3_2);
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputAccessoryView NS_AVAILABLE_IOS(3_2);
+</code></pre>
+<p>这里我们看到 <code>UIResponder</code> 将这两个属性声明为 <code>readonly</code>，所以当我们使用例如：<code>UIButton</code> 的时候，我们就需要继承这些类，然后重新将这两个属性声明称 <code>readwrite</code>。</p>
+<p>假设我们点击一个 button 时，要显示一个 <code>UIDatePicker</code>，大概的代码实现：</p>
+<pre><code>@interface TSButton : UIButton
+@property (nonatomic, strong, readwrite, nullable) UIView *inputView;
+@property (nonatomic, strong, readwrite, nullable) UIView *inputAccessoryView;
+@end
+
+@implementation TSButton
+// 1
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+// 2
+- (BOOL)canResignFirstResponder {
+    return YES;
+}
+@end
+
+@interface ViewController ()
+@property (nonatomic, weak) IBOutlet TSButton *showDatePickerButton;
+@property (nonatomic, strong) UIDatePicker *datePicker;
+@end
+
+@implementation ViewController
+
+- (UIDatePicker *)datePicker {
+    if (!_datePicker) {
+        _datePicker = [[UIDatePicker alloc] init];
+        _datePicker.datePickerMode = UIDatePickerModeCountDownTimer;
+    }
+    return _datePicker;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.showDatePickerButton.inputView = self.datePicker;
+}
+
+- (IBAction)showDatePicker {
+     // 3
+    [self.showDatePickerButton becomeFirstResponder];
+}
+
+@end
+</code></pre>
+<p>我们在这里要注意有注释的地方，除却 <code>UITextField</code> 和 <code>UITextView</code> 之外，因为这两个控件会自动成为第一响应者，其他的 <code>UIResponder</code> 子类想要成为第一响应者有两步要做：</p>
+<ol>
+<li>覆写 <code>canBecomeFirstResponder</code> 并返回 YES；</li>
+<li>主动调用 <code>becomeFirstResponder</code> 方法。</li>
+</ol>
+<p>因为只有成为第一响应者，系统才会去唤出 <code>inputView</code> 与 <code>inputAccessoryView</code>，所以我们需要主动调用 <code>becomeFirstResponder</code> 方法。</p>
+<h2 id="reloadinputviews-用法">reloadInputViews 用法</h2>
+<p>当对象是第一响应者时，调用这个方法来刷新 <code>inputView</code> 和 <code>inputAccessoryView</code>。这些 view 会立马被替换，没有动画。如果对象不是第一响应者，则这个方法就没有任何效果。</p>
+<h2 id="与-inputview-和-inputaccessoryview-相关的通知">与 inputView 和 inputAccessoryView 相关的通知</h2>
+<p>我们有时会监听与系统键盘相关的通知，以便在系统键盘出现的时候，来调整我们的 UI 界面。同样，自定义的 <code>inputView</code> 出现或者消失时也会触发键盘相关的通知。我们同样可以监听  <code>UIKeyboardWillShowNotification</code>, <code>UIKeyboardDidShowNotification</code>, <code>UIKeyboardWillHideNotification</code>, 和 <code>UIKeyboardDidHideNotification</code> 通知来调整 UI 视图。这里需要注意的是，当有 <code>inputAccessoryView</code> 时，通知的 <code>userInfo</code> 中的高度数据，是 <code>inputView</code> 的高度加上 <code>inputAccessoryView</code> 的高度。</p>
+<h2 id="最后">最后</h2>
+<p>在 <code>UIResponder</code> 还有 <code>inputViewController</code> 和 <code>inputAccessoryViewController</code> 属性，这两个属性跟自定义键盘有关。下面是它们在 <code>UIResponder</code> 中的声明：</p>
+<pre><code>// For viewController equivalents of -inputView and -inputAccessoryView
+// Called and presented when object becomes first responder.  Goes up the responder chain.
+@property (nullable, nonatomic, readonly, strong) UIInputViewController *inputViewController NS_AVAILABLE_IOS(8_0);
+@property (nullable, nonatomic, readonly, strong) UIInputViewController *inputAccessoryViewController NS_AVAILABLE_IOS(8_0);
+</code></pre>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/InputViews/InputViews.html#//apple_ref/doc/uid/TP40009542-CH12-SW5">Custom Views for Data Input</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/EventHandling/Conceptual/EventHandlingiPhoneOS/event_delivery_responder_chain/event_delivery_responder_chain.html#//apple_ref/doc/uid/TP40009541-CH4-SW1">The Responder Chain Is Made Up of Responder Objects</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/ios-de-xiang-ying-zhe-lian-tiao/" class="post-title gt-a-link">
+                    iOS 的响应者链条 ⛓️
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

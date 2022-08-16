@@ -1,0 +1,248 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>App Programming Guide for iOS - The App Life Cycle | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    App Programming Guide for iOS - The App Life Cycle
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-11-03 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h2 id="the-main-function">The Main Function</h2>
+<p>每个基于 C 语言的程序的入口都是 main 函数，iOS App 也没有区别。开发 iOS 你不需要自己编写 main 函数，Xcode 的模版项目会自动实现，一般情况下你不需要修改 main 函数。main 函数会将控制权交给 UIKit framework。<code>UIApplicationMain</code> 函数会创建应用的核心对象，从 SB 文件中加载 UI 界面，启动 App 的 runloop 等等。</p>
+<pre><code>#import &quot;AppDelegate.h&quot;
+ 
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+</code></pre>
+<p>关于在 Main 函数之前发生了什么，可以看这个 <a href="http://blog.sunnyxx.com/2014/08/30/objc-pre-main/">iOS 程序 main 函数之前发生了什么</a>。</p>
+<!-- more -->
+<h2 id="the-structure-of-an-app">The Structure of an App</h2>
+<p>每个应用的核心就是 <code>UIApplication</code> 对象，这个对象的任务就是处理系统与 App 之间的交互。</p>
+<p>下面这张图片显示了大部分应用的对象以及这些对象扮演的角色。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/core_objects_2x.png?raw=true' width=340 alt='Core Objects' />
+<div align=left>
+<p>在上面这张图中我们可以看到 iOS 应用遵守 MVC 架构。但是 MVC 是有一定的缺陷的，各种逻辑都是由 C(控制器) 来处理的，例如作为 V(视图) 的代理，接收 M(模型) 分发的通知，这样随着业务的增长，控制器中的代码就可能会越来越多。MVVM 等其他的设计模式就这样出现了。<s>扯远了 🙄🙄</s></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Object</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">UIApplication 对象</td>
+<td style="text-align:center">UIApplication 对象管理 event loop 和 high-level 应用行为。当应用的状态发生变化或者有远程通知的时候，UIApplication 对象会通知它的 delegate 对象，这个代理对象就是你在 UIApplicationMain 函数中传递的最后一个参数。</td>
+</tr>
+<tr>
+<td style="text-align:center">App 的代理对象</td>
+<td style="text-align:center">这个对象用来处理 App 的状态变化，例如：Active -&gt; Background，还可以处理其他 App 级别的事件。每个 App 只有一个这样的代理对象。</td>
+</tr>
+<tr>
+<td style="text-align:center">数据模型对象</td>
+<td style="text-align:center">App 中的数据模型。For more see <a href="https://developer.apple.com/library/content/documentation/DataManagement/Conceptual/DocumentBasedAppPGiOS/Introduction/Introduction.html#//apple_ref/doc/uid/TP40011149">Document-Based App Programming Guide for iOS</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">控制器对象</td>
+<td style="text-align:center">控制器对象是管理展示在屏幕上的内容，一个控制器对象管理一个 view 和其所有 subview。当需要展示的时候，控制器会将 view 添加到 App 的 window 上。</td>
+</tr>
+<tr>
+<td style="text-align:center"><a href="https://developer.apple.com/reference/uikit/uiwindow">UIWindow</a> 对象</td>
+<td style="text-align:center">UIWindow 对象协调多个 view 的展示。一般情况下，一个 App 只有一个 window 对象，但是 App 在外接设备上展示内容就会有多个 window。</td>
+</tr>
+<tr>
+<td style="text-align:center">UI (Views, Controls, Layers) 对象</td>
+<td style="text-align:center">Views 和 Controls 在特定的矩形框中展示可视化界面和处理这个区域内的事件。其实 Layer 才是真正渲染界面的对象，UIView 只是 CALayer 的代理，你可以直接创建 CALayer 对象，将其添加到视图层级中。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-main-run-loop">The Main Run Loop</h2>
+<p>App 的 main run loop 处理所有与用户有关的事件，main run loop 运行在 App 的<strong>主线程</strong>上，这样保证 App 处理的事件与接收的顺序是一样的。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/event_draw_cycle_a_2x.png?raw=true' width=340 alt='Event draw cycle' />
+<div align=left>
+<p>上面这张图向我们展示了 App 是如何处理用户交互的。当用户与设备进行交互的时候，系统会为这些交互生成相应的事件，然后通过 UIKit 的特殊端口传递给 App。事件在内部是通过队列管理的，事件是一个一个交给 main run loop 来处理的。UIApplication 对象是第一个接收到事件的，由它来决定如何处理这个事件。</p>
+<p>一些类型的事件是通过 main run loop 分发的，另外一些事件是直接分发给 delegate 或者传递给 block。<s>分别举一些例子</s></p>
+<p>Controls 的触摸事件跟 Views 的触摸事件是不一样的，Controls 的交互方式通常来说是有限的，所以这些事件被重新打包成动作消息 (action messages) 传递给 target 对象。这里就是 <code>target-action</code> 设计模式。</p>
+<h2 id="execution-states-for-apps">Execution States for Apps</h2>
+<p>App 有五种状态，在特定的时间，你的 App 会处于任意一种状态，这五种状态分别是：</p>
+<ul>
+<li>Not running：App 没有启动</li>
+<li>Inactive：App 在前台，但是没有处理事件</li>
+<li>Active：App 在前台，并且在处理事件</li>
+<li>Background：App 在后台，并且在执行代码</li>
+<li>Suspended：App 在后台，没有执行代码。当 App 进入这个状态，App 不会接收到通知</li>
+</ul>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/high_level_flow_2x.png?raw=true' width=340 alt='High level flow' />
+<div align=left>
+<p>大部分 App 状态改变都会调用相应的 App 代理方法：</p>
+<ul>
+<li><code>application:willFinishLaunchingWithOptions:</code> - 在 App 的启动时间，这是你第一次可以执行自己的代码。</li>
+<li><code>application:didFinishLaunchingWithOptions:</code> - 在应用展示给用户之前，你可以在这个方法做最后的初始化操作。</li>
+<li><code>applicationDidBecomeActive:</code> - 当你的 App 从后台回到前台的时候会调用这个方法。</li>
+<li><code>applicationWillResignActive:</code> - 当你的 App 即将离开前台时，这个方法会被调用。</li>
+<li><code>applicationDidEnterBackground:</code> - 这时你的 App 运行在后台，并且可能在任意时间进入 Suspended 状态。在这里可以做一些清理操作，<code>SDWebImage</code> 就监听了这个通知，来做一些清理过期图片的操作。</li>
+<li><code>applicationWillEnterForeground:</code> - 你的 App 离开后台，即将进入前台，但是仍然没有进入 active 状态。</li>
+<li><code>applicationWillTerminate:</code> - 你的 App 将要结束。如果你的 App 此时处于 Suspended 状态，这个方法就不会调用。同样可以在这里做一些清理操作，<code>SDWebImage</code> 就监听了这个通知，来做一些清理过期图片的操作。</li>
+</ul>
+<h2 id="app-termination">App Termination</h2>
+<p>App 应该有随时被终止的准备，系统会回收处于 Suspended 状态的 App 的内存资源以便分配给新启动的 App 使用。处于 Suspended 状态的 App 被终止时，不会收到通知。App 处于 Background 状态，系统会在终止 App 之前调用 <code>applicationWillTerminate:</code> 代理方法。如果设备重启的话，系统仍然不会调用 <code>applicationWillTerminate:</code> 代理方法。</p>
+<p><s>In addition to the system terminating your app, the user can terminate your app explicitly using the multitasking UI. User-initiated termination has the same effect as terminating a suspended app. The app’s process is killed and no notification is sent to the app.</s> 这句没太理解。</p>
+<h2 id="threads-and-concurrency">Threads and Concurrency</h2>
+<p>多线程开发的几点建议：</p>
+<ul>
+<li>UI 的刷新始终要在主线程</li>
+<li>消耗时间比较长的任务放在后台线程执行，例如：网络请求，文件处理等等</li>
+<li>在启动时，尽量不要将任务放在主线程执行，只将与 UI 界面有关的初始化放在主线程，其他任务异步执行</li>
+</ul>
+<p>For more see <a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091">Concurrency Programming Guide</a>.</p>
+<h2 id="related-link">Related Link</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/TheAppLifeCycle/TheAppLifeCycle.html#//apple_ref/doc/uid/TP40007072-CH2-SW1">The App Life Cycle</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/app-programming-guide-for-ios-expected-app-behaviors/" class="post-title gt-a-link">
+                    App Programming Guide for iOS - Expected App Behaviors
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>实现 NSFastEnumeration | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    实现 NSFastEnumeration
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2017-03-08 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/ieWAKptyA/" class="post-tags">
+                            # ObjC
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>关于 <code>NSFastEnumeration</code> 的基本介绍可以看这篇 <a href="https://lzhenhong.github.io/2017/02/27/Support-iOS-Enumeration/">使自定义的类支持 iOS 的枚举方式</a>。</p>
+<p>不多说废话，直接进主题。</p>
+<!-- more -->
+<h2 id="内部实现">内部实现</h2>
+<p>要实现 <code>NSFastEnumeration</code>  协议，我们先看下内部实现，将下面的代码 <code>clang -rewrite-objc main.m</code> 成 C++ 代码。</p>
+<pre><code>NSArray *array = @[@1, @2, @3];
+for (NSNumber *number in array) {
+   NSLog(@&quot;%@&quot;, number);
+}
+</code></pre>
+<p>得到的 main.cpp 文件，我将代码改了一下，看起来比较友好一点。</p>
+<pre><code>NSArray *array = @[@1, @2, @3];
+NSNumber *number;
+
+// NSFastEnumerationState
+struct __objcFastEnumerationState enumState = { 0 };
+// stackbuf
+id __rw_items[16];
+
+id l_collection = (id)array;
+// 调用 countByEnumeratingWithState:objects:count: 方法
+_WIN_NSUInteger limit = [l_collection countByEnumeratingWithState:&amp;enumState objects:(id *)__rw_items count:(_WIN_NSUInteger)16];
+
+// 判断是否遍历完毕，每次返回的是一个 C 数组，如果是 0 的话就不遍历
+if (limit) {
+    unsigned long startMutations = *enumState.mutationsPtr;
+    // 不停的调用 countByEnumeratingWithState:objects:count: 方法，直到遍历完成
+    do {
+        unsigned long counter = 0;
+        // 遍历获得的数组
+        do {
+            if (startMutations != *enumState.mutationsPtr) { // 判断数组是否被改变
+                objc_enumerationMutation(l_collection); // 抛出异常
+            }
+            number = (NSNumber *)enumState.itemsPtr[counter++];
+            NSLog(@&quot;%@&quot;, number);
+        } while (counter &lt; limit);
+    } while (limit = [l_collection countByEnumeratingWithState:&amp;enumState objects:(id *)__rw_items count:(_WIN_NSUInteger)16]);
+    number = ((NSNumber *)0);
+} else {
+    number = ((NSNumber *)0);
+}
+</code></pre>
+<p>从上面的代码中我们看到内部实现，两个 <code>do-while</code> 循环去遍历容器对象。第一个 <code>do-while</code> 循环是不断调用 <code>countByEnumeratingWithState:objects:count:</code> 判断返回的数值，查看容器对象是否遍历完成。第二个 <code>do-while</code> 是去遍历 <code>enumState</code> 中 <code>itemPtr</code> 指向的 C 数组。我们可以将容器对象中的元素分成多次通过 C 数组返回，这里 <code>itemPtr</code> 和 <code>countByEnumeratingWithState:objects:count:</code> 返回的数值组成第二个 <code>do-while</code> 循环要遍历的 C 数组。</p>
+<h2 id="编码实现-nsfastenumeration-协议">编码实现 NSFastEnumeration 协议</h2>
+<p>在看过内部实现之后，我们在实现 <code>countByEnumeratingWithState:objects:count:</code> 方法的时候就知道如何编写代码。</p>
+<p>实现 <code>countByEnumeratingWithState:objects:count:</code> 方法有两种方式，一种是容器对象中的元素在内存存储是连续的，那么可以将 <code>NSFastEnumerationState</code> 的 <code>itemPtr</code> 直接设成这个容器的首地址，但是注意必须要是 C 数组。另一种是内存存储中不是连续的，例如：链表，这时候就需要用到 <code>countByEnumeratingWithState:objects:count:</code> 提供的 <code>stackbuf</code> 数组，同时 <code>state-&gt;itemPtr = stackbuf;</code></p>
+<p>接下来看下具体代码实现：</p>
+<h3 id="在内存空间中是连续的">在内存空间中是连续的</h3>
+<pre><code>@interface TestArray: NSObject
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])stackbuf
+                                    count:(NSUInteger)len {
+    // 一次性将所有的元素都返回
+    if (state-&gt;state == 0) { // 1
+        __unsafe_unretained const id *const_array = _list.data();
+        state-&gt;itemsPtr = (__typeof__(state-&gt;itemsPtr))const_array; // 2
+        state-&gt;state = 1; // 3
+        state-&gt;mutationsPtr = &amp;state-&gt;extra[0]; // 4
+        return _numberList.size(); // 5
+    } else {
+        return 0; // 6
+    }
+}
+@end
+</code></pre>
+<ol>
+<li>利用 <code>NSFastEnumeration</code> 的 <code>state</code> 来判断是否是第一次调用 <code>countByEnumeratingWithState:objects:count:</code> 方法，在前面的 C++ 代码中，我们看到第一次调用此方法的时候，<code>NSFastEnumeration</code> 结构体都被初始化成 0；</li>
+<li>将内部容器对象转换成 C 数组，然后设置给 <code>NSFastEnumeration</code> 的 <code>itemPtr</code> 成员；</li>
+<li>将 <code>NSFastEnumeration</code> 的 <code>state</code> 设置成 1，代表不是第一次调用此方法；</li>
+<li>令 <code>mutationsPtr</code> 设成固定值，这里没有对遍历容器对象改变做保护；</li>
+<li>返回 <code>itemPtr</code> 指向的 C 数组的长度；</li>
+<li>返回 0 表示遍历已经完成。</li>
+</ol>
+<h3 id="在内存空间中是不连续的">在内存空间中是不连续的</h3>
+<pre><code>@interface TestLinkedList: NSObject
+@end
+
+@implementation TestLinkedList {
+    struct Node *head;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])stackbuf
+                                    count:(NSUInteger)len {
+    if (state-&gt;state == 0) {
+        state-&gt;mutationsPtr = &amp;state-&gt;mutationsPtr;
+        state-&gt;extra[0] = (long)head; // 1
+        state-&gt;state = 1;
+    }
+
+    struct Node *currentNode = (struct Node *)state-&gt;extra[0];
+    NSUInteger count = 0;
+
+    state-&gt;itemsPtr = stackbuf; // 2
+
+    while (currentNode &amp;&amp; count &lt; len) { // 3
+        *stackbuf++ = currentNode-&gt;value;
+        currentNode = currentNode-&gt;next;
+        count++;
+    }
+
+    if (currentNode) {
+        state-&gt;extra[0] = (long)currentNode-&gt;next; // 4
+    }
+
+    return count;
+}
+@end
+</code></pre>
+<p>这里的例子是从 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 复制过来的。</p>
+<ol>
+<li>第一次遍历的时候将 head 存进 <code>extra</code>，原因下面解释；</li>
+<li>因为这里是不连续的内存空间，所以我们需要用到 <code>stackbuf</code> 数组，将 <code>itemPtr</code> 指向 <code>stackbuf</code> 数组；</li>
+<li>这里不仅要判断当前的节点是否为 NULL，还要判断是否超出了 <code>stackbuf</code> 的长度，这也是为什么要将节点存入 <code>extra</code> 的原因，因为有可能不能一次性遍历完成；</li>
+<li>将当前节点的下一个节点存入 <code>extra</code>，以便下一次调用 <code>countByEnumeratingWithState:objects:count:</code> 的时候使用。</li>
+</ol>
+<h2 id="更多">更多</h2>
+<p>更多示例：<a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 和 <a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a>.</p>
+<p>需要注意的是在 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 这篇文章中利用 <code>state-&gt;mutationsPtr = (unsigned long *)self;</code> 来确保容器对象不会被改变是有一点问题的，关于这个有人在 <a href="https://twitter.com/gparker/status/316460848916865024">Twitter</a> 上说了。如果使用了 <code>isa-swizzling</code>，就可能会出现问题，所以使用 <code>state-&gt;mutationsPtr = &amp;state-&gt;extra[0]; </code> 或者 <code> state-&gt;mutationsPtr = &amp;state-&gt;mutationsPtr;</code> 是比较好一点的选择。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a></li>
+<li><a href="http://stackoverflow.com/a/4872564/5350993">Does anyone know how to implement the NSFastEnumeration protocol?</a></li>
+<li><a href="https://www.cocoawithlove.com/2008/05/implementing-countbyenumeratingwithstat.html">Implementing countByEnumeratingWithState:objects:count:</a></li>
+<li><a href="http://blog.leichunfeng.com/blog/2016/06/20/objective-c-fast-enumeration-implementation-principle/">Objective-C Fast Enumeration 的实现原理</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/shi-zi-ding-yi-de-lei-zhi-chi-ios-de-mei-ju-fang-shi/" class="post-title gt-a-link">
+                    使自定义的类支持 iOS 的枚举方式
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>从零开始做游戏 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    从零开始做游戏
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2020-01-08 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/EThUO2GKi/" class="post-tags">
+                            # Other
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>最近一年多的时间几乎都花在一款游戏上面，这款是自己一个人从零到一做起来的，现在已经完成的差不多了，最近准备正式上线，上线之后就会面临很多玩家，对游戏和自己都是很大的挑战。如何去处理好玩家反馈的问题，如何去更好的避免玩家遇到问题等等，这些都是后续需要提升的地方。先不说远了，在游戏正式上线之前就遇到很多问题，在这里记录一下完成这款游戏遇到的问题。</p>
+<!-- more -->
+<h3 id="初印象">初印象</h3>
+<p>因为在做这款游戏之前，我自己就参与过两款游戏的开发，因为在之前的游戏开发过程没有遇到过特别难解决的问题，并且在出现的时候也有人可以求助，就导致自己盲目自信，认为自己从零做一款游戏应该问题不大。</p>
+<p>随后就与其他人一拍即合，自己做一款游戏，在定下来项目的方向之后，就创建好游戏的 git 仓库，不久就提交项目的 Init commit。完全没有做提前的调研，也没有提前研究游戏的技术难点。直接就开始对动手做项目，这也为后面埋下了很大的坑，导致后续花了很多时间去填补这些坑。</p>
+<h3 id="过程的困难">过程的困难</h3>
+<h4 id="开发引擎的选择">开发引擎的选择</h4>
+<p>因为之前接触的游戏引擎比较多的就是 Cocos-JS，所以这款游戏也就选用了这个引擎来做开发。Cocos-JS 引擎的特点就是上手容易，但是可能会遇到比较多的坑，这些坑掉进去了就很难爬出来。在开发过程中碰到印象比较深的问题有四个：</p>
+<ol>
+<li>
+<p>cc.eventManager 有个问题，就是有多个监听者的时候，接收的事件参数会有问题，查了很久也没有找到具体问题在哪，最后没办法，因为项目开始还不久，直接就把引擎升级到 3.16 版本来解决。至于升级 Cocos 引擎也是个巨坑。</p>
+</li>
+<li>
+<p>cc.TableView 删除 cc.TableViewCell 会导致 cell 上添加的 button 失去点击相响应，这个问题最开始我一直以为是我们自己代码有问题，也花费了不少时间，最后查到是引擎的 bug，在 remove cell 的时候 cleanup 了，但是 cell 是复用的，就导致这个被删掉的 cell 复用时不响应事件点击。<a href="https://github.com/cocos2d/cocos2d-x/issues/18423">更详细戳👈</a></p>
+</li>
+<li>
+<p>这个算是比较小众的问题，因为游戏的语言是泰语的，使用 Cocos 引擎会导致一些泰语字上面被截断，如下图所示：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/15844405218446.jpg?raw=true" alt="泰语字体截断" loading="lazy"></p>
+<p>这个问题是因为 Cocos 引擎在 Android 层对文本尺寸进行计算的时候，高度没有算对，引擎在渲染文本的时候高度不够，导致截断。最后查到的问题是 Cocos2dxBitmap.java 中使用 StaticLayout 计算文本尺寸时有个参数 includepad 设置成了 false，导致 Android 计算时出现了文本截断，将参数改成 true 解决了问题。</p>
+</li>
+<li>
+<p>Cocos 热更新组件也是存在很多问题的，Cocos 的热更新组件支持同时下载多个热更新包，但是又没办法保证热更新下载解压的顺序，如果你在两个热更新包都包含同一个代码文件，就有可能造成新的热更新的代码文件被老的热更新包的代码文件覆盖。这个问题最开始的解决方案是限制热更新组件的下载，让热更新包串行下载 <code>this._assetsMgr.setMaxConcurrentTask(1);</code>。但是热更新组件还是有个问题，就是热更新组件维护热更新包下载顺序用的 <strong>unordered_map</strong>，并且插入热更新包资源用的是 <code>push_back</code>，这个就导致虽然热更新包是串行下载的，但是下载的顺序不能保证。解决方案是将维护下载顺序队列的维护成 <strong>map</strong>。</p>
+</li>
+</ol>
+<p>这些是在开发中遇到的印象比较深的问题，还有比较多大大小小的问题。开发中不是怕遇到问题，而是遇到问题之后找不到解决办法，Cocos 开发中遇到的问题有些很难找到解决办法，一方面可能是没有其他人讨论资料不好找，另一方面是有人讨论但是没有最终的解决方案，这些就是比较坑的地方。还有一点就是 Cocos 的引擎升级，基本上在开发初期定下来了引擎版本，后面基本上就没有升级的可能，这也就意味着引擎后续的 bug 修复，性能优化等等，这些都是享受不到。最最坑的地方就是，Cocos 引擎团队放弃了 Cocos 引擎的维护，将重点转到 Cocos Creator，并且在 4.0 版本移除了 JavaScript 的支持，这就意味着，项目中使用的 Cocos-JS 引擎出现问题，后续很难得到引擎团队的解决。</p>
+<!-- 还有些问题就是 Cocos 引擎本身的稳定性，也不如其他的引擎，在游戏上线之后崩溃率是比较高的，后续经过了一系列优化才降低到比较合理的水平。 -->
+<h4 id="开发中遇到的问题">开发中遇到的问题</h4>
+<ol>
+<li><strong>大量的冗余代码</strong>。这个问题是目前项目中比较严重的问题，因为前期项目时间紧张，就大量使用 <code>⌘+C</code> 和 <code>⌘+V</code>，最后造成很多重复的代码，只要代码出现问题或者需求出现变动，要改的地方就很多，也容易漏掉，这样也造成了很多 bug。这个问题的原因是前期搭建项目框架时，缺少基础框架的搭建，在有相同功能的代码时，要多使用继承和封装，尽量避免复制粘贴代码。前期需要对项目的基础架构进行封装，确定项目的大概结构，对常用的基础控件进行封装，一方面是保证项目中使用的统一性，另一方面对方便后期对控件进行统一修改。不要一上来就对着业务撸代码，这样会给后期代码维护和扩展造成很多麻烦和难以填补的坑。</li>
+<li><strong>资源管理混乱</strong>。这个也是项目做到中后期遇到的比较大的问题，在游戏初期，游戏的玩法少，活动少，所以资源就不多，前期就忽略了资源管理规范的重要性，在游戏开发的中后期需要对整体的资源进行梳理和优化，在后期资源很多的情况也是一件很麻烦的事情。所以在前期定好资源管理的规范和资源加载的处理方式，会对后期的开发有很大的帮助，也对内存占用优化有很大的帮助。</li>
+<li><strong>内存峰值优化</strong>。其实对于我们这种体量的游戏，几乎可以忽略这一块。在游戏上线之前都没有重视这一块，但是上线之后崩溃率很高，最开始一直以为是代码逻辑的问题，没有往内存占用这一块考虑。但是最后优化了内存占用之后，崩溃率就稳定在比较合理的水平。这个是因为游戏发行在泰国，泰国玩家的手机机型普遍不高端，所以手机内存少，就导致游戏在运行期间容易发生崩溃。但是游戏如果发行在国内，这种情况会好很多。所以内存占用要提前考虑好策略，在编写代码的同时也要兼顾到内存占用的优化。</li>
+</ol>
+<h4 id="公测中遇到的问题">公测中遇到的问题</h4>
+<ol>
+<li><strong>玩家反馈卡</strong>。游戏在上线测试之后，总是有玩家反馈网络卡顿。这个点我们花了很多时间去定位问题，然后去修复，都收效甚微，最终发现问题是因为前端在网络波动的情况下检测弱网和网络重连处理很慢，就网络波动的时候一直出现 loading，也不会触发重连，或者弱网出现重连的时间很久。就导致玩家的感受是游戏很卡，但是玩家反馈的很卡，其实有很多方面，游戏性能问题导致游戏卡顿，弱网情况下网络层出现问题导致玩家玩的时候很卡。所以在解决问题时，要先确定玩家具体的问题，再去检查问题，修复问题。前端发现问题之后，就很好修复，减少心跳包的间隔，建立 WebSocket 连接的检测等待时间缩短，压后台之后回到前台的策略优化。最后基本上解决了弱网情况下的游戏体验问题。</li>
+<li><strong>游戏崩溃率高</strong>。在游戏初期上线的时候，bugly 统计的崩溃率很高，这个有明确 log 上报，所以很好解决。但是后面玩家多了之后，崩溃率还是比较高，这个问题也是花了很多时间，从各个角度都考虑去解决，但是收效也是很小，最后还是内存占用的问题，因为泰国手机机型的特点，需要去优化内存占用。优化内存占用的时候也做了很多，动态加载图片资源，释放音频资源，最后都是没有把内存占用减下来。最后原因是 JS 引擎自动回收太慢的问题，导致游戏在运行期间不停生成中间对象，最后内存占用越来越高，泰国手机机型内存小，就很容易导致闪退。最后的解决方案就是 <code>cc.sys.garbageCollect()</code> 强制 JS 引擎回收内存，就能导致内存占用的峰值降下去，随后崩溃率就下降了很多。</li>
+</ol>
+<h3 id="游戏开发的基本步骤">游戏开发的基本步骤</h3>
+<ol>
+<li><strong>游戏引擎的调研</strong>，这个是非常重要的，因为这个关系着后面游戏的性能，引擎 bug 的修复，以及开发中遇到问题的解决效率。</li>
+<li><strong>确定游戏的设计分辨率</strong>，一开始就需要确定下来，与美术约定好设计分辨率，保证适配市面上大部分机型。</li>
+<li><strong>确定游戏的总体框架</strong> (MVC)，整体的游戏框架需要在撸代码之前就要确定下来，游戏如果没有整体的设计模式，会在后期的代码维护上面遇到很大问题。</li>
+<li><strong>基础控件的封装</strong>，这个一方面可以方便开发，另一方面可以减少冗余代码，在后期统一修改游戏的控件风格时，这种封装的优势就体现出来了。之前的项目，要统一调整按钮的样式，因为没有做封装，导致修改这个按钮样式费时费力。</li>
+<li><strong>资源加载和释放</strong>，这个问题在游戏开发中是很重要的一环，需要在最开始就考虑好项目的资源管理方式，异步加载资源还是同步加载资源，如果管理资源的释放，是一款游戏的基本素质。虽然这个玩家开不见摸不着，但是对玩家的影响还是比较大的，如果资源加载处理的不好，会导致耗电严重，手机发烫等等的问题。所以不管游戏体量的大小，每个游戏都应该要重视资源管理。</li>
+<li><strong>内存峰值的优化</strong>，这里有两个点需要注意，一个就是避免内存占用陡增，另一个就是使用的内存要释放，不能有内存泄漏。内存占用陡增一方面是会造成游戏卡顿，另一方面也是会增加崩溃的概率。内存泄漏这个是肯定不能有的，或者说影响不会很严重，不然在游戏运行期间内存占用一直会是增加的情况，最后也是会被系统杀掉进程的。</li>
+<li>根据项目实际情况<strong>优化游戏性能</strong>，这个每个游戏都不一样，根据游戏的实际情况和项目需求对游戏进行优化。例如：图片格式的优化 iOS 使用 PVR，Android 使用 ETC1 等等。</li>
+</ol>
+<h3 id="小结">小结</h3>
+<p>写下这篇文章主要是为了记录下这段时间踩过的坑，遇到的问题，让自己以后碰到类似的情况不至于再踩一次坑。目前能想到的点都写上去了，后续有想到其他的点，或者是新踩的坑，也会尽量更新到这里来。</p>
+<p>从零做一款游戏看似简单，但实际上还是会有许多问题。这也让我认识到自己的不足，也学习到了很多知识，果然人还是要踩过坑才知道做事情有难度。</p>
+<!-- 链接 -->
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/she-bei-qia-dun-chan-sheng-de-yuan-yin/" class="post-title gt-a-link">
+                    设备卡顿产生的原因
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

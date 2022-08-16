@@ -1,0 +1,203 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>热更新实现流程 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    热更新实现流程
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2020-04-03 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/V8l9wV7uO/" class="post-tags">
+                            # Cocos
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>最近游戏的热更新出了一些问题，导致崩溃率有点上升，并且热更新有些文件没有生效。游戏中用的热更新模块是 Cocos 引擎提供的，就花了点时间去翻了 Cocos 的源码文件 AssetsManagerEx.cpp，了解了 Cocos 引擎处理热更新的流程以及问题，也借此机会思考下热更新的处理逻辑。</p>
+<!-- more -->
+<h2 id="cocos-热更新的-manifest-文件">Cocos 热更新的 Manifest 文件</h2>
+<p>在 Cocos 的热更新中有一个重要的 Manifest 文件，检查热更新和下载热更新相关的信息都包含在这个文件中，App 包内有一个本地的 Local Manifest，同时里面有个 &quot;remoteManifestUrl&quot; 字段指向远程的 Remote Manifest，这个 Remote Manifest 当有热更新资源时会更新，Cocos 检查有新的热更新就会下载这个 Remote Manifest，然后判断是否新的热更新，有的话则下载新的热更新文件。随后将 Remote Manifest 缓存成 Cache Manifest。</p>
+<h3 id="local-manifest">Local Manifest</h3>
+<pre><code>{
+  &quot;packageUrl&quot;: &quot;http://xxx.com/&quot;,
+  &quot;remoteManifestUrl&quot;: &quot;http://xxx.com/AppUpdate/project?version=1.0.0&quot;,
+  &quot;remoteVersionUrl&quot;: &quot;http://xxx.com/AppUpdate/version?version=1.0.0&quot;,
+  &quot;version&quot;: &quot;1.0.0.0&quot;,
+  &quot;engineVersion&quot;: &quot;Cocos2d-JS v3.16&quot;
+}
+</code></pre>
+<p>这个一般是 App 包内的 Manifest 文件，这里主要申明的是 Version，热更新资源 CDN 地址， Remote Manifest 地址和 Version Url。</p>
+<h3 id="remote-manifest">Remote Manifest</h3>
+<pre><code>{
+    &quot;packageUrl&quot;: &quot;http://xxx.com/cdn&quot;,
+    &quot;remoteManifestUrl&quot;: &quot;http://xxx.com/AppUpdate/project?version=1.0.0&quot;,
+    &quot;remoteVersionUrl&quot;: &quot;http://xxx.com/AppUpdate/version?version=1.0.0&quot;,
+    &quot;version&quot;: &quot;1.0.0.2&quot;,
+    &quot;engineVersion&quot;: &quot;Cocos2d-JS v3.16&quot;,
+    &quot;groupVersions&quot;: {
+        &quot;1&quot;: &quot;1.0.0.1&quot;,
+        &quot;2&quot;: &quot;1.0.0.2&quot;
+    },
+    &quot;assets&quot;: {
+        &quot;src_1.0.0.1_f1b1d1040801913b99fd15ed208ed830.zip&quot;: {
+            &quot;md5&quot;: &quot;f1b1d1040801913b99fd15ed208ed830&quot;,
+            &quot;compressed&quot;: true,
+            &quot;group&quot;: &quot;1&quot;
+        },
+        &quot;src_1.0.0.2_e3d58ae365a5a1c2fe2220f3c5968c8e.zip&quot;: {
+            &quot;md5&quot;: &quot;e3d58ae365a5a1c2fe2220f3c5968c8e&quot;,
+            &quot;compressed&quot;: true,
+            &quot;group&quot;: &quot;2&quot;
+        }
+    },
+    &quot;searchPaths&quot;: []
+}
+</code></pre>
+<p>这个是在 1.0.0 版本发过两次热更的 Remote Manifest 文件，主要的是 version 字段、groupVersions 字段和 assets 字段，version 字段表示当前的热更新版本，这个是判断是否有新的热更资源最重要的字段，assets 对应的是热更新的 CDN 资源，下载热更热更新资源要使用到 packageUrl 和 assets 字段的组合。</p>
+<h2 id="cocos-热更新步骤">Cocos 热更新步骤</h2>
+<ol>
+<li>加载 App 包内的 Local Manifest，Cocos 会使用这个文件来判断是否有新的热更新资源。在加载 Local Manifest 的同时会尝试去加载 Cache Manifest，如果 Cache Manifest 存在，则会先判断这两个 Manifest 的 Version 字段。如果本地的 Manifest 文件比缓存的 Manifest 的文件 Version 要大或者等于，则删除热更新目录，Cocos 认为 App 的代码比热更新的代码要更新。如果本地的 Manifest 文件比缓存的 Manifest 文件的 Version 要小，则使用 Cache Manifest 去跟 Remote Manifest 做对比。如果没有 Cache Manifest，就继续用 Local Manifest 做对比。</li>
+<li>调用 jsb.AssetsManager 的 checkUpdate 方法开始检查是否有新的热更新资源。在检查之前会下载一个 Version Manifest 文件，这个文件主要的字段就是 Version 字段，Cocos 通过这个字段来判断是否有新的热更新资源，如果本地 Manifest 的 Version 比这个 Version Manifest 的 Version 要大或者等于的话，就直接删除临时热更新目录，并直接完成热更新流程。如果本地 Manifest 的 Version 比 Version Manifest 的 Version 要小，就开始下载 Remote Manifest。</li>
+<li>下载好 Remote Manifest 之后，开始比较 Remote Manifest 和 Local Manifest 的 Version 字段，Remote Manifest 的 Version 比 Local Manifest 的小或者等于，就直接删除临时热更新目前，完成热更新流程。如果 Remote Manifest 比 Local Manifest 要大，则开始现在热更新资源包。</li>
+<li>开始下载热更新的时，Cocos 会检查是否有未完成的热更新包，同时也会检查 MD5 值有变化的热更新包，生成一个下载队列。AssetsManager 中有一个 _maxConcurrentTask 属性来控制同时下载热更新包的数量。</li>
+<li>下载好一个热更新包之后，就开始解压 Zip 包，等所有的热更新 Zip 包下载完成后，就将热更新资源从临时路径拷贝到指定的缓存热更新路径。随后通知代理热更新下载完毕。</li>
+</ol>
+<h2 id="cocos-热更新问题">Cocos 热更新问题</h2>
+<p>按照理想的情况，Cocos 的热更新是可以正常运行。但是在游戏上线一段时间后，我们发现 Cocos 的热更新是存在问题的。如果一次性下载多个热更新包，Cocos 不能保证热更新包下载完成的先后顺序，这个就导致了如果两个热更新包包含同一个代码文件，但是新的代码文件比旧的代码文件先下载好，就会导致旧的代码文件将新的代码文件覆盖。这里的解决办法就是将 _maxConcurrentTask 属性设为 1，让 Cocos 每次只下载一个热更新包，这样来保证热更新包下载的顺序。Cocos 热更新组件还是有个问题，就是热更新组件维护热更新包下载顺序用的 <strong>unordered_map</strong>，并且插入热更新包资源用的是 <code>push_back</code>，这个就导致虽然热更新包是串行下载的，但是下载的顺序不能保证，解决方案是将维护下载顺序队列的维护成 <strong>map</strong>。</p>
+<h2 id="热更新的优化">热更新的优化</h2>
+<p>从 Cocos 的热更新系统，我自己也受了一点启发。虽然 Cocos 的热更新系统基本功能都有，但是还是存在一些问题，热更新是没办法回滚的，重发的热更也需要有新热更触发下载才会触发 MD5 值变化的下载，同时下载多个热更新包如何保证顺序，热更新流程的优化可以从这几方面入手。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/cong-ling-kai-shi-zuo-you-xi/" class="post-title gt-a-link">
+                    从零开始做游戏
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

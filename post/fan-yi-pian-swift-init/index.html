@@ -1,0 +1,275 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>翻译篇 - Swift init() | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    翻译篇 - Swift init()
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-08-28 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/Q-9LDzSZC/" class="post-tags">
+                            # Swift
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p><em>PS：翻译水平有限，推荐看原文</em></p>
+<p><a href="http://merowing.info/2015/11/Initializers.playground.zip">下载 Playgroung 文件</a></p>
+<p><a href="http://merowing.info/2015/11/swift-init/">原文链接.</a></p>
+<p>因为 <code>Swift</code> 的强类型和不可变性，所以就有规则防止你在一个对象完全初始化之前访问属性。</p>
+<p>我不喜欢在一个函数体内做太多的事情，所以我会将初始化函数分成多个函数，这样问题就来了。</p>
+<!-- more -->
+<p>让我们假定你有一个这样的类：</p>
+<pre><code>class Foo {
+  let coreDataStack: CoreDataStack
+  let mfpService = MFPService()
+  let integrator: IntegrationService
+  let flowController: FlowController
+  let window: UIWindow
+}
+</code></pre>
+<p>这样的类需要许多行来初始化所有的属性，所以我们会将初始化逻辑分成多个函数，可能像这样：</p>
+<pre><code>init(coreDataStack stack: CoreDataStack) {
+  coreDataStack = stack
+  integrator = setupIntegrator(stack, provider: mfpService)
+  flowController = setupFlowController(stack)
+  window = setupWindow(flowController.rootViewController)
+}
+</code></pre>
+<p>这仅仅是常规的重构... 猜一猜，这样不能通过编译：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/initializers.png?raw=true" alt="" loading="lazy"></p>
+<p>这样显得不那么 Cool. :]</p>
+<p>我在 Twitter 上跟一些能干的人交流，寻找一些选择，下面是我觉得挺好的。</p>
+<p>让我们来看一下这些选择</p>
+<h2 id="选择-1-对可选变量隐式解包">选择 1 - 对可选变量隐式解包</h2>
+<pre><code>var integrator: IntegrationService!
+</code></pre>
+<p>这个选择经常会出错，我们选择 <code>Swift</code> 是因为它能写出更安全的代码。</p>
+<p>请不要这样写。</p>
+<h2 id="选择-2-有副作用的懒加载">选择 2 - 有副作用的懒加载</h2>
+<p>我们用隐藏的懒加载属性，但是可能会有副作用</p>
+<pre><code>class Foo_lazy {
+  let coreDataStack: CoreDataStack
+  let mfpService = MFPService()
+  
+  init(coreDataStack stack: CoreDataStack) {
+    coreDataStack = stack
+    let _ = integrator
+    let _ = rootFlowController
+    let _ = window
+  }
+  
+  lazy var rootFlowController: FlowController = {
+    return FlowController(coreDataStack: self.coreDataStack)
+  }()
+  
+  lazy var window: UIWindow = {
+    let window = UIWindow(frame: UIScreen.mainScreen().bounds)
+    window.backgroundColor = UIColor.whiteColor()
+    window.rootViewController = self.rootFlowController.rootViewController
+    window.makeKeyAndVisible()
+    return window
+  }()
+  
+  
+  lazy var integrator: IntegrationService = {
+    let coreDataProcessor = CoreDataReportProcessor(stack: self.coreDataStack)
+    let integrator = IntegrationService(provider: self.mfpService) {
+      coreDataProcessor.processReports($0)
+    }
+    return integrator
+  }()
+}
+</code></pre>
+<p>这个解决方法允许我们将代码分开，并且也运行得很好，但是这样也不是那么好，因为</p>
+<ul>
+<li>属性不是真正的不可变，我们可以将其定义成隐私，如此不能在外面更改它们，但是他们仍然是可变的。</li>
+<li>我不喜欢像这样会触发副作用的代码，这样看起来很不整洁。</li>
+</ul>
+<h2 id="选择-3-隐私的静态方法">选择 3 - 隐私的静态方法</h2>
+<p>我们可以定义隐私的静态方法，用它们来初始化属性(并且可以将它们放在隐私的类扩展中)：</p>
+<pre><code>class Foo_ext {
+  let coreDataStack: CoreDataStack
+  let mfpService = MFPService()
+  let integrator: IntegrationService
+  let flowController: FlowController
+  let window: UIWindow
+  
+  init(coreDataStack stack: CoreDataStack) {
+    coreDataStack = stack
+    integrator = Foo_ext.SetupIntegrator(stack, provider: self.mfpService)
+    flowController = Foo_ext.SetupFlowController(stack)
+    window = Foo_ext.SetupWindow(self.flowController.rootViewController)
+  }
+}
+
+private extension Foo_ext {
+  static func SetupIntegrator(stack: CoreDataStack, provider: Provider) -&gt; IntegrationService {
+    let coreDataProcessor = CoreDataReportProcessor(stack: stack)
+    let integrator = IntegrationService(provider: provider) {
+      coreDataProcessor.processReports($0)
+    }
+    return integrator
+  }
+  
+  static func SetupFlowController(stack: CoreDataStack) -&gt; FlowController {
+    return FlowController(coreDataStack: stack)
+  }
+  
+  static func SetupWindow(controller: UIViewController) -&gt; UIWindow {
+    let window = UIWindow(frame: UIScreen.mainScreen().bounds)
+    window.backgroundColor = UIColor.whiteColor()
+    window.rootViewController = controller
+    window.makeKeyAndVisible()
+    return window
+  }
+}
+</code></pre>
+<p>这是我现在最喜欢的方式：</p>
+<ul>
+<li>确保不可变的属性</li>
+<li>不会有副作用</li>
+<li>非常整洁并且不会有编译错误</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>还有一些 Twitter 上的朋友推荐的其他方法，<a href="https://gist.github.com/krzysztofzablocki/6a1b6afab974f442f5ff">你可以在这里找到</a></p>
+<p>我也是才刚刚开始学 <code>Swift</code>，我必须说我越来越喜欢它，尤其是 <code>Swift 2.0</code>。</p>
+<p>在有了20年的编程经历之后，重新变成新手很有趣，幸运的是，我们有伟大的愿意分享知识的社区。</p>
+<p>非常感谢 <a href="http://twitter.com/jessyMeow">@jessyMeow</a> 和 <a href="http://twitter.com/KostiaKoval">@KostiaKoval</a> 指出比我原来方法更好的方法 😃</p>
+<p>如果你有你喜欢的方法，请在 Twitter 上让我知道，我很愿意学习！</p>
+<p><a href="https://twitter.com/intent/follow?original_referer=http%3A%2F%2Fmerowing.info%2F2015%2F11%2Fswift-init%2F&amp;ref_src=twsrc%5Etfw&amp;region=follow_link&amp;screen_name=merowing_&amp;tw_p=followbutton">Follow @merowing_ on Twitter</a></p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/xiang-jie-property/" class="post-title gt-a-link">
+                    详解 property
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

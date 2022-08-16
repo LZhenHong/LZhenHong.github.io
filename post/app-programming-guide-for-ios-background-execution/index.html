@@ -1,0 +1,271 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>App Programming Guide for iOS - Background Execution | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    App Programming Guide for iOS - Background Execution
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-11-25 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>我们知道 iOS App 有五种状态：not running／inactive／active／background／suspended，当用户按下 Home 键的时候，App 就会进入 background 状态，随后进入 suspended 状态。在 suspended 状态下，我们没有办法对 App 进行任何操作。所以，我们会尽量在 background 状态下就做好 App 的一些清理等操作，来使 App 有进入 suspended 的准备。但是，iOS 系统分配给 App 的 background 状态下的时间是有限的，我们需要做一些自定义的操作来向 iOS 系统申请更多的后台时间，或者直接常驻后台。例如一些音乐类 App，当我们退出这类 App，我们还是可以听到 🎵 的播放，这些 App 就属于常驻后台的 App。</p>
+<!-- more -->
+<p>iOS 为三类适合在后台运行的 App 提供很好的支持，这三类 App 分别是：</p>
+<ul>
+<li>App 在前台的时候开启了一个持续时间较短的任务，当 App 进入后台的时候希望能继续执行完成。</li>
+<li>App 在前台初始化一个下载操作，当 App 进入后台时，将下载操作的控制权交给系统。这样 App 就能在下载操作继续的情况下被挂起或者结束。</li>
+<li>支持特定的在后台执行任务的 App 要先声明它们支持的一个或者多个后台运行模式。</li>
+</ul>
+<h2 id="executing-finite-length-tasks">Executing Finite-Length Tasks</h2>
+<p>当 App 进入到 background 状态，系统期望尽快将 App 转入 suspended 状态。但是如果这个时候 App 还需要更多时间来做一些操作，我们就需要向系统申请额外的后台运行时间。iOS 为 <code>UIApplication</code> 对象提供了 <code>beginBackgroundTaskWithName:expirationHandler:</code> 和 <code>beginBackgroundTaskWithExpirationHandler:</code> 方法来申请额外的后台时间，调用任意一个方法都会延缓 App 进入 suspended 状态，当任务完成之后，你需要调用 <code>UIApplication</code> 对象的 <code>endBackgroundTask:</code> 方法来告诉系统，你的 App 已经准备好可以进入 suspended 状态。</p>
+<p>需要注意的是，<code> beginBackgroundTaskWithName:expirationHandler:</code> 和<br>
+<code>beginBackgroundTaskWithExpirationHandler:</code> 这两个方法的调用都会为相应的后台 task 创建唯一的 token，这个 token 是 <code>endBackgroundTask:</code> 需要的参数，如果调用 <code>endBackgroundTask:</code> 失败会导致 App 直接被终止。我们在申请额外后台时间的时候，可以提供一个 expirationHandler，当额外时间消耗完，task 这时还是没有完成的话，系统就会调用这个 handler 来给你最后的机会做一些清理操作。</p>
+<p>你不需要等到 App 进入后台状态才去调用 <code> beginBackgroundTaskWithName:expirationHandler:</code> 或者 <code>beginBackgroundTaskWithExpirationHandler:</code> 方法，你可以在开始一个 task 之前就可以调用这两个方法中的任意一个，然后在 task 完成之后尽快调用 <code>endBackgroundTask:</code>。当 App 还在前台的时候就可以这样做。</p>
+<p><strong>Starting a background task at quit time</strong></p>
+<pre><code>@property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    bgTask = [application beginBackgroundTaskWithName:@&quot;MyTask&quot; expirationHandler:^{
+        // App 已经快要没有后台运行时间
+        // 在这里尽快清理没有完成的 task
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // 做一些操作来完成 task
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    });
+}
+</code></pre>
+<p>在原来经常用这种方式来处理一些网络上传和下载操作，系统通常情况下会给大概 10 mins 的时间，但是系统并不保证一定会给 10 mins，实际的后台运行时间是由 iOS 系统决定的，可以通过 <code>backgroundTimeRemaining</code> 来查看剩余的后台运行时间。现在可以用 <code>NSURLSession</code> 来处理网络请求，即使 App 进入 suspended 状态 <code>NSURLSession</code> 还是可以继续运行。More about NSURLSession: <a href="https://www.raywenderlich.com/110458/nsurlsession-tutorial-getting-started">NSURLSession Tutorial: Getting Started</a>.</p>
+<p>严格来说这个并不算后台模式，因为它只是申请一些额外的后台运行时间，并不能常驻后台，最后还是要进入 suspended 状态。</p>
+<h2 id="downloading-content-in-the-background">Downloading Content in the Background</h2>
+<p>前面提到过，下载网络数据使用 <code>NSURLSession</code>，可以在 App 被挂起或者停止的时候将控制权交给系统。</p>
+<p>为了支持后台下载，你需要为 <code>NSURLSession</code> 做一些配置。</p>
+<ol>
+<li>用 <code>NSURLSessionConfiguration</code> 的 <code>backgroundSessionConfigurationWithIdentifier:</code> 方法来创建一个 <code>NSURLSession</code> 的配置对象。</li>
+<li>设置 <code>NSURLSessionConfiguration</code> 对象的 <code>sessionSendsLaunchEvents</code> 属性为 YES。</li>
+<li>如果 App 在前台开始这个请求，最好将 <code>NSURLSessionConfiguration</code> 对象的 <code> discretionary</code> 属性也设置为 YES。</li>
+<li>正确设置 <code>NSURLSessionConfiguration</code> 对象的其他属性。</li>
+<li>用创建好的 <code>NSURLSessionConfiguration</code> 对象来创建 <code>NSURLSession</code> 对象。</li>
+</ol>
+<p>用这个配置好的 <code>NSURLSession</code> 创建的上传 &amp; 下载操作都可以在恰当的时机将控制权交给系统。对于所有后台上传 &amp; 下载的 task，你必须要提供一个遵守 <code>NSURLSessionDownloadDelegate</code> 协议的 delegate，如果你不需要 delegate 提供的额外特性，在创建 session 对象的时候给 delegate 参数传递 nil (session 对象在 App 退出或者你使 session 对象无效之前会对 delegate 有一个强应用)。</p>
+<p>当 task 完成之后，如果 App 在运行，不管是前台还是后台，都会通知 session 对象的 delegate。如果 task 还没有完成，这时系统结束 App，系统还会继续在后台管理 tasks，当 session 相关的 tasks 都完成之后，系统会重新唤醒 App 并调用 <code>application:handleEventsForBackgroundURLSession:completionHandler:</code> 方法。如果是用户主动结束 App，系统会取消等待执行的 tasks，不会继续在后台管理 session 相关的  tasks。</p>
+<p>在  Stack Overflow 找了几篇关于用户主动退出 App，后台下载操作是否会继续执行的讨论，感兴趣的话可以看一下：<a href="http://stackoverflow.com/questions/25047427/does-nsurlsession-continue-file-transfer-if-the-app-is-killed-from-task-manager?answertab=votes#tab-top">第一篇</a>／<a href="http://stackoverflow.com/questions/20159471/ios-does-force-quitting-the-app-disables-background-upload-using-nsurlsession">第二篇</a>／<a href="http://stackoverflow.com/questions/31904182/how-to-resume-nsurlsession-download-process-after-app-force-quit-and-app-relaunc">第三篇</a>。</p>
+<h2 id="implementing-long-running-tasks">Implementing Long-Running Tasks</h2>
+<p>一些特定类型的 App 需要一直运行在前台或者后台，不进入 suspended 状态，这种类型 App 需要向系统申请后台运行权限，可以在项目 setting 的 Capabilities 选项的来声明特定类型的后台应用。只有特定的几种允许常驻后台：</p>
+<ul>
+<li><em><a href="#location">需要一直得到用户位置更新信息的 App</a></em>。</li>
+<li><em><a href="#audio">播放音频或者记录音频的 App</a></em>。</li>
+<li><em><a href="#fetch">定时下载和处理数据的 App</a></em>。</li>
+<li><em><a href="#VoIP">支持 Voice over Internet Protocol (VoIP) 的 App</a></em>。</li>
+<li><em><a href="#accessory">接收外设更新的 App</a></em>。</li>
+</ul>
+<p><span id='location'></span></p>
+<h3 id="tracking-the-users-location">Tracking the User’s Location</h3>
+<p>在后台跟踪用户的位置有好几种方法，大部分都不需要 App 一直运行在后台：</p>
+<ul>
+<li>用户的位置信息有显著的更新才通知 App，当 App 不需要特别精确的位置信息，Apple 强烈推荐使用这种方法。</li>
+<li>只在前台获取用户的位置信息。</li>
+<li>后台获取用户位置。</li>
+</ul>
+<p>当 App 使用第一种服务，有显著的位置信息更新时，如果 App 处于 suspended 状态，系统会将 App 变成  background 状态以便来处理位置信息的更新。如果 App 使用这种位置服务的时候，被系统完全退出，当有位置信息更新时系统就会启动 App 来处理，并调用 <code>CLLocationManager</code> delegate 的 <code>locationManager:didUpdateLocations:</code> 方法。</p>
+<p>前台或者后台位置服务都是使用标准的 Core Location 服务来取得位置数据。不同的是，使用前台服务的 App 在应用被挂起之后就不会再接收到位置信息更新。</p>
+<p>当你在 Xcode 项目的 Capabilities 选项中勾选了 <strong>Location Update</strong>，这样做并不会阻止 App 进入 suspended 状态，而是在位置信息更新的时候唤醒 App 来处理位置数据。</p>
+<p>对Map 方面了解比较少。More about location services: <a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009497">Location and Maps Programming Guide</a>.</p>
+<p><span id='audio'></span></p>
+<h3 id="playing-and-recording-background-audio">Playing and Recording Background Audio</h3>
+<p>这类 App 可以在后台播放或者记录音频，但是 App 播放的音频必须是有声的。<s>因为以前有些 App 会通过播放一段没有声音的音频来获取后台运行权限。</s></p>
+<p>典型的音频类 App 包括：</p>
+<ul>
+<li>音乐播放 App。</li>
+<li>记录音频 App。</li>
+<li>支持 AirPlay 播放音频 &amp; 视频的 App。</li>
+<li>VoIP App。</li>
+</ul>
+<p>当你将 App 声明为这类应用，系统的 media frameworks 会自动阻止你的 App 进入 suspended 状态。因为 App 一直处理后台，这时处理回调和在前台没有区别，但是在回调中你应该只处理播放相关的数据，并且尽可能快的返回。当播放或者记录停止，系统就会让 App 进入 suspended 状态。</p>
+<p>可能会有多个 App 属于音频类型，系统会决定这些 App 的优先级。前台的 App 的优先级适中比后台高。在后台同时播放音频是有可能的，这要取决于每个 App 的 audio session 对象的配置。你应该要时刻准备好音频播放被打断的打算，并且提供相应的操作来处理打断和一些其他音频相关的通知。More about configuring audio session objects for background execution: <a href="https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40007875">Audio Session Programming Guide</a>.</p>
+<p><span id='fetch'></span></p>
+<h3 id="background-fetch">Background Fetch</h3>
+<p>这类 App 需要时不时的检查是否有新数据，并且在有新数据的时候初始化下载操作来下载新内容。当你在 Xcode 中将 App 声明成这类应用并不能保证系统会给 App 分配时间来执行 background fetch。系统会决定在恰当的时候来执行 background fetch。</p>
+<p>当有好机会的时候，系统会唤醒或者启动 App 到 background 状态，然后调用 <code>UIApplication</code> 代理的 <code>application:performFetchWithCompletionHandler:</code> 方法，在这个方法中来检查是否有新内容需要下载。当你完成新内容的下载之后，要尽快调用提供的 completion handler 块，并且传递参数来表明是否有新数据，如果传递的是 <code> UIBackgroundFetchResultNewData</code> 可能会让 iOS 对应用做一次截图操作。执行这个 block 会告诉系统可以将 App 变成 suspended 状态了。</p>
+<p><span id='VoIP'></span></p>
+<h3 id="implementing-a-voip-app">Implementing a VoIP App</h3>
+<p>VoIP 应用可以让用户使用网络连接来通话，而不是使用蜂窝服务。这样的 App 需要维护与服务器维护一个长连接。iOS 系统不会让 VoIP 应用一直保持运行，而是提供工具来监测 sockets，并且会在需要的时候唤醒 VoIP 应用，并将 socket 的控制权交给 VoIP 应用。</p>
+<p>More about VoIP: <a href="http://jpache.com/2016/03/18/iOS-VoIP-VoIP-Push-%E5%BC%80%E5%8F%91%E9%9B%86%E6%88%90/">iOS VoIP (VoIP Push)开发集成</a> &amp; <a href="http://www.jianshu.com/p/3bf73a293535/comments/5271525">iOS Call Kit for VoIP</a> &amp; <a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/StrategiesforImplementingYourApp/StrategiesforImplementingYourApp.html#//apple_ref/doc/uid/TP40007072-CH5-SW13">Tips for Developing a VoIP App</a>.</p>
+<h3 id="using-push-notifications-to-initiate-a-download">Using Push Notifications to Initiate a Download</h3>
+<p>当服务器发送远程通知来告诉 App 有新内容，你可以告诉系统在后台运行你的应用来开始下载新内容。</p>
+<p>为了触发这样的操作，服务器发出的 notification payload 中一定要有 <code>content-available</code> 字段，并且设置为 1。当这样的字段出现，系统会唤醒或者启动 App 到 background 状态，并且调用相应的代理方法来让你做一些操作。</p>
+<p><span id='accessory'></span></p>
+<h3 id="communicating-with-external-accessory">Communicating with External Accessory</h3>
+<p>对这一块真的没有一点接触，所以我就不瞎说了 😛😛。给出<a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW53">官方文档</a>。</p>
+<h3 id="downloading-newsstand-content-in-the-background">Downloading Newsstand Content in the Background</h3>
+<p>现在好像已经看不到这种应用，记得在 iOS 7 的时候还下过一个。感兴趣可以看一下<a href="https://developer.apple.com/reference/newsstandkit">官方文档</a>。</p>
+<h2 id="being-a-responsible-background-app">Being a Responsible Background App</h2>
+<ul>
+<li>Do not make any OpenGL ES calls from your code.</li>
+<li>Cancel any Bonjour-related services before being suspended.</li>
+<li>Be prepared to handle connection failures in your network-based sockets.</li>
+<li>Save your app state before moving to the background.</li>
+<li>Remove strong references to unneeded objects when moving to the background.</li>
+<li>Stop using shared system resources before being suspended.</li>
+<li>Avoid updating your windows and views.</li>
+<li>Respond to connect and disconnect notifications for external accessories.</li>
+<li>Clean up resources for active alerts when moving to the background.</li>
+<li>Remove sensitive information from views before moving to the background.</li>
+<li>Do minimal work while running in the background.</li>
+</ul>
+<p><a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW8">More details</a>.</p>
+<h2 id="opting-out-of-background-execution">Opting Out of Background Execution</h2>
+<p>如果你一点也不想 App 运行在 background 状态下，你可以在 Info.plist 文件中添加 <code>UIApplicationExitsOnSuspend</code> 键并且设置为 YES，这样 App 只有 not running／inactive／active 状态。当用户按了 Home 键之后，<code>applicationWillTerminate:</code> 方法就会调用。Apple 不推荐这样实现。</p>
+<h2 id="summary">Summary</h2>
+<p>废话了很多，我自己看到这里都很辛苦了 😅😅。这里有一篇知乎的 <a href="https://www.zhihu.com/question/20258088">所谓的iOS「伪多任务」和Android的多任务处理的区别在哪？</a>感兴趣的话可以看一下。</p>
+<p>Apple 官方文档还有一节关于 <a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW7">Understanding When Your App Gets Launched into the Background</a>。同样，感兴趣的话可以看一下。</p>
+<p>还有关于 Background Execution  的实践，可以看 <a href="https://www.raywenderlich.com/143128/background-modes-tutorial-getting-started">Background Modes Tutorial: Getting Started</a>.</p>
+<h2 id="related-link">Related Link</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW1">Background Execution</a></li>
+<li><a href="https://www.raywenderlich.com/143128/background-modes-tutorial-getting-started">Background Modes Tutorial: Getting Started</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/uiscrollview-and-autolayout/" class="post-title gt-a-link">
+                    UIScrollView And Autolayout
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

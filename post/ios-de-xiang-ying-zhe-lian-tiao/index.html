@@ -1,0 +1,216 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>iOS 的响应者链条 ⛓️ | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    iOS 的响应者链条 ⛓️
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-12-03 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>响应者链条在刚学 iOS 的时候有学过，但是平常开发也很少去仔细思考，也没有发生过很大的错误，所以就更加不会去考虑 What Under The Hood。</p>
+<p>在实习的时候要做自定义 transition。我在 <code>UITransitionView</code> 上添加了一个 subview 作为背景 view，点击这个背景的 view，要 dismiss 掉 present 的 ViewController，给背景的 view 添加了一个 <code>UITapGestureRecognizer</code>，但是背景的 view 就是死活不响应点击。来来回回折腾了好久才找出原因：事件根本就没有传递给背景的 view 😭😭。</p>
+<!-- more -->
+<p>哎！还是基础不扎实的锅！！！就写下这篇来记录踩的坑。</p>
+<h2 id="响应者对象">响应者对象</h2>
+<p>当用户点击应用的控件时，硬件检测到物理接触并通知操作系统，<code>UIKit</code> 会创建相应的 <code>UIEvent</code> 对象，并将事件对象传递给正在运行的应用的事件队列。对于触摸事件，这个对象就是包含一系列 <code>UITouch</code> 对象的 <code>UIEvent</code> 对象。</p>
+<p>我们需要处理这些事件，来给用户正确的反馈。在 iOS 中，继承自 <code>UIResponder</code> 的对象，都可以作为响应者链条上的节点来响应事件。<code>UIResponder</code> 定义了一系列接口来处理事件响应，<code>UIView</code>／<code>UIViewController</code>／<code>UIApplication</code> 都是继承自 <code>UIResponder</code> 类。这里注意 Core Animation 的 Layer 不是响应者对象，<code>CALayer</code> 是直接继承自 <code>NSObject</code>。</p>
+<p><code>UIResponder</code> 的继承层级关系：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/UIKit-Framework.png?raw=true' alt='UIKit Framework' />
+<div align=left>
+<h2 id="确定-hit-testing-view">确定 hit-testing view</h2>
+<p>既然知道 iOS 中有许多对象可以响应事件，我们就需要确定哪一个响应者对象是最适合处理一个事件对象。对于触摸事件来说，系统会首先将触摸事件分发给触摸事件发生的视图来确认这个视图是否能处理这个事件对象，这个视图称为 hit-test view。</p>
+<p>寻找 hit-test view 的过程称为 hit-testing，这个过程会确定触摸事件发生的位置是否处于相关视图的边界内。如果在的话，就递归检测子视图。视图层级中包含触摸事件发生位置的最低层级的视图就是 hit-testing view。确认 hit-testing view 之后，<code>UIKit</code> 就会将事件传递给 hit-testing view，让 hit-testing view 来尝试处理这个事件。</p>
+<p>我们通过一个示例来演示 hit-testing 的过程。下图是 Apple 官方的例子：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/hit_testing_2x.png?raw=true' width=240 alt='Hit Testing' />
+<div align=left>
+<p>假设用户点击了视图 E，系统按照以下顺序来查找 hit-test view：</p>
+<ol>
+<li>点击事件发生在视图 A 的边界内，所以检测子视图 B 和 C；</li>
+<li>点击事件不在视图 B 的边界内，但在视图 C 的边界范围内，所以检测子视图 D 和 E；</li>
+<li>点击事件不在视图 D 的边界内，但在视图 E 的边界范围内。</li>
+</ol>
+<p>视图 E 是包含触摸点的视图层次架构中最底层的视图，所以它就是 hit-test view。</p>
+<p>在 hit-testing 过程中，会调用 <code>hitTest:withEvent:</code> 方法，并传入 <code>CGPoint</code> 和 <code>UIEvent</code> 对象。这个 <code>hitTest:withEvent:</code> 方法先要调用 <code>pointInside:withEvent:</code> 方法。如果 <code>pointInside:withEvent:</code> 返回 YES，那么就会递归子视图的 <code>hitTest:withEvent:</code> 方法来进一步确定 hit-testing view。</p>
+<p>如果方法 <code>pointInside:withEvent:</code> 返回 NO，那么这个 view 的整个分支都会被忽略。这就意味着超出父视图的子视图的范围，是没有办法接收到触摸事件。</p>
+<h2 id="响应者链条">响应者链条</h2>
+<p>在触摸事件下，<code>UIApplication</code> 对象最先从事件队列中取出最前面的事件，然后将其分发给 key window，随后 key window 将事件传递到 hit-testing view，让 hit-testing view 有第一机会来处理这个触摸事件，如果这个 hit-testing view 不能处理这个触摸事件，hit-testing view 就会将这个触摸事件沿着响应者链条传递，直到找到能处理这个触摸事件的响应者或者被丢弃。</p>
+<p>响应者链条的构成与 App 的视图层级有密切的关系，所以，在 App 视图层级结构构建起来的同时，响应者链条也逐渐构建完成。</p>
+<p>我们接下来看两个 Apple 官方的例子，如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/iOS_responder_chain_2x.png?raw=true' width=540 alt='iOS Responder Chain' />
+<div align=left>
+<p>我们来分析一下右边的视图就可以了：</p>
+<ol>
+<li>initial view 尝试处理触摸事件。如果它不能处理这个事件，它就传递给 <code>superView</code>，这个 <code>superView</code> 就是 initial view 的 <code>nextResponder</code>。</li>
+<li>superView 尝试处理触摸事件。如果不能的话，就传递给管理这个 view 的 <code>UIViewController</code>，因为这个 view 是 <code>UIViewController</code> 的 top most view。</li>
+<li><code>UIViewController</code> 对象会尝试处理这个触摸事件。如果不能，<code>UIViewController</code> 就会将这个事件传递给自己 top most view 的 <code>superView</code>。</li>
+<li>这个 top most view 尝试处理这个触摸事件。如果不能，因为这个 view 也是 <code>UIViewController</code> 的 top most view，它就会将事件传递给 <code>UIViewController</code>。</li>
+<li><code>UIViewController</code> 对象尝试处理触摸事件。如果不能，它会将事件传递给 key window，因为这个 key window 的 <code>rootViewController</code> 是这个 <code>UIViewController</code> 对象。</li>
+<li>key window 尝试处理触摸事件。如果不能，它会将事件传递给 <code>UIApplication</code> 对象。</li>
+<li><code>UIApplication</code> 对象尝试处理事件。如果不能，事件就被丢弃。</li>
+</ol>
+<h2 id="总结">总结</h2>
+<p>在实际开发中，我们会碰到响应者对象不能响应事件时，可以先从一下几点排除：</p>
+<ul>
+<li>先看响应者对象下面的属性是否设置正确：
+<ul>
+<li><code>userInteractionEnabled != NO</code></li>
+<li><code>hidden != YES</code></li>
+<li><code>alpha != 0.0 ~ 0.01</code></li>
+</ul>
+</li>
+<li><code>UIImageView</code> 的 <code>userInteractionEnabled</code> 默认是 NO，<code>UIImageView</code> 默认是不能接收事件，因此其子控件也不能接收触摸事件。</li>
+<li>如果到了这一步就好好分析一下响应者链条吧。</li>
+</ul>
+<p>这里仅仅介绍了如何寻找 hit-testing view 和响应者链条的构建。更多关于 <code>UIResponder</code> 的分析可以看 <a href="http://southpeak.github.io/2015/03/07/cocoa-uikit-uiresponder/">UIKit: UIResponder | 南峰子的技术博客</a> 或者 <a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIResponder_Class">UIResponder Class Reference</a>。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://zhoon.github.io/ios/2015/04/12/ios-event.html">深入浅出 iOS 事件机制</a></li>
+<li><a href="http://southpeak.github.io/2015/03/07/cocoa-uikit-uiresponder/">UIKit: UIResponder | 南峰子的技术博客</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/EventHandling/Conceptual/EventHandlingiPhoneOS/event_delivery_responder_chain/event_delivery_responder_chain.html#//apple_ref/doc/uid/TP40009541-CH4-SW2">Event Delivery: The Responder Chain</a></li>
+<li><a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIResponder_Class">UIResponder Class Reference</a></li>
+<li><a href="https://www.zybuluo.com/MicroCai/note/66142">iOS Events and Responder Chain</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/app-programming-guide-for-ios-background-execution/" class="post-title gt-a-link">
+                    App Programming Guide for iOS - Background Execution
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

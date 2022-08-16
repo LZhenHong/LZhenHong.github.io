@@ -1,0 +1,308 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>GCD 使用笔记 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    GCD 使用笔记
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-09-19 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>在我年少无知的时候其实就已经写过一篇关于 GCD 的文章，自己现在拿出来看觉得有点羞愧，发现自己对 GCD 的认识基本上还是停留在一年前的水平，所以自己开始慢慢补上 GCD 的知识。</p>
+<p>将以前写的东西拿出来<s>充字数</s>提醒自己。</p>
+<!-- more -->
+<h2 id="任务">任务</h2>
+<p>GCD 中要执行的操作都可以叫做任务(下载图片、下载文本等)。</p>
+<h2 id="队列">队列</h2>
+<p>按照 FIFO (先进先出)的顺序帮我们调度任务，GCD 会把我们添加到队列中的任务取出，放到线程中执行。队列分为：</p>
+<ol>
+<li>
+<p>串行队列：串行队列同一时间只能有一个任务执行，后一个任务只有在前一个任务执行完之后才能被调度到线程中执行。</p>
+<figure data-type="image" tabindex="1"><img src="https://github.com/LZhenHong/BlogImages/blob/master/072323111886385.png?raw=true" alt="072323111886385" loading="lazy"></figure>
+</li>
+<li>
+<p>并行队列：并行队列同一时间可以多个任务执行，后一个任务不需要等前一个任务执行完，就可以被调度。</p>
+<figure data-type="image" tabindex="2"><img src="https://github.com/LZhenHong/BlogImages/blob/master/072323191425022.png?raw=true" alt="072323191425022" loading="lazy"></figure>
+</li>
+</ol>
+<h2 id="任务的提交">任务的提交</h2>
+<p>任务提交的方式会决定要不要 <strong>开启新的线程</strong>，在 GCD 中将任务添加到队列中有两种方式：</p>
+<ol>
+<li>
+<p><strong>同步提交</strong>：将任务同步提交给队列，不会开启新的线程，只会在<em>当前线程执行</em>，并且只有在同步任务执行完之后，才能继续向下执行代码，同步提交的方式：<code>dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);</code></p>
+</li>
+<li>
+<p><strong>异步提交</strong>：任务被异步提交给队列，<em>会开启新的线程</em>，但开多少新的线程，我们不能决定，由系统自己决定，并且不需要等异步任务执行完，就可以继续向下执行代码，异步提交的方式：<code>dispatch_async(dispatch_queue_t queue, dispatch_block_t block);</code></p>
+</li>
+</ol>
+<h2 id="gcd-中不同的提交方式与不同队列的组合">GCD 中不同的提交方式与不同队列的组合</h2>
+<h3 id="串行队列同步提交">串行队列同步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.yys.test&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_sync(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>首先根据同步提交 -&gt; 没有新的线程开启。</li>
+<li>然后根据串行队列的特点 -&gt; 同一时间只能执行一个任务。</li>
+<li>最终得到 -&gt; 不会开启新的线程，任务按照提交顺序在当前线程依次执行。</li>
+</ul>
+<h3 id="串行队列异步提交">串行队列异步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.yys.test&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_async(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>根据异步提交 -&gt; 会有新的线程开启。</li>
+<li>根据串行队列的特点 -&gt; 同一时间只能执行一个任务。</li>
+<li>最终得到 -&gt; 会开启新的线程，任务在新开启的线程中按照提交顺序依次执行，但是仅仅只会开启一条新的线程，因为异步提交会开启新的线程，但是串行队列只需要一条线程就可以执行所有提交的任务。</li>
+</ul>
+<h3 id="并行队列同步提交">并行队列同步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.yys.test&quot;, DISPATCH_QUEUE_CONCURRENT);
+dispatch_sync(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>根据同步提交 -&gt; 没有新的线程开启。</li>
+<li>并行队列 -&gt; 同一时间可以有多个任务被调度，但是在同步提交的条件下，并行队列失去了并行的能力，与串行队列区别不大。</li>
+<li>最终得到 -&gt; 不会开启新的线程，提交的任务在当前线程按照提交顺序依次执行。</li>
+</ul>
+<h3 id="并行队列异步提交">并行队列异步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.yys.test&quot;, DISPATCH_QUEUE_CONCURRENT);
+dispatch_async(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>异步提交 -&gt; 可以开启新的线程。</li>
+<li>并行队列 -&gt; 同一时间可以有多个任务被调度。</li>
+<li>最终得到 -&gt; 有新的线程开启，可以多个任务同时执行，会开多条线程，但是开多少条线程我们不能控制。所以，可以用来同时下载多张图片。</li>
+</ul>
+<h2 id="gcd-中特别的队列主队列串行队列">GCD 中特别的队列：主队列(串行队列)</h2>
+<p>主队列是串行队列，它的主要作用就是用来更新 UI 控件，<em>所有 UI 控件的刷新都必须在主线程中执行</em>。</p>
+<h3 id="主队列同步提交">主队列同步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_get_main_queue();
+dispatch_sync(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>主队列同步提交任务一定会发生死锁，就是线程被阻塞，不会再继续向下执行代码。</li>
+<li>同步提交使用时尤其注意，不能在当前线程再向这个线程中提交任务。</li>
+<li>主线程在执行任务 A，在任务 A 中向主队列中添加任务 B，这时任务 B 会在主线程中执行，由于<em>主队列是串行队列</em>，所以任务会依次执行，任务 A 执行完就会执行任务 B，但是任务 A 要执行完则任务 B 必须也要执行完，但是任务 B 要等任务 A 执行完才能执行，因此会发生死锁，代码不会向下执行。</li>
+</ul>
+<figure data-type="image" tabindex="3"><img src="https://github.com/LZhenHong/BlogImages/blob/master/%E4%B8%BB%E7%BA%BF%E7%A8%8B.png?raw=true" alt="主线程" loading="lazy"></figure>
+<h3 id="主队列异步提交">主队列异步提交</h3>
+<pre><code>dispatch_queue_t queue = dispatch_get_main_queue();
+dispatch_async(queue, ^{
+    // 下载文件，图片等资源
+});
+</code></pre>
+<ul>
+<li>这一情况也是很特殊的，尽管是异步提交，但是没有新的线程开启，GCD会在恰当的时候把你提交的任务在主线程中执行完，执行的时刻不可控。</li>
+</ul>
+<h2 id="gcd-的其他用法">GCD 的其他用法</h2>
+<h3 id="dispatch_after-延后执行">dispatch_after: 延后执行</h3>
+<pre><code>dispatch_time_t time ＝ dispatch_time(DISPATCH_TIME_NOW, (int64_t)(需要延后的时间 * NSEC_PER_SEC));
+dispatch_after(time, dispatch_get_main_queue(), ^{
+   // 需要延后执行的代码
+});
+NSLog(@&quot;线程执行开始&quot;);
+dispatch_async(dispatch_get_main_queue(), ^{
+   [NSThread sleepForTimeInterval:10.];
+});
+dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5. * NSEC_PER_SEC));
+dispatch_after(time, dispatch_get_main_queue(), ^{
+   NSLog(@&quot;延后提交任务”);
+});
+</code></pre>
+<ul>
+<li>
+<p>需要注意的是，这里并不是在某一个时刻执行任务，只是将任务提交给队列。</p>
+</li>
+<li>
+<p>执行结果：</p>
+<figure data-type="image" tabindex="4"><img src="https://github.com/LZhenHong/BlogImages/blob/master/072323514709413.png?raw=true" alt="072323514709413" loading="lazy"></figure>
+</li>
+<li>
+<p>这里第二次打印是在第一次打印10秒之后，并不是5秒之后。</p>
+</li>
+</ul>
+<h3 id="dispatch_once-只执行一次某段代码">dispatch_once: 只执行一次某段代码</h3>
+<pre><code>static dispatch_once_t onceToken;
+dispatch_once(&amp;onceToken, ^{
+    // 只需要执行一次的代码
+});
+</code></pre>
+<ul>
+<li>需要注意的是 onceToken 一定要用 static 申明，这样才能保证需要执行一次的代码执行一次，否则的话，不能保证代码只执行一次，会出现难以修复的 bug。</li>
+</ul>
+<h3 id="dispatch_group">dispatch_group</h3>
+<p>使用场景：当你执行多个异步任务，并且要等到所有的任务执行完做某些操作时</p>
+<pre><code>dispatch_group_t group = dispatch_group_create();
+dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // 提交任务A
+});
+dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // 提交任务B
+});
+dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+    // 所有任务执行完后，所需要的操作
+});
+</code></pre>
+<p>这里有两种方式通知所有的任务完成：</p>
+<ul>
+<li>dispatch_group_notify 这一种是异步通知，不会阻塞当前线程(常用)</li>
+<li>dispatch_group_wait 这一种会一直等待，直到所有的任务完成或者超时</li>
+</ul>
+<h3 id="dispatch_barrier_sync-和-dispatch_barrier_async">dispatch_barrier_sync 和 dispatch_barrier_async</h3>
+<pre><code>dispatch_barrier_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // 提交任务
+});
+</code></pre>
+<ul>
+<li>这两个函数提交的任务，在执行时会阻塞后面的任务，在这一时间内，只有这一任务在执行，后续任务只有在这个任务执行完成后才能执行，并且所有在这个任务之前的任务一定会先于这个任务完成。</li>
+<li>dispatch_barrier_sync 和 dispatch_barrier_async 只在自己创建的并发队列上有效，在全局并发队列、串行队列上，效果跟 dispatch_sync、 dispatch_async 效果一样。</li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/guan-yu-enumerateobjectsusingblock-de-xiao-zhi-shi-dian/" class="post-title gt-a-link">
+                    关于 enumerateObjectsUsingBlock 的小知识点
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

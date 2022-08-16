@@ -1,0 +1,308 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>百度面试准备 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    百度面试准备
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-11-10 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/0kjbJUJXr/" class="post-tags">
+                            # iOS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p><strong>申明：以下知识点均来自网络，来源均在每节最前面给出，侵删。</strong><br>
+<strong>感谢愿意分享知识的人 🙏🙏，是他们让我们学习了更多更好的知识。</strong></p>
+<p>前一段时间准备百度面试总结的一些知识点，<s>虽然面试没过 😭😭</s> 把这些东西记录下来，也方便自己以后查看。</p>
+<!-- more -->
+<h2 id="load-方法理解"><code>+ load</code> 方法理解</h2>
+<blockquote>
+<p><a href="http://draveness.me/load/">你真的了解 load 方法么？</a><br>
+「Effective Objective-C」Page 200</p>
+</blockquote>
+<p>文章介绍的很详细，推荐阅读，但对面试来说，我们需要知道下面的知识应该差不多了。同时 <code>Effective Objective-C</code> 这本书的第 51 条也介绍了 <code>+ load</code> 方法。</p>
+<p>load 作为 Objective-C 中的一个方法，与其它方法有很大的不同。它只是一个在整个文件被加载到运行时，在 main 函数调用之前被 ObjC 运行时调用的钩子方法。其中关键字有这么几个：</p>
+<ul>
+<li>文件刚加载</li>
+<li>main 函数之前</li>
+<li>钩子方法</li>
+</ul>
+<p>由于它的调用不是惰性的，且其只会在程序调用期间调用一次，最最重要的是，如果在类与分类中都实现了 load 方法，它们都会被调用，不像其它的在分类中实现的方法会被覆盖。</p>
+<p>load 方法并不像普通的方法那样，它并不遵从那套继承规则。如果某个类本身没实现 load 方法，那么不管其各级超类是否实现此方法，系统都不会调用。 load 方法调用顺序：</p>
+<ul>
+<li>父类先于子类调用</li>
+<li>类先于分类调用</li>
+</ul>
+<p>不要在 load 方法中使用其他类，因为类的载入我们是不能确定的，所以会造成安全隐患。</p>
+<p>load 方法务必实现得精简一些，也就是要尽量减少其所执行的操作，因为整个应用程序在执行 load 方法时都会阻塞。如果 load 方法中包含繁杂的代码，那么应用程序在执行期间就会变得无响应。不要在里面等待锁，也不要调用可能会加锁的方法。</p>
+<p>其真正用途仅在于调试程序，比如可以在分类里编写此方法，用来判断该分类是否已经正确加载。</p>
+<p>由于 <code>+ load</code> 方法的特殊性，我们经常会在 <code>+ load</code> 方法中进行 <a href="http://nshipster.cn/method-swizzling/">Method Swizzling</a> 。</p>
+<h2 id="initialize-方法理解"><code>+ initialize</code> 方法理解</h2>
+<blockquote>
+<p><a href="http://draveness.me/initialize/">懒惰的 initialize 方法</a><br>
+「Effective Objective-C」Page 202</p>
+</blockquote>
+<p><code>+ initialize</code> 只会在对应类的方法第一次被调用时，才会调用。如果这个类一直没有使用，这个方法就不会执行。</p>
+<p><code>+ initialize</code> 方法是在 <code>alloc</code> 方法之前执行完的，<code>alloc</code> 的调用导致了前者的执行。</p>
+<p>在这个方法中，运行期系统是处于正常的状态，因此可以在此方法中调用任何类中的任意方法。</p>
+<p><code>+ initialize</code> 方法只应该用来设置内部数据。不应该调用其他方法。若某个全局状态无法在编译期初始化，可以放在 <code>+ initialize</code>  方法中来做。</p>
+<pre><code>// EOCClass.h
+#import &lt;Foundation/Foundation.h&gt;
+
+@interface EOCClass: NSObject
+@end
+
+// EOCClass.m
+static const int kInterval = 10;
+// 创建实例之前必须先激活运行期系统
+static NSMutableArray *kSomeObjects;
+
+@implementation
+
++ (void)initialize {
+    if (self == [EOCClass class]) {
+        kSomeObjects = [NSMutableArray array];
+    }
+}
+
+@end
+</code></pre>
+<ul>
+<li><code>+ initialize</code> 的调用是惰性的，它会在第一次调用当前类的方法时被调用</li>
+<li>与 <code>load</code> 不同，<code>+ initialize</code> 方法调用时，所有的类都已经加载到了内存中</li>
+<li><code>+ initialize</code> 的运行是线程安全的</li>
+<li>子类会继承父类的 <code>+ initialize</code> 方法，父类的调用先于子类。</li>
+</ul>
+<h2 id="runtime-理解">runtime 理解</h2>
+<blockquote>
+<p><a href="http://nshipster.cn/method-swizzling/">Method Swizzling</a><br>
+<a href="http://nshipster.cn/associated-objects/">Associated Objects</a><br>
+<a href="http://draveness.me/ao/">关联对象 AssociatedObject 完全解析</a><br>
+<a href="http://www.jianshu.com/p/1bde36ad9938/">轻松学习之一－－Objective-C消息转发</a><br>
+<a href="http://tech.glowing.com/cn/objective-c-runtime/">Objective-C Runtime</a></p>
+</blockquote>
+<h3 id="method-swizzling">Method Swizzling</h3>
+<p>Method swizzling 用于改变一个已经存在的 selector 的实现。这项技术使得在运行时通过改变 selector 在类的消息分发列表中的映射从而改变方法的掉用成为可能。</p>
+<p><strong>swizzling 应该只在 dispatch_once 中完成</strong><br>
+由于 swizzling 改变了全局的状态，所以我们需要确保每个预防措施在运行时都是可用的。原子操作就是这样一个用于确保代码只会被执行一次的预防措施，就算是在不同的线程中也能确保代码只执行一次。Grand Central Dispatch 的 dispatch_once 满足了所需要的需求，并且应该被当做使用 swizzling 的初始化单例方法的标准。</p>
+<p>实现的代码可以参考 <a href="http://nshipster.cn/method-swizzling/">Method Swizzling</a> 。</p>
+<h3 id="associated-objects">Associated Objects</h3>
+<p>在分类中 @property 并不会自动生成实例变量以及存取方法，所以一般使用关联对象为已经存在的类添加「属性」。</p>
+<p>我们使用了两个方法 <code>objc_getAssociatedObject</code> 以及 <code>objc_setAssociatedObject</code> 来模拟「属性」的存取方法，而使用关联对象模拟实例变量。使用 @selector(categoryProperty) (即 <code>_cmd</code>) 作为 key 传入。因为这种方法省略了声明参数的代码，并且能很好地保证 key 的唯一性。</p>
+<p>在分类中，因为类的实例变量的布局已经固定，使用 @property 已经无法向固定的布局中添加新的实例变量（这样做可能会覆盖子类的实例变量），所以我们需要使用关联对象以及两个方法来模拟构成属性的三个要素。</p>
+<p>函数 <code>objc_removeAssociatedObjects</code> 的主要目的是在「初始状态」时方便地返回一个对象。你不应该用这个函数来删除对象的属性，因为可能会导致其他客户对其添加的属性也被移除了。规范的方法是：调用 <code>objc_setAssociatedObject</code> 方法并传入一个 nil 值来清除一个关联。<a href="http://weibo.com/3321824014/EcKe666en?type=comment/">可以看这里</a>。</p>
+<p>关联对象应用实例：<a href="http://tech.glowing.com/cn/change-uinavigationbar-backgroundcolor-dynamically/">动态修改UINavigationBar的背景色</a>。</p>
+<p><em>不懂待填</em>：<s>创建一个用于 KVO 的关联观察者</s></p>
+<h3 id="消息转发">消息转发</h3>
+<p>读一下这一篇文章<a href="http://www.jianshu.com/p/1bde36ad9938/">轻松学习之一－－Objective-C消息转发</a>，简单易懂。</p>
+<p>很多情况下，程序会在运行时挂掉并抛出 unrecognized selector sent to … 的异常。但在异常抛出前，Objective-C 的运行时会给你三次拯救程序的机会：</p>
+<ul>
+<li>
+<p>Method resolution<br>
+<code>+ (BOOL)resolveInstanceMethod:(SEL)sel</code><br>
+<code>+ (BOOL)resolveClassMethod:(SEL)sel</code></p>
+</li>
+<li>
+<p>Fast forwarding<br>
+<code>- (id)forwardingTargetForSelector:(SEL)aSelector</code></p>
+</li>
+<li>
+<p>Normal forwarding<br>
+<code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector</code>：如果 <code>-methodSignatureForSelector:</code> 返回 nil ，runtime 则会发出 <code>-doesNotRecognizeSelector:</code> 消息，程序这时也就挂掉了<br>
+<code>- (void)forwardInvocation:(NSInvocation *)anInvocation</code></p>
+</li>
+</ul>
+<p>Objective-C 中给一个对象发送消息会经过以下几个步骤：</p>
+<ol>
+<li>在对象类的 dispatch table 中尝试找到该消息。如果找到了，跳到相应的函数IMP去执行实现代码；</li>
+<li>如果没有找到，runtime 会发送 <code>+ resolveInstanceMethod:</code> 或者 <code>+ resolveClassMethod:</code> 尝试去 resolve 这个消息；</li>
+<li>如果 resolve 方法返回 NO，runtime 就发送 <code>- forwardingTargetForSelector:</code> 允许你把这个消息转发给另一个对象；</li>
+<li>如果没有新的目标对象返回， runtime 就会发送 <code>- methodSignatureForSelector:</code> 和 <code>- forwardInvocation:</code> 消息。你可以发送 <code>- invokeWithTarget:</code> 消息来手动转发消息或者发送 <code>- doesNotRecognizeSelector:</code> 抛出异常。</li>
+</ol>
+<h2 id="category">Category</h2>
+<blockquote>
+<p><a href="http://tech.meituan.com/DiveIntoCategory.html">深入理解Objective-C：Category</a><br>
+<a href="http://blog.sunnyxx.com/2014/03/05/objc_category_secret/">objc category的秘密</a></p>
+</blockquote>
+<ul>
+<li>可以把类的实现分开在几个不同的文件里面。这样做有几个显而易见的好处：
+<ul>
+<li>可以减少单个文件的体积</li>
+<li>可以把不同的功能组织到不同的 category 里</li>
+<li>可以由多个开发者共同完成一个类</li>
+<li>可以按需加载想要的category</li>
+</ul>
+</li>
+<li>声明私有方法</li>
+<li>模拟多继承</li>
+<li>把 framework 的私有方法公开</li>
+</ul>
+<p>extension 在编译期决议，它就是类的一部分，在编译期和头文件里的 @interface 以及实现文件里的 @implementation 一起形成一个完整的类，它伴随类的产生而产生，亦随之一起消亡。extension 一般用来隐藏类的私有信息，你必须有一个类的源码才能为一个类添加 extension，所以你无法为系统的类比如 NSString 添加 extension。</p>
+<p>但是 category 则完全不一样，它是在运行期决议的。<br>
+就 category 和 extension 的区别来看，我们可以推导出一个明显的事实，extension 可以添加实例变量，而 category 是无法添加实例变量的（因为在运行期，对象的内存布局已经确定，如果添加实例变量就会破坏类的内部布局，这对编译型语言来说是灾难性的）。</p>
+<p>怎么调用到原来类中被 category 覆盖掉的方法？<br>
+对于这个问题，我们已经知道 category 其实并不是完全替换掉原来类的同名方法，只是 category 在方法列表的前面而已，所以我们只要顺着方法列表找到最后一个对应名字的方法。</p>
+<h2 id="ios-内存管理">iOS 内存管理</h2>
+<blockquote>
+<p><a href="http://blog.devtang.com/2016/07/30/ios-memory-management/">理解 iOS 的内存管理</a></p>
+</blockquote>
+<p><strong>弱引用的实现原理</strong></p>
+<p>弱引用的实现原理是这样，系统对于每一个有弱引用的对象，都维护一个表来记录它所有的弱引用的指针地址。这样，当一个对象的引用计数为 0 时，系统就通过这张表，找到所有的弱引用指针，继而把它们都置成 nil。</p>
+<p>从这个原理中，我们可以看出，弱引用的使用是有额外的开销的。虽然这个开销很小，但是如果一个地方我们肯定它不需要弱引用的特性，就不应该盲目使用弱引用。举个例子，有人喜欢在手写界面的时候，将所有界面元素都设置成 weak 的，这某种程度上与 Xcode 通过 Storyboard 拖拽生成的新变量是一致的。但是我个人认为这样做并不太合适。因为：</p>
+<ol>
+<li>我们在创建这个对象时，需要注意临时使用一个强引用持有它，否则因为 weak 变量并不持有对象，就会造成一个对象刚被创建就销毁掉。</li>
+<li>大部分 ViewController 的视图对象的生命周期与 ViewController 本身是一致的，没有必要额外做这个事情。</li>
+<li>早先苹果这么设计，是有历史原因的。在早年，当时系统收到 Memory Warning 的时候，ViewController 的 View 会被 unLoad 掉。这个时候，使用 weak 的视图变量是有用的，可以保持这些内存被回收。但是这个设计已经被废弃了，替代方案是将相关视图的 CALayer 对应的 CABackingStore 类型的内存区会被标记成 volatile 类型。</li>
+</ol>
+<h2 id="uiwindow">UIWindow</h2>
+<blockquote>
+<p><a href="http://www.cnblogs.com/YouXianMing/p/3811741.html">分析UIWindow</a><br>
+<a href="https://developer.apple.com/documentation/uikit/uiwindow?language=objc">UIWindow - Apple Developer</a><br>
+<a href="https://developer.apple.com/library/content/documentation/WindowsViews/Conceptual/ViewPG_iPhoneOS/CreatingWindows/CreatingWindows.html">View Programming Guide for iOS</a></p>
+</blockquote>
+<p>UIWindow 一旦被创建就会被添加到整个界面上。Xcode 创建的新项目使用 Storyboard，Storyboard 需要使用 AppDelegate 提供的 window 对象，Xcode 创建的模版自动提供该 window。Window 不展示自身，通常保留 rootViewController 的 view。不使用 Storyboard 的项目需要手动创建 UIWindow 对象，让 AppDelegate 引用这个对象，并调用 <code>-makeKeyAndVisible</code> 设成 app 的 keyWindow。</p>
+<p>每一个 controller 都会被 UIWindow 接管，UIWindow 一次只能接管一个 controller。</p>
+<p>UIWindow 会在一个 controller 的 <code>- viewDidAppear</code> 方法中才接管了当前 controller，而不是在<code>- viewDidLoad</code> 方法中。</p>
+<p>UIWindow 有着比一切 controller 都要高的优先级显示权利，加载在 UIWindow 上面的 View 是不会被遮挡住的。keyWindow 是指定的用来接收键盘以及非触摸类的消息，而且程序中每一个时刻只能有一个 window 是 keyWindow。</p>
+<p>UIWindow的主要功能：</p>
+<ul>
+<li>提供一个区域来显示 views</li>
+<li>发送 events 给 views</li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/app-programming-guide-for-ios-the-app-life-cycle/" class="post-title gt-a-link">
+                    App Programming Guide for iOS - The App Life Cycle
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

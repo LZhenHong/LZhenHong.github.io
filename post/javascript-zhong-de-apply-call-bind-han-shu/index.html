@@ -1,0 +1,385 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Javascript 中的 apply/call/bind 函数 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Javascript 中的 apply/call/bind 函数
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2017-07-05 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/O496b1F6G/" class="post-tags">
+                            # JS
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>有很长一段时间没有写博客了，前一段时间做毕设，写论文，改论文，答辩，拍毕业照... 很多很多不喜欢的事情，再加上那段时间沉不下心，就很少有机会去写博客了。</p>
+<p>这周一刚进公司，开始做游戏，原来对游戏开发也不太了解，进公司这几天也一直都在学习各种东西，JS 语法，常见的 Cocos API 等等。今天在看 Cocos 的东西时，对 Cocos 的继承不是很了解，就去网上搜资料，在看 <a href="http://wiki.jikexueyuan.com/project/cocos2d-x-from-cplusplus-js/john-resiq-inheritance-of-written-resolution.html">John Resiq 的继承写法解析</a>的时候，对 <code>apply</code> 函数的用法不是很了解，于是又去查资料，这篇博客主要是记录自己对三个函数的理解，也让自己开始继续写博客。</p>
+<!-- more -->
+<p>关于这些函数网上的解析数不胜数，我这个 JS 方面的 green-hand 来写这三个函数，主要还是记录下自己的理解。</p>
+<p>这三个函数，其中 <code>apply</code> 与 <code>call</code> 函数的作用基本相同，就是改变某个函数运行时的上下文，只是这两个函数接收参数的方式不同。<code>apply</code> 函数接收的参数是包含多个参数的数组，<code>call</code> 函数接收的参数类型是多个参数的列表。</p>
+<ul>
+<li><code>apply</code> 函数的调用方式：<code>func.apply(thisArg, [argsArray])</code></li>
+<li><code>call</code> 函数的调用方式：<code>func.call(thisArg, arg1, arg2, ...)</code></li>
+</ul>
+<h2 id="apply-与-call-的相同点">apply 与 call 的相同点</h2>
+<p>从上面的两个函数的调用方式，就能得知这两个函数都是 JS 中函数对象原型 (prototype) 的方法。来看一下这两个函数的具体用法：</p>
+<h3 id="apply-函数的用法">apply 函数的用法</h3>
+<p>这个函数接收两个参数，第一个参数代表需要替换的上下文对象，第二个参数代表调用对象的参数数组。</p>
+<ul>
+<li>
+<p>不带参数的函数使用 <code>apply</code> ：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printName() {
+    console.log(this.name);
+}
+
+printName(); // log: lzh
+printName.apply(o); // log: eden
+</code></pre>
+</li>
+<li>
+<p>多个参数的函数使用 <code>apply</code>，将多个参数打包成数组作为第二个参数传入 <code>apply</code> 函数：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printHello(greeting, address) {
+    console.log(greeting + &quot;: &quot; + this.name + &quot;, Live in: &quot; + address);
+}
+
+printHello(&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: lzh, Live in: ShenZhen
+printHello.apply(o, [&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;]); // Hello. My name is: eden, Live in: ShenZhen
+</code></pre>
+</li>
+</ul>
+<h3 id="call-函数的用法">call 函数的用法</h3>
+<p>这个函数接收多个参数，参数不限，第一个参数跟 <code>apply</code> 函数的第一个参数相同，代表要替换掉的上下文对象，后面的参数都是调用函数的参数。</p>
+<ul>
+<li>
+<p>不带参数的函数使用 <code>call</code>，这里跟 <code>apply</code> 的使用基本上没有区别：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printName() {
+    console.log(this.name);
+}
+
+printName(); // log: lzh
+printName.call(o); // log: eden
+</code></pre>
+</li>
+<li>
+<p>多个参数的函数使用 <code>call</code>，这里跟 <code>apply</code> 有不同，调用函数的参数传入方式，<code>apply</code> 函数是利用数组，<code>call</code> 函数的参数是需要逐个传入：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printHello(greeting, address) {
+    console.log(greeting + &quot;: &quot; + this.name + &quot;, Live in: &quot; + address);
+}
+
+printHello(&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: lzh, Live in: ShenZhen
+printHello.call(o, &quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: eden, Live in: ShenZhen
+</code></pre>
+</li>
+</ul>
+<h2 id="apply-与-call-的不同点">apply 与 call 的不同点</h2>
+<p>其实从上面两个函数的用法就可以看出来，两个函数的作用是相同的，就是改变函数执行的上下文对象，只是在有多个参数函数的用法上有区别。在参数个数不确定的情况下，就使用 <code>apply</code> 函数；在参数确定的情况下，使用两个函数都可以。</p>
+<p>我们看一个**<a href="https://segmentfault.com/a/1190000000375138?page=1#articleHeader1">面试题</a>**来看一下这两个函数的具体区别。这个面试题的题目是：「定义一个 log 函数，然后它可以代理 <code>console.log</code> 的方法」。我们首先想到的是在 log 函数中直接调用 <code>console.log</code> 方法，这种方式在只有一个参数的情况下能满足要求，但是有个参数，这个方式就只能打印第一个参数。</p>
+<pre><code>function log(msg)　{
+    console.log(msg);
+}
+
+log(&quot;lzh&quot;); // lzh
+log(&quot;lzh&quot;, &quot;eden&quot;); // lzh
+</code></pre>
+<p>更好的方式是使用 <code>apply</code> 函数，将 log 函数的隐藏参数 <code>arguments</code> 作为参数传递给 <code>console.log</code> 函数。下面代码是实现方式：</p>
+<pre><code>function log() {
+    // 在这里我有将参数列表中的 console 替换成其他对象，结果虽然是正确的
+    // 但是最好还是使用 console，因为不知道函数内部究竟有没有使用 console
+    console.log.apply(console, arguments);
+}
+
+log(&quot;lzh&quot;, &quot;eden&quot;); // lzh eden
+</code></pre>
+<p>这道面试题还有一部分：在每次输出的时候，在每一个 log 消息前添加一个 &quot;(app)&quot; 的前辍。</p>
+<pre><code>function log() {
+    // var args = [].slice.call(arguments);
+    var args = Array.prototype.slice.call(arguments); // 这里使用 apply 也是可以的
+    args.unshift('(app)');
+
+    console.log.apply(console, args);
+};
+</code></pre>
+<h2 id="bind-函数">bind 函数</h2>
+<p>首先我们来看下面的代码：</p>
+<pre><code>var o = {
+    name: &quot;lzh&quot;,
+    printName: function() {
+        console.log(this.name);
+    }
+};
+o.printName(); // lzh
+
+var name = &quot;eden&quot;;
+var f = o.printName;
+f(); // eden
+</code></pre>
+<p>从上面的输出结果就可以看出，将对象 o 的 <code>printName</code> 属性赋值给 f，再调用 f，此时输出的结果就不一样了，这是因为当调用 f 函数的时候，会查找。如果我们需要函数的上下文是某个指定的上下文对象，我们就需要使用 <code>bind</code> 来对函数进行一些操作。可以利用上面提到的 <code>apply</code> ／ <code>call</code>  函数，但是这两个函数会立马执行。在本节提到 <code>bind</code> 函数会生成新的函数，不会马上执行。</p>
+<p>上面的例子可以使用下面的代码来解决，这时 f 函数的上下文对象就是 o 而不是全局对象：</p>
+<pre><code>var o = {
+    name: &quot;lzh&quot;,
+    printName: function() {
+        console.log(this.name);
+    }
+};
+o.printName(); // lzh
+
+var name = &quot;eden&quot;;
+var f = o.printName.bind(o);
+f(); // lzh
+</code></pre>
+<p><code>bind</code> 函数的主要作用是创建绑定函数，使得这个函数不管怎么调用始终具有相同的 <code>this</code> 值。就像上面的示例代码。</p>
+<p>我原来以为 JS 中的函数中的对象都是在执行时才确定的，直到看到这篇文章 <strong><a href="https://github.com/mqyqingfeng/Blog/issues/3">JavaScript 深入之词法作用域和动态作用域</a></strong>，才意识到自己原来的理解错了。在 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind()</a> 有一段话：</p>
+<blockquote>
+<p>bind() 最简单的用法是创建一个函数，使这个函数不论怎么调用都有同样的 this 值。JavaScript新手经常犯的一个错误是将一个方法从对象中拿出来，然后再调用，希望方法中的 this 是原来的对象。（比如在回调中传入这个方法）如果不做特殊处理的话，一般会丢失原来的对象。</p>
+</blockquote>
+<p>这样的话并不能直接理解为 JS 函数的上下文对象是在调用时决定的，相反 JS 的作用域是采用静态作用域，函数的作用域是基于函数创建的位置。下面的例子就能证明：</p>
+<pre><code>// 来自 https://github.com/mqyqingfeng/Blog/issues/3
+var value = 1;
+function foo() {
+    console.log(value);
+}
+
+function bar() {
+    var value = 2;
+    foo();
+}
+bar(); // 1
+</code></pre>
+<h3 id="上下文切换导致对象丢失">上下文切换导致对象丢失</h3>
+<p>至于在 Cocos-JS 开发中经常使用的回调会导致上面说的对象的丢失，这种情况跟上面代码中的情况不同，因为这里涉及了函数执行上下文的问题，而不仅仅只是一个变量。在 <a href="https://github.com/mqyqingfeng/Blog/issues/4">JavaScript 深入之执行上下文栈</a> 提到 JS 引擎会创建一个上下文调用栈，每当一个函数执行时，会向这个栈中压入当前上下文。每个上下文都有三个重要的属性，如下图：<strong>变量对象</strong>、<strong>作用域链</strong>和 <strong>this</strong>，只有进入上下文中，这个上下文的变量对象才可以被访问。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/Contexts.png?raw=true' width=300 alt='JS Contexts.' />
+</div>
+<pre><code>// HTTPService.js
+var httpService = (function() {
+    var service = {};
+    
+    service.getData = function(callback) {
+        if (callback) {
+            callback(data); // 1
+        }
+    };
+    
+    return service;
+})();
+
+// Test.js
+var mainView = cc.Node.extend({
+    data_: null,
+    onEnter: function() {
+        this._super();
+        
+        var self = this; // 2
+        httpService.getData(function(data) {
+            // this.data_ = data;
+            self.data_ = data;
+        });
+    }
+});
+</code></pre>
+<p>假设在 mainView 的 <code>onEnter</code> 方法中发送网络请求获取数据，因为网络请求是异步的，所以我们获取数据之后的操作需要以回调的方式实现。这个回调的调用是在 <code>HTTPService.js</code> 类中注释 1 那，但是在回调中如果像注释那里那样 <code>this.data_ = data;</code> 这样实现会有问题，因为在 <code>HTTPService.js</code> 类中，上下文已经切换了，所以 this 值不再是 <code>Test.js</code> 中的 this 值，因此会报错，this 获取不到 data_。如果像注释 2 那样写，self 不再依赖上下文，当调用回调时，需要使用 self，会到注释 2 获取，而不是直接取当前上下文的值，这是因为 JS 使用的是静态作用域。当然还可以像下面这样使用 <code>bind</code> 来实现，这样回调里面的 this 一直就会是 <code>Test.js</code> 中的 this。</p>
+<pre><code>// Test.js
+var mainView = cc.Node.extend({
+    data_: null,
+    onEnter: function() {
+        this._super();
+        
+        httpService.getData(function(data) {
+            this.data_ = data;
+        }.bind(this));
+    }
+});
+</code></pre>
+<h3 id="bind-函数小提示">bind 函数小提示</h3>
+<p>在<a href="https://www.cnblogs.com/coco1s/p/4833199.html">深入浅出妙用 Javascript 中 apply、call、bind</a>这篇博客中还提到，多次使用 <code>bind</code> 函数没有效果，看下面的例子：</p>
+<pre><code>// 来自 http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html
+var bar = function() {
+    console.log(this.x);
+};
+var foo = { x: 3 };
+var sed = { x: 4 };
+var func = bar.bind(foo).bind(sed);
+func(); // 3
+
+var fiv = { x: 5 };
+
+var func = bar.bind(foo).bind(sed).bind(fiv);
+func(); // 3
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>关于这三个函数的主要作用就是改变函数的上下文对象，其中 <code>apply</code> 和 <code>call</code> 函数会立马执行函数，这两个函数的区别就是接收的参数类型不同；而 <code>bind</code> 函数会生成新的函数，这在函数的回调非常有用。</p>
+<p>关于 JS 的继承，可以参考 <a href="http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html">JavaScript 继承详解</a>，这一系列文章对 JS 的继承介绍得很详细。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.cnblogs.com/coco1s/p/4833199.html">深入浅出妙用 Javascript 中 apply、call、bind</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/3">JavaScript 深入之词法作用域和动态作用域</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/4">JavaScript 深入之执行上下文栈</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/5">JavaScript 深入之变量对象</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/6">JavaScript 深入之作用域链</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">Function.prototype.apply()</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call">Function.prototype.call()</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind()</a></li>
+<li><a href="http://wiki.jikexueyuan.com/project/cocos2d-x-from-cplusplus-js/john-resiq-inheritance-of-written-resolution.html">John Resiq 的继承写法解析</a></li>
+<li><a href="http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html">JavaScript 继承详解</a></li>
+</ul>
+<!-- 参考 -->
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/arc-de-nei-cun-guan-li/" class="post-title gt-a-link">
+                    ARC 的内存管理
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>设备卡顿产生的原因 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    设备卡顿产生的原因
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2018-01-06 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/EThUO2GKi/" class="post-tags">
+                            # Other
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>虽然当下的设备越来越强大，处理速度也越来越快，显示效果越来越好。但是如果处理不好，再强大的设备还是会有卡顿的可能性，所以了解卡顿产生的原因是很有必要的。</p>
+<!-- more -->
+<h2 id="帧率和刷新率的区别">帧率和刷新率的区别</h2>
+<p>我们先来看一下显示器是如何显示图像的，CPU 将计算好的内容传递给 GPU，GPU 进行图像处理（GPU 对浮点计算做了优化），GPU 执行渲染之后将内容放入帧缓冲区，显示器需要显示图像时就会经过一系列操作获取帧缓冲区的内容，显示到屏幕上，展示给用户。如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/CPU_GPU_FB.png?raw=true' height=300 alt='CPU GPU' />
+</div>
+<p>接下来开始说帧率和刷新率，帧率指的是 GPU 绘制图片的速度，帧率 60FPS 指的是在 1 秒内绘制 60 张图片。刷新率指的是屏幕 1 秒内显示图片的次数， 刷新率 60Hz 指的是 1 秒内需要显示 60 张图片。我们举几个例子来更好的说明：</p>
+<ol>
+<li>如果 GPU 的帧率是 2FPS，显示器的刷新率是 1Hz，这个就会造成 GPU 1 秒内绘制的两张图片只会有一张被显示，因为当显示器第二次从帧缓存区中取图片数据的时候，帧缓存区中已经是 GPU 绘制的第三张图片了，GPU 绘制好的第二张图片被丢弃了。</li>
+<li>如果 GPU 的帧率是 1FPS，当显示器的刷新率是 2Hz，GPU 1 秒绘制一张图片，显示器 1 秒要显示两张图片，GPU 1 秒将绘制好的图片放入帧缓存区中，显示器第一次从帧缓存区中取出图片数据显示到屏幕上，当显示器第二次去帧缓存区中取图片时 GPU 才绘制好新一帧的一半，这就造成后面要说的画面撕裂。</li>
+</ol>
+<h2 id="屏幕撕裂">屏幕撕裂</h2>
+<p>屏幕撕裂也是画面撕裂，屏幕撕裂 (Screen Tearing) 是指显示器把两个或更多的帧显示在同一画面上。</p>
+<p>显示器的更新频率是固定的，通常是 60Hz。现在显卡效能大幅提高，游戏时输出的帧率可以非常高，如果显卡的输出高于 60FPS，上面我们提到过一个例子 GPU 的绘制速度恰好显示器的刷新速度的两倍，虽然 GPU 和显示器的频率不相同但是也不至于造成屏幕撕裂。但是事实上 GPU 和显示器的组合有很多种可能，如果 GPU 的帧率是 75FPS，显示器的刷新率是 60Hz，也会造成屏幕撕裂。</p>
+<div align=center>
+<img src='http://www.geforce.com/Active/en_US/shared/images/articles/introducing-the-geforce-gtx-680-gpu/Tearing2-650.png' height=350 alt='CPU GPU' />
+</div>
+<h2 id="如何解决屏幕撕裂">如何解决屏幕撕裂</h2>
+<h3 id="多个帧缓冲区">多个帧缓冲区</h3>
+<p>上面提到的屏幕撕裂的例子都是以单个帧缓冲区为前提条件，因为只有一个帧缓冲区，GPU 只能在这个帧缓冲区中绘制图像，就很容易造成上面所说的屏幕撕裂。</p>
+<p>引入多个帧缓冲区可以有效地<strong>缓解</strong>屏幕撕裂，多个帧缓冲区分为帧缓冲区和多个后备缓冲区，GPU 在一个缓冲区绘制完之后，就到下一个缓冲区中绘制，这样 GPU 新绘制的图像帧就不会影响前面的图像帧。显示器每次会从帧缓冲区中取出图像显示，当帧缓冲区的图像显示之后，会将后备缓冲区的图像覆盖到帧缓冲区。</p>
+<p>但多个帧缓冲区并不能真正的解决屏幕撕裂的问题，上面说到多个帧缓冲区只能<strong>缓解</strong>屏幕撕裂。以使用双缓冲区的设备为例，如果后备缓冲区绘制完成，就会开始将后备缓冲区的图像内容覆盖到帧缓冲区，此时帧缓冲区的图像还没有被显示器取出显示，在覆盖期间就会导致帧缓冲区的图像有 GPU 绘制的两帧的内容，如果这个时候显示器从帧缓冲区中取出图像同样会造成屏幕撕裂。</p>
+<p>这里当然可以再增加帧缓冲区来解决问题，但是没有真正的解决根本问题，就是 GPU 和显示器的同步问题。为了解决屏幕撕裂的问题，引入了垂直同步（V-Sync），有了这个机制之后就能彻底解决屏幕撕裂。</p>
+<h3 id="垂直同步v-sync">垂直同步（V-Sync）</h3>
+<p>上面我们提到的 GPU 的绘制与显示器的显示是完全独立的，中间只通过帧缓冲区来交互。垂直同步就是保证 GPU 的绘制和显示器的显示是同步的，GPU 绘制好的每一帧图像显示器都会显示，不会出现一帧没有显示就被后面的帧覆盖的情况。</p>
+<p>垂直同步的工作原理大概是：显示器在处理完当前图像帧，会向 GPU 发送 VSync 信号，当 GPU 接收到 VSync 信号之后，就会进行帧缓冲区的更新和新图像帧的绘制。这样就能保证 GPU 绘制的图像帧不会出现被覆盖的情况，也就解决了屏幕撕裂。</p>
+<p>垂直同步理想的工作状态如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/VSync-good.png?raw=true'  alt='VSync 理想情况' />
+</div>
+<p>如上图所示，CPU 和 GPU 能在两个 VSync 信号之间将显示器要显示的图像帧准备完成，就能保证显示器流畅的刷新，我们就不会感受到卡顿的情况。</p>
+<p>虽然垂直同步解决了 GPU 和显示器的同步问题，但是垂直同步也是有一定缺点的，显卡的性能再好也得看显示器的 VSync 信号的频率，所以垂直同步会限制 GPU 的性能；并且垂直同步也会消耗更多的计算资源，也会带来部分延迟。现在的设备通常是使用多缓冲区和垂直同步两种方式相结合，目前 iOS 设备使用的双缓冲区加垂直同步机制，Android 设备有使用双缓冲区或者三缓冲区加垂直同步机制。</p>
+<p>目前有更好的显示技术可以解决 GPU 和显示器的同步问题：Nvidia 提出的专利技术 G-Sync 以及 AMD 提出开放标准 FreeSync。关于这两个技术可以看：<a href="https://www.zhihu.com/question/48273439">显示器刷新率和显卡fps一定要很匹配吗？</a></p>
+<h2 id="卡顿的原因">卡顿的原因</h2>
+<p>上面我们提到理想状态下，显示器的刷新是流畅的。那在不理想的情况下就会造成要说的卡顿现象，专业的说法就是掉帧 🤨。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/VSync-bad.png?raw=true'  alt='VSync 卡顿情况' />
+</div>
+<p>从上图可以看出，CPU 和 GPU 在两个 VSync 信号之间不能将显示器要显示的图像帧准备好，就会造成掉帧的情况。如果 CPU 和 GPU 没有将图像帧准备好，这一帧就会被丢弃，等待下一次 VSync 信号的到来。显示屏就会保持当前的显示图像不变，如果这时界面是在不断变化的，我们就会感受到卡顿。</p>
+<h2 id="解决卡顿">解决卡顿</h2>
+<p>卡顿产生的原因是因为 CPU 和 GPU 在两个 VSync 信号之间，没有完成显示图像的提交。要解决卡顿就需要了解 CPU 和 GPU 在两个 VSync 信号做了什么事情。</p>
+<h3 id="cpu-相关的操作">CPU 相关的操作</h3>
+<ol>
+<li>
+<p>对象创建 - 对象的创建会分配内存、调整属性、甚至还有读取文件等操作，比较消耗 CPU 资源。</p>
+</li>
+<li>
+<p>对象销毁 - 对象的销毁虽然消耗资源不多，但累积起来也是不容忽视的。通常当容器类持有大量对象时，其销毁时的资源消耗就非常明显。</p>
+</li>
+<li>
+<p>布局计算 - 如果你的视图层级过于复杂，当视图呈现或者修改的时候，计算图层帧率就会消耗一部分时间。</p>
+</li>
+<li>
+<p>解压图片 - PNG 或者 JPEG 压缩之后的图片文件会比同质量的位图小得多。但是在图片绘制到屏幕上之前，必须把它扩展成完整的未解压的尺寸（通常等同于图片宽 x 长 x 4个字节）。</p>
+</li>
+<li>
+<p>....</p>
+</li>
+</ol>
+<h3 id="gpu-相关的操作">GPU 相关的操作</h3>
+<ol>
+<li>
+<p>纹理的渲染 - 所有的 Bitmap，包括图片、文本、栅格化的内容，最终都要由内存提交到显存，绑定为 GPU Texture。不论是提交到显存的过程，还是 GPU 调整和渲染 Texture 的过程，都要消耗不少 GPU 资源。</p>
+</li>
+<li>
+<p>视图的混合 - 当多个视图重叠在一起显示时，GPU 会首先把他们混合到一起。如果视图结构过于复杂，混合的过程也会消耗很多 GPU 资源。</p>
+</li>
+<li>
+<p>降低 GPU 性能的事情：</p>
+<ul>
+<li>
+<p>太多的几何结构 - 这发生在需要太多的三角板来做变换，以应对处理器的栅格化的时候。</p>
+</li>
+<li>
+<p>重绘 - 主要由重叠的半透明图层引起。GPU 的<em>填充比率</em>（用颜色填充像素的比率）是有限的，所以需要避免<em>重绘</em>（每一帧用相同的像素填充多次）的发生。</p>
+</li>
+<li>
+<p>离屏绘制 - 这发生在当不能直接在屏幕上绘制，并且必须绘制到离屏图片的上下文中的时候。离屏绘制发生在基于 CPU 或者是 GPU 的渲染，或者是为离屏图片分配额外内存，以及切换绘制上下文，这些都会降低 GPU 性能。</p>
+</li>
+<li>
+<p>过大的图片 - 如果视图绘制超出 GPU 支持的 2048x2048 或者 4096x4096 尺寸的纹理，就必须要用 CPU 在图层每次显示之前对图片预处理，同样也会降低性能。</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>知道了 CPU 和 GPU 做的操作，就可以针对相应的操作来进行优化。例如：限制每一帧对象的创建、优化图片的处理等等。</p>
+<h2 id="tipgpu-和显卡的区别">Tip：GPU 和显卡的区别</h2>
+<blockquote>
+<p>GPU 即 Graphic Processing Unit，图像处理器，是整个显卡的核心。显卡是由 GPU、显存等等组成的。大部分情况下，我们所说 GPU 就等于指显卡，但是实际情况是 GPU 是显卡的一个核心组成部分。</p>
+</blockquote>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://www.jianshu.com/p/5f93b8ed3bbb">番外——深入垂直同步机制(VSYNC)</a></li>
+<li><a href="http://www.jianshu.com/p/71cba1711de0">脑洞大开：为啥帧率达到 60 fps 就流畅？</a></li>
+<li><a href="https://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/">iOS 保持界面流畅的技巧</a></li>
+<li><a href="https://draveness.me/asdk-rendering">使用 ASDK 性能调优 - 提升 iOS 界面的渲染性能</a></li>
+<li><a href="https://zsisme.gitbooks.io/ios-/content/chapter12/cpu-versus-gpu.html">CPU VS GPU</a></li>
+<li><a href="https://www.zhihu.com/question/48273439">显示器刷新率和显卡fps一定要很匹配吗？</a></li>
+<li><a href="https://zhidao.baidu.com/question/1603727701553635587.html">显卡和 GPU 的区别</a></li>
+<li><a href="https://zhidao.baidu.com/question/90238623.html">帧率与刷新率的区别</a></li>
+<li><a href="http://www.geforce.cn/hardware/technology/adaptive-vsync/technology">自适应垂直同步</a></li>
+</ul>
+<!-- GPU 和显卡的区别 -->
+<!-- 图片 -->
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/objective-c-zi-mian-liang/" class="post-title gt-a-link">
+                    Objective-C 字面量
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

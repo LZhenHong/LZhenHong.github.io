@@ -1,0 +1,251 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>关于 enumerateObjectsUsingBlock 的小知识点 | Eden&#39;s Blog</title>
+
+<link rel="shortcut icon" href="https://lzhenhong.github.io/favicon.ico?v=1660659286356">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://lzhenhong.github.io/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Eden&#39;s Blog
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1660659286356" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    关于 enumerateObjectsUsingBlock 的小知识点
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2016-09-08 ·
+                    </time>
+                    
+                        <a href="https://lzhenhong.github.io/tag/ieWAKptyA/" class="post-tags">
+                            # ObjC
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>在 StackOverflow 上看到 <strong><a href="http://stackoverflow.com/questions/12357904/what-is-the-bool-stop-argument-for-enumerateobjectsusingblock-used-for">这篇讨论</a></strong> 的时候，让我发现了自己的盲区，所以写下这篇文章记录一下。</p>
+<p>有一次在项目中使用的 <code>enumerateObjectsUsingBlock</code> 遍历数组的时候，使用了 return，当时没有多想，在 code review 的时候被同事指出，当时觉得不妥就改掉了，今天突然想起就去搜了一下。项目中好像没有直接跳出方法，而是执行到循环外面（这里的需求是当遍历到最后一个直接跳出循环，return 在 <code>enumerateObjectsUsingBlock</code> 相当于 continue，所以项目中会造成直接跳出循环）。</p>
+<!--more -->
+<h3 id="objc-中遍历容器数据">ObjC 中遍历容器数据</h3>
+<p>在 ObjC 中有好几种遍历容器数据的方式，这里讨论一下常用的三种。</p>
+<h4 id="c-语言风格">C 语言风格</h4>
+<p>这种不需要多说，直接上代码</p>
+<pre><code>NSArray *names = @[@&quot;lzh&quot;, @&quot;ysh&quot;, @&quot;yys&quot;];
+for (int i = 0; i &lt; names.count; ++i) {
+   NSString *name = names[i];
+   NSLog(@&quot;%@&quot;, name);
+}
+</code></pre>
+<h4 id="objc-风格">ObjC 风格</h4>
+<p>这种相信会 ObjC 的人都会，也直接上代码。这里本质是使用了 NSFastEnumeration，在 <strong><a href="http://nshipster.com/enumerators/">这里</a></strong> 了解更多</p>
+<pre><code>NSArray *names = @[@&quot;lzh&quot;, @&quot;ysh&quot;, @&quot;yys&quot;];    
+for (NSString *name in names) {
+   NSLog(@&quot;%@&quot;, name);
+}
+</code></pre>
+<p>在上面两种遍历中，我们还可使用 <code>continue</code> 和 <code>break</code> 来控制循环的跳转逻辑。</p>
+<h4 id="objc-中的-block-方式">ObjC 中的 block 方式</h4>
+<p>我们看一下如何在 <code>enumerateObjectsUsingBlock:</code> 这里控制跳转逻辑</p>
+<ul>
+<li>stop 参数的作用：停止遍历，但是会执行完 block 的代码才会退出循环</li>
+</ul>
+<pre><code>NSArray *names = @[@&quot;lzh&quot;, @&quot;ysh&quot;, @&quot;yys&quot;];
+[names enumerateObjectsUsingBlock:^(NSString *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+   if ([obj isEqualToString:@&quot;lzh&quot;]) {
+      *stop = YES; // 这里并不会马上退出循环，而是执行完 block 中的代码才退出循环
+   }
+   NSLog(@&quot;Name %@\n&quot;, obj);
+}];
+</code></pre>
+<p>运行结果：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202016-09-08%20%E4%B8%8B%E5%8D%881.28.56.png?raw=true" alt="1.png" loading="lazy"></p>
+<ul>
+<li>return 的作用：相当于前两种循环的 <code>continue</code>，会跳过此次循环</li>
+</ul>
+<pre><code>NSArray *names = @[@&quot;lzh&quot;, @&quot;ysh&quot;, @&quot;yys&quot;];
+[names enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    if ([obj isEqualToString:@&quot;lzh&quot;]) {
+       return; // 跳出此次循环
+    }
+    NSLog(@&quot;Name %@\n&quot;, obj);
+}];
+</code></pre>
+<p>运行结果：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202016-09-08%20%E4%B8%8B%E5%8D%881.35.05.png?raw=true" alt="2.png" loading="lazy"></p>
+<ul>
+<li>马上退出循环</li>
+</ul>
+<pre><code>NSArray *names = @[@&quot;lzh&quot;, @&quot;ysh&quot;, @&quot;yys&quot;];
+[names enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    if ([obj isEqualToString:@&quot;ysh&quot;]) {
+        *stop = YES;
+        return; // 立马跳出循环，并退出
+    }
+    NSLog(@&quot;Name %@\n&quot;, obj);
+}];
+</code></pre>
+<p>运行结果：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202016-09-08%20%E4%B8%8B%E5%8D%881.37.50.png?raw=true" alt="3.png" loading="lazy"></p>
+<h4 id="补充循环遍历的了解">补充循环遍历的了解</h4>
+<p>在看了 <strong><a href="http://blog.sunnyxx.com/2014/04/30/ios_iterator/">iOS 中集合遍历方法的比较和技巧</a></strong> 之后觉得自己对 ObjC 中的循环遍历还是了解的不好，决定再补上学到的知识。</p>
+<p>其他几种循环遍历：</p>
+<ul>
+<li>makeObjectsPerformSelector</li>
+<li>KVC 集合运算符</li>
+<li>enumerateObjectsUsingBlock</li>
+<li>enumerateObjectsWithOptions(NSEnumerationConcurrent)</li>
+<li>dispatch_apply</li>
+</ul>
+<h5 id="倒序遍历">倒序遍历</h5>
+<pre><code>NSArray *strings = @[@&quot;1&quot;, @&quot;2&quot;, @&quot;3&quot;];
+for (NSString *string in [strings reverseObjectEnumerator]) {
+    NSLog(@&quot;%@&quot;, string);
+}
+</code></pre>
+<p><code>reverseObjectEnumerator</code> 这个方法只会在循环第一次的调用。</p>
+<pre><code>[array enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(Sark *sark, NSUInteger idx, BOOL *stop) {
+    [sark doSomething];
+}];
+</code></pre>
+<h5 id="并发遍历">并发遍历</h5>
+<p>对于与顺序无关的遍历，我们可以使用并发来遍历容器数据。</p>
+<h5 id="block-枚举比-for-循环的好处">block 枚举比 for 循环的好处</h5>
+<p>使用 block 来枚举时，block 内部会自动添加一个 autoreleasepool：</p>
+<pre><code>[array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    // 这里有一个 @autoreleasepool 包围着
+}];
+</code></pre>
+<p>在普通 for 循环和 for-in 循环中没有，新版的 block 版本枚举器更加方便。for 循环中遍历产生大量 autorelease 变量时，就需要手动加局部 autoreleasepool。</p>
+<h3 id="总结">总结</h3>
+<p>这篇文章没有什么含量，只是将自己不知道的知识点记录下来。😅😅</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://stackoverflow.com/questions/12357904/what-is-the-bool-stop-argument-for-enumerateobjectsusingblock-used-for">What is the BOOL *stop argument for enumerateObjectsUsingBlock: used for?</a></li>
+<li><a href="http://blog.sunnyxx.com/2014/04/30/ios_iterator/">iOS 中集合遍历方法的比较和技巧</a></li>
+<li><a href="http://blog.sunnyxx.com/2014/10/15/behind-autorelease/">黑幕背后的Autorelease</a></li>
+</ul>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://lzhenhong.github.io/post/guan-yu-uitableview-de-hua-dong-you-hua-wen-ti/" class="post-title gt-a-link">
+                    关于 UITableView 的滑动优化问题
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/LZhenHong" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://twitter.com/yys_RySn" target="_blank">
+                    <i class="fab fa-twitter gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://lzhenhong.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

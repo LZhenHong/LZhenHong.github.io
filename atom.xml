@@ -1,0 +1,2423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://lzhenhong.github.io</id>
+    <title>Eden&apos;s Blog</title>
+    <updated>2022-08-16T14:18:34.685Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://lzhenhong.github.io"/>
+    <link rel="self" href="https://lzhenhong.github.io/atom.xml"/>
+    <logo>https://lzhenhong.github.io/images/avatar.png</logo>
+    <icon>https://lzhenhong.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, Eden&apos;s Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[C# 扩展方法]]></title>
+        <id>https://lzhenhong.github.io/post/c-kuo-zhan-fang-fa/</id>
+        <link href="https://lzhenhong.github.io/post/c-kuo-zhan-fang-fa/">
+        </link>
+        <updated>2022-07-09T18:09:22.000Z</updated>
+        <summary type="html"><![CDATA[<p>为什么想要把 C# 的方法扩展单独拿出来讲一下呢？</p>
+<p>因为当我们学习一门新的编程语言时，很多时候都会拿这门编程语言跟我们熟悉的编程做对比。因为编程语言的设计者不同，编程思想和理念是存在很多差别的，就算是同样相同的面向对象的编程语言，也会在细节上存在各种差异。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>为什么想要把 C# 的方法扩展单独拿出来讲一下呢？</p>
+<p>因为当我们学习一门新的编程语言时，很多时候都会拿这门编程语言跟我们熟悉的编程做对比。因为编程语言的设计者不同，编程思想和理念是存在很多差别的，就算是同样相同的面向对象的编程语言，也会在细节上存在各种差异。</p>
+<!-- more -->
+<p>我个人的编程经历是从 C 语言入门，然后就开始学习 Objective-C，在随后很长一段时间里都是和 OC 打交道，作为第一门面向对象的编程语言，OC 很大程度上影响了我的编程习惯和风格，以至于在学习其他编程语言时都会跟 OC 做对比，或者代入 OC 的编程习惯。</p>
+<p>当我在 C# 中看到<strong>扩展方法</strong>时，很快就联想到 OC 里面的类扩展。他们都可以在不修改类源码的前提下，扩展类的实例方法，但是在实现方式上存在差异。因此想简单记录下 C# 的扩展方法使用以及与 OC 类扩展的异同点。</p>
+<h1 id="扩展实现">扩展实现</h1>
+<p>先了解一下 C# 中如何实现扩展方法：</p>
+<pre><code class="language-c#">using System;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace Extension
+{
+    public static class StringExt
+    {
+        /// &lt;summary&gt;
+        /// 将字符串转换成 MD5
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;加密后的 MD5 值&lt;/returns&gt;
+        public static string MD5(this string text)
+        {
+            var md5 = new MD5CryptoServiceProvider();
+            byte[] bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(text));
+            string md5Hash = BitConverter.ToString(bytes).Replace(&quot;-&quot;, &quot;&quot;).ToLower();
+            return md5Hash;
+        }
+    }
+}
+</code></pre>
+<p>这种方式看起来的和我们自定义普通的静态工具类看起来没有什么区别，但是注意在方法的参数前面有一个 <code>this</code> 的修饰词，这个 <code>this</code> 关键字就是 C# 定义扩展方法的魔法。</p>
+<p>如果没有 <code>this</code> 关键字，我们调用这个 MD5 方法的方式是 <code>StringExt.MD5(str);</code> 这样的。</p>
+<p>在加上了 <code>this</code> 关键字之后，我们就可以像调用 string 的实例方法一样去调用 MD5 方法 <code>str.MD5();</code>，同样我们也可以像上面一样方式 <code>StringExt.MD5(str);</code> 调用。这样的调用方式看起来更符合直觉，对字符串进行 MD5 就应该像是字符串的实例方法。</p>
+<h1 id="扩展接口">扩展接口</h1>
+<p>如果我们需要为 C# 写一些工具类方法，扩展方法是很理想的实现方式。但是扩展方法的使用场景更强大，上面举的例子是针对于特定的类实现的扩展方法，但是扩展方法还可以针对于接口。例如： <code>System.Linq.Enumerable</code> 中有很多对接口 <code>IEnumerable&lt;T&gt;</code> 的扩展方法 (<code>Where/SortBy/ThenBy </code>等)。</p>
+<p>下面的例子来自《Effective C#》P125：</p>
+<pre><code class="language-c#">public static class Comparable
+{
+    public static bool LessThan&lt;T&gt;(this T left, T right) where T : IComparable&lt;T&gt; =&gt; left.CompareTo(right) &lt; 0;
+}
+</code></pre>
+<p>这里示例是扩展 <code>IComparable</code> 接口，所有实现 <code>IComparable</code> 接口类的实例都可以使用 <code>LessThan</code> 方法，这个就是扩展方法强大的地方。虽然没有 Swift 扩展那么强大，但是也足够我们在扩展类的方法上有了另一种选择。</p>
+<p>用扩展的方式来扩充类方法是最好的实践，我们可以利用 <code>namespace</code> 来区分不同分类的扩展方法。例如：把排序相关的扩展方法放在 Sort 命名空间下，把转换相关的扩展方法放在 Transform 命名空间下，这样使用者就是根据自身的需求来引入不同的命名空间，来扩展现有类的实例方法。在扩展方法的支持下，我们把一个类的实现分成基础类加上不同分类的扩展方法，这样的实现方法可以减少对原始类的修改或者编写新的派生类。</p>
+<h1 id="注意点">注意点</h1>
+<p>扩展方法的实现方法是因为 C# 编译器在编译过程中生成的中间语言 (IL) 会将扩展方法的实例调用转换成对静态方法的调用。所以 <code>str.MD5();</code> 在经过编译器编译之后与 <code>StringExt.MD5(str);</code> 是没有区别的。</p>
+<p>当了解了编译器的实现扩展方法的方式之后，我们对扩展方法的特点也可以描述出来。</p>
+<ol>
+<li>
+<p>可以利用扩展方法为枚举类型编写方法。</p>
+</li>
+<li>
+<p>如果扩展方法是针对于值类型，因为值类型的参数传递是复制，在扩展方法中的修改不会影响原始值，可以使用 <code>ref</code> 关键字解决。</p>
+</li>
+<li>
+<p>不能重写扩展方法 ，当有多个相同方法签名的扩展方法时，C# 编译器会选择第一个被找到的扩展方法。</p>
+</li>
+<li>
+<p>如果扩展方法与该类型中定义的方法具有相同的方法签名，C# 编译器在编译过程中选择方法实现时会优先选择类型中定义的方法，扩展方法不会被调用。</p>
+</li>
+<li>
+<p>不能访问类型中的私有变量，这个跟静态方法的限制是一样的。</p>
+</li>
+</ol>
+<h1 id="相关链接">相关链接</h1>
+<ol>
+<li><a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/extension-methods">扩展方法（C# 编程指南）</a></li>
+<li><a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/how-to-implement-and-call-a-custom-extension-method">如何实现和调用自定义扩展方法（C# 编程指南）</a></li>
+<li>《Effective C#》第 27 条、第 28 条</li>
+</ol>
+<!-- more -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Promise 与动画]]></title>
+        <id>https://lzhenhong.github.io/post/promise-yu-dong-hua/</id>
+        <link href="https://lzhenhong.github.io/post/promise-yu-dong-hua/">
+        </link>
+        <updated>2022-07-02T15:45:47.000Z</updated>
+        <summary type="html"><![CDATA[<p>学习编程语言的过程都是相似的，先介绍语言基础类型、流程控制、函数格式等。编程的过程基本上就是流程的控制，判断状态，执行不同的逻辑，类、对象、方法是行为的封装。我们在刚接触编程会写很多 if-else、switch，为了减少 if-else 和 switch 的使用，会有继承、设计模式的应用。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>学习编程语言的过程都是相似的，先介绍语言基础类型、流程控制、函数格式等。编程的过程基本上就是流程的控制，判断状态，执行不同的逻辑，类、对象、方法是行为的封装。我们在刚接触编程会写很多 if-else、switch，为了减少 if-else 和 switch 的使用，会有继承、设计模式的应用。</p>
+<!-- more -->
+<p>在流程控制中有一种特别的存在，就是异步处理，在我个人的编程生涯很长一段时间里都是以回调或者委托的方式处理。回调的方式可以把逻辑写在一处，同时可以很轻松得到异步处理的上下文，但是多个异步处理的情况就会导致回调地狱。委托的方式则会把回调逻辑分开，上下文需要另外维护。</p>
+<p>如何控制好异步处理的逻辑是很重要的，回调方式和委托的方式大部分情况下都不是最优解。现在有更好的 Promise 解决方案，再结合 <code>async/await</code> 的语法糖，让我们得以以同步的方式来处理异步逻辑，更好控制异步逻辑的流程。</p>
+<p><s>Promise 真的是一学就后悔，后悔学晚了。</s></p>
+<h1 id="promise-简介">Promise 简介</h1>
+<p>Promise 可以很方便对异步操作进行封装。Promise 提供的链式接口可以很便捷顺序组装、合并组装异步操作。</p>
+<pre><code class="language-typescript">function main() {
+    requestData((isSucc, data, error) =&gt; {
+        if (isSucc) {
+            console.log(data);
+        } else {
+            console.error(error);
+        }
+    });
+}
+
+function requestData(complete: (isSucc: boolean, data?: any, error?: any) =&gt; void) {
+    sendRequest((data) =&gt; {
+        complete(true, data)
+    }, (error) =&gt; {
+        complete(false, null, error);
+    });
+}
+
+function sendRequest(success: (data: any) =&gt; void, failure: (error: any) =&gt; void) {
+    // Send request to server.
+    // 伪代码
+    if (succ) {
+        success(data);
+    } else {
+        failure(error);
+    }
+}
+</code></pre>
+<p>这里以一个简单的网络请求为例，网络请求是程序开发中最常见的异步操作。这种回调方案是刚接触编程常用的处理方式。这种方式看起来也没有太大的问题，把网络请求的结果处理另外封装成单独的函数，看起来也是很简洁的。但是这样我们在处理多个异步操作时，就会发现我们要理顺异步操作的流程，就需要不停的在回调里跳转。如果不把处理异步处理封装成单独的函数，就会出现回调地狱的情况。</p>
+<p>下面来看 Promise 的解决方案。</p>
+<pre><code class="language-typescript">function main() {
+    requestDataAsync().then(console.log, console.error);
+}
+
+function requestDataAsync(): Promise&lt;any&gt; {
+    return new Promise((resolve, reject) =&gt; {
+        sendRequest((data) =&gt; {
+            resolve(data);
+        }, (error) =&gt; {
+            reject(error);
+        })
+    });
+}
+
+function sendRequest(success: (data: any) =&gt; void, failure: (error: any) =&gt; void) {
+    ...
+}
+</code></pre>
+<p>Promise 的解决方案跟异步回调的处理方式貌似没有太大的区别，但是这只是一个异步处理，如果有多个异步处理，Promise 是可以直接在 then 方法里返回下一个异步处理的 Promise ，这样异步处理就可以顺序执行。</p>
+<p>在异步处理的流程里，Promise 可以清晰表明每一步异步处理。可以很方便调整异步处理的顺序，也可以快速新增或删除某一个异步处理，这是在回调方式中难以办到的。</p>
+<h1 id="动画的回调">动画的回调</h1>
+<p>程序为了给用户更好的体验和表现，会在程序中加入很多动画以优化程序表现和用户体验。动画是不易发现的异步操作，我们经常会在播放动画后，执行某种操作。类似于上面的网络请求例子，当有多个动画执行，如何控制动画的执行顺序和回调的运行时机是动画中非常重要的部分。</p>
+<p>我们以两种常见的动画场景举例：</p>
+<h2 id="多个动画顺序播放播放完成执行回调">多个动画顺序播放，播放完成执行回调</h2>
+<pre><code class="language-typescript">function main() {
+    let players: Player[] = [p1, p2, p3, p4, p5];
+    playAnimations(players, () =&gt; {
+        console.log('Animation over!');
+    });
+}
+
+function playAnimations(players: Player[], callback: Function) {
+    if (players.length &gt; 0) {
+        player = players.shift();
+        playerMoveAnimation(player, playAnimations(players, callback));
+    } else {
+        callback();
+    }
+}
+
+function playerMoveAnimation(player: Player, callback: Function) {
+    player.playMoveAnimation(callback);
+}
+</code></pre>
+<p>在这种动画情况下，我们在上一次动画执行完的回调里执行下一次回调，举例的还是一样的动画，可以用递归的方式处理。如果每次动画都是不相同的，则很容易导致回调地狱。</p>
+<h2 id="多个动画同时播放播放完成执行回调">多个动画同时播放，播放完成执行回调</h2>
+<pre><code class="language-typescript">function main() {
+    let players: Player[] = [p1, p2, p3, p4, p5];
+    let callback = () =&gt; {
+        console.log('Animation over!');
+    };
+    players.forEach((player, index) =&gt; {
+        let func = index == (players.length - 1) ? callback : null;
+        playerMoveAnimation(player, func);
+    });
+}
+
+function playerMoveAnimation(player: Player, callback?: Function) {
+    ...
+}
+</code></pre>
+<p>上述代码在执行回调时，判断是不是最后一个动画，如果是最后一个动画，则把回调传入，否则传入空值。这种还是最简单的情况，我们假设每个动画的时间是一样的。但是如果每个动画的时长不同，如何在动画时长最长的动画播放完成之后执行回调，是需要花一番工夫的，我们需要获取到每次动画的动画时长，然后根据动画时长判断是否需要传入回调。</p>
+<h1 id="动画的-promise-实现方式">动画的 Promise 实现方式</h1>
+<p>针对于上面举例的动画案例。我们用 Promise 如何优雅的解决。</p>
+<h2 id="多个动画顺序播放播放完成执行回调-2">多个动画顺序播放，播放完成执行回调</h2>
+<pre><code class="language-typescript">function main() {
+    let players: Player[] = [p1, p2, p3, p4, p5];
+    let promise = players.reduce((pre, cur) =&gt; pre.then(playerMoveAnimationAsync(cur)), Promise.resolve());
+    promise.then(_ =&gt; console.log('Animation over!'));
+}
+
+function playerMoveAnimationAsync(player: Player) {
+    return new Promise(resolve =&gt; {    
+        player.playMoveAnimation(resolve);
+    });
+}
+</code></pre>
+<p>通过将每个动画转换成 Promise 的形式，然后利用 Promise 的 then 将每个动画 Promise 连接起来，Promise 会在执行完之后再执行 then 方法，这样就实现了动画播放，我们只需要监听最后的 Promise 的 then 方法，执行我们的回调，就实现了动画需求。</p>
+<p>相较于普通的回调处理方式，Promise 的方案更为简洁，同时动画的调整也会变得更为便捷。</p>
+<h2 id="多个动画同时播放播放完成执行回调-2">多个动画同时播放，播放完成执行回调</h2>
+<pre><code class="language-typescript">function main() {
+    let players: Player[] = [p1, p2, p3, p4, p5];
+    let promises = players.map(player =&gt; playerMoveAnimationAsync(player));
+    Promise.resolve().then(_ =&gt; Promise.all(promises)).then(_ =&gt; console.log('Animation over!'));
+}
+
+function playerMoveAnimationAsync(player: Player) {
+    ...
+}
+</code></pre>
+<p>这里通过 <code>Promise.all</code> 方法来处理动画 Promise 数组，<code>Promise.all</code> 这个方法会在所有的 Promise 执行完成，才会执行 then 方法。</p>
+<p>这个方法完美契合我们同时执行动画的需求，而且不用担心每个动画的动画时长不一样，因为这个方法会等待所有 Promise 执行完成，所以会在动画时长最长的动画运行完再执行回调。</p>
+<h1 id="promise-的注意点">Promise 的注意点</h1>
+<p>上面的举例都只考虑了 Promise 正常执行的情况，如果 Promise 抛出 reject，如何应对是需要注意的点。如果在每个 Promise 的 then 方法单独处理 reject 回调，会显得很有点繁琐，也可能会出现很多重复代码。如果统一用 catch 处理，又会难以辨别 reject 是哪个 Promise 抛出的。</p>
+<p>如果封装的 Promise 只给自己使用，我们可以了解 Promise 内部是如果处理 resolve 和 reject 的。但是封装的 Promise 要提供给他人使用，就需要统一 resolve 和 reject 的处理标准，并且一直遵守，当有统一的共识存在。如何应对 reject 以及针对不同的 reject 恢复程序状态，就会显得很轻松。</p>
+<h1 id="最后">最后</h1>
+<p>在程序的世界里，是没有银弹可以解决一切问题，只有针对于特定需求的最佳解决方案。所以，多学习了解各种技术，是程序员进阶的必不可少的步骤。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[整洁的代码]]></title>
+        <id>https://lzhenhong.github.io/post/zheng-ji-de-dai-ma/</id>
+        <link href="https://lzhenhong.github.io/post/zheng-ji-de-dai-ma/">
+        </link>
+        <updated>2022-04-18T07:34:35.000Z</updated>
+        <summary type="html"><![CDATA[<p>在说到写代码这件事之前，可以先来聊聊程序员这份职业。我不太清楚大家对于程序员这份职业的理解是什么，我简单说下我对程序员认知的变化吧，或者说我对职业的认知。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>在说到写代码这件事之前，可以先来聊聊程序员这份职业。我不太清楚大家对于程序员这份职业的理解是什么，我简单说下我对程序员认知的变化吧，或者说我对职业的认知。</p>
+<!-- more -->
+<p>几年前大四要毕业的我磕磕碰碰找了份游戏开发的工作，初入职场的我对程序员这份工作感到很新奇，看似每天如饥似渴的学习着功能开发，做着每天安排的需求，好似每天都在进步。当时对程序员的认知就是每天写着代码，开发着需求，完成安排的工作就好了。久而久之，就会发现每天都在重复做的同样的事情，bug 层出不穷，技术也没有提升，一直都在原地踏步。渐渐的，失去了写代码的兴趣，也对程序员这个职业没有了激情。</p>
+<p>不知道怎么的去年 3 月份突然开窍，写代码这件事是我们程序员的手艺啊，是我们赖以生存的工具，不好好琢磨提升这门手艺，注定会被淘汰。写代码这门手艺的门槛很低，因为代码是不会面向用户的，代码是在底层运行，用户面对的是界面操作，界面好不好看，功能好不好用，是用户关心的，至于代码写的好不好，大概只有程序员关心。因此，不管好代码、烂代码，只要在面对用户没有致命的 bug，也就不会有太大问题，导致很多项目的代码在中后期就没法维护了，或者维护起来很困难。</p>
+<p>程序员写代码，就像木匠雕刻工艺品，厨师烹饪佳肴。不能因为代码藏的深，不直接面对用户，而忽略了这门手艺的修炼。不管在任何行业，做着什么样的工作，磨练手艺都是重要的。</p>
+<p>闲扯了很多，还是继续我们的主题吧。</p>
+<p>在作为程序员工作了五年之后，发现程序员的工作更多时间都是在阅读代码，而不是在写代码。不管是做需求，还是改 bug，或者是想优化结构，代码总是在被修改，修改代码之前就需要理解代码在做的事情，了解上下文。所以，利于阅读和理解的代码就是整洁的代码。</p>
+<h2 id="命名">命名</h2>
+<p>命名这件事放到第一个说，因为它真的太重要了。程序员在写代码期间，每时每刻都在命名，类名、变量名、函数名、接口名等。</p>
+<h3 id="命名准确">命名准确</h3>
+<p>好的命名有助于理解代码段正在做的事情。例如：</p>
+<p><code>int d = 5;</code></p>
+<p>你可以一眼看出来这个变量代表的含义吗，我相信大部分程序员应该是不理解的。要理解这个变量的含义，就需要浏览代码上下文，理解代码段逻辑之后再去推断。</p>
+<p><code>int dayPassedSinceSunday = 5;</code></p>
+<p>这个变量名代表的含义我相信即使不是程序员也能看出来。阅读的人不需要了解上下文做了什么事情，只需要看到这个名称就可以理解。</p>
+<h3 id="少使用魔数">少使用魔数</h3>
+<p>魔数指的是在代码中出现的整数字面量，没有任何含义，它就这样出现，触不及防。</p>
+<pre><code class="language-typescript">for (let i = 0; i &lt; 7; ++i) {
+    // do something with varible i
+}
+</code></pre>
+<p>上面代码中出现的数字 7，就是 magic number，它代表的含义不明，而且可能散落在代码各处，当要修改的时候，完全不知道各处的魔数是否代表同一含义。</p>
+<pre><code class="language-typescript">const MAX_PLAYERS_IN_ROOM = 7;
+for (let i = 0; i &lt; MAX_PLAYERS_IN_ROOM; ++i) {
+    // do something with varible i
+}
+</code></pre>
+<p>上面的数字字面量被常量取代了，数字 7 有了自己的含义。而且即使代码中多处使用了常量 <code>MAX_PLAYERS_IN_ROOM</code>，要修改的时候只需要修改常量定义这一处，不需要每一处去改动。</p>
+<p>这里只是以整数举例，在代码中都不应该直接出现字面量，如字符串、整数、布尔值等等，要为它们赋予含义，统一使用，在以后的阅读和修改都会感受到好处。</p>
+<h2 id="注释">注释</h2>
+<p>代码注释拿出来单独说，是因为每个程序员对写注释的态度都不一样，有些程序员不喜欢写注释，有些程序员注释比代码更详细。</p>
+<p>首先，我们应该要明白几点：</p>
+<ul>
+<li>注释不能优化代码，烂代码不会因为注释变成好代码。</li>
+<li>注释可能告诉你错误的信息，只有代码才是最真实的，因为代码会有很多人去修改、去维护，但是不一定每个程序员都会去维护注释。久而久之，注释可能出现在其他位置，与最开始注释的代码相距甚远。还会出现需求逻辑已经被修改，但是注释描述的是之前的逻辑。</li>
+<li>很多程序员喜欢注释代码，觉得可能会出现需求被改成之前的逻辑。但是现在有 Git、SVN 等版本控制工具，你删掉的代码在任何时候都可以被找回。别人看到注释掉的代码，认为这个代码可能还有其他用处，就导致注释的代码一直留着，无人问津。</li>
+</ul>
+<p>注释跟命名也会有一定联系，好的命名就相当于注释。这种加注释描述的形式：<code>int d = 5; // 距周日过去了多少天</code>，不如准确的命名：<code>int dayPassedSinceSunday = 5;</code>。</p>
+<p>应该加注释的地方是代码表现不出来的地方，代码只能解释“怎么做”，但为什么这么做代码是表现不出来的。一些啰嗦、冗余、抖机灵的注释不应该出现，它会分散读者的视线。</p>
+<h2 id="代码风格">代码风格</h2>
+<p>每位程序员有各自写代码的习惯和风格，但是作为一个团队，代码的风格需要统一。如果在项目中出现多种风格的代码就像是你在语文书中看到数学书中的文字，你需要暂时停下来转化下思维，才能继续读下去。</p>
+<p>在项目启动之前，团队成员需要一起制定项目的代码风格，输出成文档。不管你是否喜欢，既然大家达成共识，就要遵守。统一编写代码的风格，也是利于代码阅读的有效方式。</p>
+<h2 id="设计模式">设计模式</h2>
+<p>设计模式是从实际项目中总结出来的，是某些特定问题下的最佳实践。在合适的时机使用设计模式，可以保证代码的重用性、可扩展性。</p>
+<p>设计模式是程序世界中的被广泛认可的，标准的设计模式实现在其他也了解设计模式的程序员看起来会非常亲切和熟悉，自然也就容易理解和阅读。</p>
+<p>作为程序员，要熟悉、了解常用的设计模式，基础的工厂模式、单例模式、组合模式等等。更详细可看：<a href="https://refactoring.guru/design-patterns">设计模式</a>。</p>
+<h2 id="编程思想">编程思想</h2>
+<p>现在编程世界的语言太多了，C / C# / C++ / Objective-C / Swift / Java / TypeScript / Python / Rust 等等，当熟练掌握了一门编程语言，会发现转向其他语言时，刚写出来的代码都是带着之前编程语言的味道。因为编程语言在设计时是带着设计者的思想，设计者会把自己的编程思想灌注到编程语言，这样就导致编程语言的最佳实践会有很大差异。例如：C 语言是面向过程的语言，C# 是面向对象的语言，这样的差异就会导致在解决同样的问题解决思路完全不一样。</p>
+<p>当时在 Apple 在推出 Swift 之后，刚写 Swift 代码挥发现怎么写怎么别扭，写出来的代码带着浓浓的 OC 味，也很不理解为什么 Swift 会给枚举增加这么多功能，枚举可以定义方法，可以携带关联值。但是在熟悉了语言后，就会发现 Swift 针对于某些问题有完全不同的实现方式，相较于 OC 的实现更为优雅、整洁。而且 Swift 在提升了扩展的等级后，发展出了 POP（面向协议编程），跟面向过程编程和面向对象编程完全不同的思想。</p>
+<p>我们学习一门编程语言，不应该只关注于语言的语法，更应该关注设计者表达的思想。了解设计者的思想之后，就能写出更合理、优雅的代码。</p>
+<h2 id="最后">最后</h2>
+<p>试着回想一下，你是否有过看着过去写的代码觉得很羞耻的感觉，觉得代码写的真垃圾。其实不用太在意，几乎没有人可以在一开始就把代码写的整洁，利于阅读。即使做了提前设计，中途也会因为需求变化，或者其他原因，导致最终实现与初期的设计相距甚远。代码是需要修改和维护的，初期代码实现也繁杂，而且也不能考虑到所有情况，不能一直保持代码的整洁，不过我们需要时刻提醒自己注意代码的整洁，尽可能保证代码优雅。</p>
+<p>就像代码一样，人站在今天审视着过去的自己，很容易对以前产生种种不满，会做出各种假设、如果，而忽视了今天的自己。渐渐的，今天的自己变成昨天的自己，昨天的自己依然做着假设，时间就这样悄然而逝。</p>
+<p>过去已然，未来不明，现在可改。</p>
+<p>也许有一天，你不再是程序员，进入了其他的行业，做着不同的工作。同样，你也不该停下学习的脚步，不管在哪一行，做着什么样的工作，技巧需要练习，技艺需要精进。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[集合函数式编程]]></title>
+        <id>https://lzhenhong.github.io/post/han-shu-shi-bian-cheng-xiao-jie/</id>
+        <link href="https://lzhenhong.github.io/post/han-shu-shi-bian-cheng-xiao-jie/">
+        </link>
+        <updated>2022-02-07T23:07:25.000Z</updated>
+        <summary type="html"><![CDATA[<p>相信大多数程序员接触到的第一门编程语言都是 C 语言，我们的编程思维基本上都是 C 语言帮助我们塑造的，这种编程思想会贯彻我们整个职业生涯。C 语言是一门面向过程的语言，表达力强、非常直观，是初学编程接受程度较高的语言。但是随着程序应用越来越广泛，面向过程的编程思想对现实世界的抽象稍显不足。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>相信大多数程序员接触到的第一门编程语言都是 C 语言，我们的编程思维基本上都是 C 语言帮助我们塑造的，这种编程思想会贯彻我们整个职业生涯。C 语言是一门面向过程的语言，表达力强、非常直观，是初学编程接受程度较高的语言。但是随着程序应用越来越广泛，面向过程的编程思想对现实世界的抽象稍显不足。</p>
+<!-- more -->
+<p>一般接下来接触的就是面向对象的编程语言，一般是 Java 或者 C++，现在流行的编程语言几乎都是面向对象，面向对象的编程思想足够我们应付几乎所有的问题，即使你不了解文章要说的<strong>函数式编程</strong>也没有任何问题，也不会对我们在日常编程中解决问题有什么影响。但是理解函数式编程会在解决某些问题上显得更优雅，函数式编程和面向对象编程并不冲突，没有孰优孰劣。相反，这两种编程思想是相辅相成的，现在很多语言，例如：Java、C# 等，随着编程思想的发展，在面向对象的基础上也开始支持函数式编程，为我们解决问题提供多种方案，像 Swift 这种新兴语言从一开始就是支持面向对象和函数式编程的。所以，了解函数式编程是很有必要的。</p>
+<h2 id="数组-for-循环遍历">数组 for 循环遍历</h2>
+<p>数组是 C 语言中常见的数据结构，也是我们在编程过程中常接触的，对于数组的遍历，C 语言中的方式就是使用 for 循环或者 while 循环。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+   int n[10];
+   int i, j;
+
+   for (i = 0; i &lt; 10; ++i) {
+      n[i] = i + 100;
+   }
+
+   for (j = 0; j &lt; 10; ++j) {
+      printf(&quot;第[%d]个 = %d\n&quot;, j, n[j]);
+   }
+
+   return 0;
+}
+</code></pre>
+<p>尽管后续的一些语言中有 for-in 或者 for-of 的遍历方式，但跟 C 语言的 for 循环遍历也是差不多的，只是省去了我们从数组中取出元素的步骤，但是这样我们需要自己维护遍历索引。</p>
+<pre><code class="language-c#">using System;
+
+class TestArray
+{
+    static void Main(string[] args)
+    {
+        int[] n = new int[10];
+        for (int i = 0; i &lt; 10; ++i)
+        {
+            n[i] = i + 100;
+        }
+
+        foreach (int j in n)
+        {
+            int i = j - 100;
+            Console.WriteLine(&quot;第[{0}]个 = {1}&quot;, i, j);
+        }
+        Console.ReadKey();
+    }
+}
+</code></pre>
+<p>这种 C 语言风格的数组遍历方式是我们操作数组元素的基础，如果我们需要对数组中的某些元素进行操作，我们也会遍历数组中所有的元素，在进行操作之前先判断是否符合要求，不符合要求则用 <code>continue</code> 跳过。考虑数组的操作一直都是停留在数组元素上，没有从数组的整体来思考。函数式编程会从更高的层次来考虑，把数组当作整体，我们对数组元素的判断其实就是对数组进行过滤，然后再对过滤后的数组进行操作，函数式编程将这些数组常用的操作封装起来，让我们从另一种角度操作集合。</p>
+<h2 id="函数式操作集合">函数式操作集合</h2>
+<p>在上文有提到过，函数式操作集合是从整体上考虑的，这种方式不会聚焦于集合中的元素。它将我们对集合的常用操作抽象出来，例如：过滤、遍历、转换等，分别对应的函数就是 filter/forEach/map，这里使用的是常用的函数名，一些语言有相同作用的函数，但是名称可能会不一样。</p>
+<p>这里举一个例子，<em>将数组中为双数的数字翻倍之后打印出来</em>。</p>
+<h3 id="c-语言风格的遍历">C 语言风格的遍历</h3>
+<pre><code class="language-typescript">let nums: Array&lt;number&gt; = [1, 2, 3, 4, 5];
+for (let i = 0; i &lt; nums.length; ++i) {
+    let num = nums[i];
+    if (num % 2 != 0) {
+        continue;
+    }
+    num *= 2;
+    console.log(`number: ${num}`);
+}
+</code></pre>
+<p>上面的代码是很典型的 C 语言风格的遍历，可以看到我们是针对于单个元素，在遍历中取出单个元素，然后进行需求中的操作。这种方式很符合我们的直觉，在很长一段时间里，我都是以这种方式来处理集合的，集合拿到手上不管三七二十一，先执行遍历，随后在对单个元素执行我们想要的操作。</p>
+<h3 id="函数式风格">函数式风格</h3>
+<pre><code class="language-typescript">let nums: Array&lt;number&gt; = [1, 2, 3, 4, 5];
+nums.filter(num =&gt; num % 2 == 0)
+    .map(num =&gt; num * 2)
+    .forEach(num =&gt; console.log(`number: ${num}`));
+</code></pre>
+<p>函数式的风格相较于 C 语言的风格，一眼看上去没有那么好理解，其实是非常简单的。在 C 语言风格执行的 <code>continue</code> 操作，就相当于函数式编程中的过滤，对应到例子上就是过滤出双数，然后执行转换操作，对应到例子上就是将双数翻倍，然后遍历翻倍后的计算结果打印出来。</p>
+<p>当熟悉了集合常用的操作函数，会发现这种方式对集合问题的抽象更为合理，并且更为简洁，尽管 C 语言风格更为直观，但是程序员就应该用更合理、更优雅的方式来解决问题。以 TypeScript 语言为例，TS 还为集合提供了其他有用的操作，例如 reduce/find/findIndex/some/every。</p>
+<p>我们把上面的例子扩展一下，<em>将数组中为双数的数字翻倍之后相加，打印相加之后的数值</em>。</p>
+<h3 id="c-语言风格">C 语言风格</h3>
+<pre><code class="language-typescript">let nums: Array&lt;number&gt; = [1, 2, 3, 4, 5];
+let sum = 0;
+for (let i = 0; i &lt; nums.length; ++i) {
+    let num = nums[i];
+    if (num % 2 != 0) {
+        continue;
+    }
+    sum += num * 2;
+}
+console.log(`number: ${sum}`);
+</code></pre>
+<p>在 C 语言的风格里我们需要额外定义一个变量 <code>sum</code> 来保存上次遍历相加后的数值。</p>
+<h3 id="函数式风格-2">函数式风格</h3>
+<pre><code class="language-typescript">let nums: Array&lt;number&gt; = [1, 2, 3, 4, 5];
+let sum = nums.filter(num =&gt; num % 2 == 0)
+    .map(num =&gt; num * 2)
+    .reduce((pre, cur) =&gt; pre + cur);
+console.log(`number: ${sum}`);
+</code></pre>
+<p>函数式的方式把每一步区分的非常明显，我们可以任意增加和删减其中一步。得益于 TS 箭头函数的支持，相较于 C 语言风格的实现更为整洁。</p>
+<h2 id="总结">总结</h2>
+<p>当然函数式编程能做的事情非常多，这里介绍的只是集合函数式编程的基础，语言给我们提供了好用的工具，如何组合这些工具去解决问题，是我们在实际编程中要去思考的。当然，函数式编程不是万能的，它只是针对于某些问题有更好的解决方式。</p>
+<p>也许有人会说不用函数式也能解决问题，函数式编程没啥用。但是作为程序员的我们，学习如何把需求更优雅的解决，不是应该的吗，毕竟需求总是在变，代码总会被修改。</p>
+<p>写好代码应该是每一个程序员的追求。正如诗人对写出好诗的追求，画家对画出好画的追求。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Unity 热更 ILRuntime 基本原理]]></title>
+        <id>https://lzhenhong.github.io/post/unity-re-geng-ilruntime-ji-ben-yuan-li/</id>
+        <link href="https://lzhenhong.github.io/post/unity-re-geng-ilruntime-ji-ben-yuan-li/">
+        </link>
+        <updated>2021-03-22T13:56:46.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>CIL: Common Intermediate Language，通用中间语言<br>
+CLI: Common Language Infrastructure，通用语言基础结构<br>
+JIT: Just-in-Time compilation，即时编译<br>
+AOT: Ahead-of-Time，提前编译或静态编译</p>
+</blockquote>
+<p>对 Unity 有一定的了解应该都知道 Unity 本身是不支持热更新的，但是在各种需求的驱使下，想要完全不用热更新几乎是不可能的，所以就诞生了很多热更新方案。有 tolua、xlua 这些成熟的 lua 解决方案，也有就是完全用 C# 实现的 ILRuntime 方案，因为热更新的代码也是用 C# 实现，没有 lua 的学习成本，现在 ILRuntime 的热更新方案越来越流行。</p>
+<p>我们今天就着重介绍一下 ILRuntime 以及它的基本原理。</p>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>CIL: Common Intermediate Language，通用中间语言<br>
+CLI: Common Language Infrastructure，通用语言基础结构<br>
+JIT: Just-in-Time compilation，即时编译<br>
+AOT: Ahead-of-Time，提前编译或静态编译</p>
+</blockquote>
+<p>对 Unity 有一定的了解应该都知道 Unity 本身是不支持热更新的，但是在各种需求的驱使下，想要完全不用热更新几乎是不可能的，所以就诞生了很多热更新方案。有 tolua、xlua 这些成熟的 lua 解决方案，也有就是完全用 C# 实现的 ILRuntime 方案，因为热更新的代码也是用 C# 实现，没有 lua 的学习成本，现在 ILRuntime 的热更新方案越来越流行。</p>
+<p>我们今天就着重介绍一下 ILRuntime 以及它的基本原理。</p>
+<!--more-->
+<h2 id="为何-unity-不支持热更新">为何 Unity 不支持热更新</h2>
+<p>要解释为何 Unity 不支持热更新就要从 Unity 是如何实现跨平台说起。Unity 会先将代码编译成叫做 CIL 的代码指令集，CIL 可以在任何支持 CLI 的环境中运行，Unity 最开始使用的 Mono 运行时来支持 CIL 的运行，现在也可以使用 Unity 自身实现的 IL2CPP 来支持 CIL 的运行，运行时可以将 CIL 指令集转换成平台的本地指令， 所以我们可以在 Unity 用 C# 实现一套代码然后在多平台上运行。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/ilruntime_cil.png?raw=true' alt='ILRuntime CIL' />
+</div>
+<p>通过上面的图我们看到整体的流程，首先我们通过 C# 代码编写游戏逻辑，Unity 打包会将 C# 编译成 CIL，然后通过 Mono 运行时运行在原生平台上，这样就实现了游戏的跨平台。</p>
+<p>现在我们集中在 Mono 运行时上，我们需要了解一下 Mono 是如何将 CIL 编译成原生平台的机器码，Mono 提供了两种编译方式：JIT 和 AOT，JIT 会在运行才进行编译，AOT 会提前将代码编译好随后直接运行。既然 Mono 提供了 JIT，从技术上的角度来说，是可以进行热更新，为什么 Unity 不支持呢？原因就是 iOS、PS、Xbox 等平台是不允许 JIT 的，Unity 要支持这些平台，即使其他平台可以实现热更新，但是 Unity 官方也没有提供热更新方案。</p>
+<h2 id="程序域-appdomain">程序域 AppDomain</h2>
+<p>Unity 在运行期间会默认构建一个程序域 AppDomain，程序域中是可以加载多个程序集 Assembly。例如：Unity 的程序域中会存在 System.dll、UnityEngine.UI.dll 等。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/ilruntime_appdomain.png?raw=true' alt='ILRuntime AppDomain' />
+</div>
+<p>Unity 会将未放在 StreamingAssets 路径下的程序集都加载到默认的程序域中，如果将热更新的 DLL 文件放在其他目录下，随后再去加载热更新 DLL，这种方式热更新的 DLL 不会生效，Unity 使用的还是之前的热更新 DLL 文件。如果不考虑不支持 JIT 的平台，其实也可以用利用 C# 动态加载 DLL 来实现热更新。如下所示：</p>
+<pre><code class="language-C#">string dllPath = &quot;{DLL_Path}&quot;;
+var dllUri = new Uri(dllPath);
+UnityWebRequest webRequest = UnityWebRequest.Get(dllUri);
+yield return webRequest.SendWebRequest();
+if (webRequest.isNetworkError || webRequest.isHttpError)
+{
+    Debug.LogError($&quot;Load Hotfix DLL error at path: {dllPath}&quot;);
+    yield return null;
+}
+byte[] mDllBytes = webRequest.downloadHandler.data;
+webRequest.Dispose();
+
+try {
+    Assembly assembly = Assembly.Load(mDllBytes);
+    var types = assembly.GetTypes();
+    for (var innerType in types)
+    {
+        if (innerType.Name == &quot;Class_Name&quot;)
+        {
+            var instance = Activator.CreateInstance(innerType);
+            MethodInfo method = innerType.GetMethod(&quot;Method_Name&quot;);
+            if (method != null)
+            {
+                var returnValue = method.Invoke(instance, null);
+                Debug.Log(&quot;Return value: &quot; + returnValue);
+            }
+        }
+    }
+}
+catch (Exception exception)
+{
+    Debug.LogError(exception.Message);
+}
+</code></pre>
+<h2 id="ilruntime">ILRuntime</h2>
+<p>ILRuntime 的使用是需要区分两个 VS 工程，一个是 Unity 生成的主工程，另一个就是生成 DLL 文件的热更工程，ILRuntime 通过解析 DLL 文件实现热更新。</p>
+<p>根据 ILRuntime 官网上的介绍：&quot;ILRuntime 借助 Mono.Cecil 库来读取 DLL 的 PE 信息，以及当中类型的所有信息，最终得到方法的 IL 汇编码，然后通过内置的 IL 解译执行虚拟机来执行 DLL 中的代码。&quot;</p>
+<p>DLL 的内容就是 IL 指令，CIL 类似一个面向对象的组合语言，并且它是完全基于堆栈的，它运行在虚拟机上。从 ILRuntime 官网上的定义可知，ILRuntime 实现了 IL 解释执行虚拟机和自己的 IL 托管栈来模拟代码的执行，在 ILRuntime 解释执行期间，所有的对象都是用 StackObject 表示的，没有新类型的生成，所以不存在运行时编译的情况，由此可以实现热更新的动态加载。</p>
+<h2 id="ilruntime-使用">ILRuntime 使用</h2>
+<h3 id="简单使用">简单使用</h3>
+<pre><code class="language-c#">ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+
+void Start()
+{
+    StartCoroutine(LoadILRuntime());
+}
+
+IEnumerator LoadILRuntime()
+{
+    appdomain = new ILRuntime.Runtime.Enviorment.AppDomain();
+
+    var dllUri = new Uri(dllPath);
+    UnityWebRequest webRequest = UnityWebRequest.Get(dllUri);
+    yield return webRequest.SendWebRequest();
+
+    if (webRequest.isNetworkError || webRequest.isHttpError)
+    {
+        Debug.LogError($&quot;Load Hotfix DLL error at path: {dllPath}&quot;);
+        yield return null;
+    }
+    byte[] dll = webRequest.downloadHandler.data;
+    webRequest.Dispose();
+
+    var pdbUri = new Uri(pdbPath);
+    webRequest = UnityWebRequest.Get(pdbUri);
+    yield return webRequest.SendWebRequest();
+
+    if (webRequest.isNetworkError || webRequest.isHttpError)
+    {
+        Debug.Log($&quot;Load Hotfix PDB error at path: {pdbPath}&quot;);
+        yield return null;
+    }
+    byte[] pdb = webRequest.downloadHandler.data;
+    webRequest.Dispose();
+
+    System.IO.MemoryStream fs = new MemoryStream(dll);
+    System.IO.MemoryStream p = new MemoryStream(pdb);
+    appdomain.LoadAssembly(fs, p, new Mono.Cecil.Pdb.PdbReaderProvider());    
+
+    OnILRuntimeInitialized();
+}
+
+void OnILRuntimeInitialized()
+{
+    appdomain.Invoke(&quot;Hotfix.Game&quot;, &quot;Initialize&quot;, null, null);
+}
+</code></pre>
+<p>要使用 ILRuntime 首先要创建一个 <code>ILRuntime.Runtime.Enviorment.AppDomain</code> 热更新域，通过这个热更新域加载热更新 DLL，随用调用热更新 DLL 的入口。在游戏运行期间，只保留一个热更新域，与热更新 DLL 的交互都需要使用这个 AppDomain。</p>
+<h3 id="clr-绑定">CLR 绑定</h3>
+<p>默认情况下，热更新 DLL 中访问主工程和 Unity 的接口，是通过反射的方式来实现的。通过反射的方式调用接口的效率会比直接调用低很多，同时调用期间会产生很多临时变量，造成额外的 GC Alloc，会引起性能问题。</p>
+<p>因为上述原因，ILRuntime 使用 CLR 绑定机制来尽可能规避上述问题。CLR 绑定是借助了 ILRuntime 的 CLR 重定向机制来实现，CLR 重定向的实现原理是 ILRuntime 的 IL 解释器发现需要调用某个方法时，可以将这个方法的调用指定到另一个方法的实现，由此实现方法的挟持。</p>
+<p>CLR 重定向方法的编写需要对 ILRuntime 的底层非常了解，并且工作量巨大，因为热更新 DLL 不可避免调用主工程和 Unity 的接口，这样就需要实现很多重定向的方法。幸运的是 ILRuntime 提供了工具来自动生成 CLR 绑定代码。</p>
+<pre><code class="language-c#">[MenuItem(&quot;ILRuntime/Generate CLR Binding Code by Analysis&quot;)]
+static void GenerateCLRBindingByAnalysis()
+{
+    // 用新的分析热更 dll 调用引用来生成绑定代码
+    ILRuntime.Runtime.Enviorment.AppDomain domain = new ILRuntime.Runtime.Enviorment.AppDomain();
+    using (System.IO.FileStream fs = new System.IO.FileStream(&quot;{Hotfix_dll_path}&quot;, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+    {
+        domain.LoadAssembly(fs);
+
+        // Crossbind Adapter is needed to generate the correct binding code
+        InitILRuntime(domain);
+        ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, &quot;Assets/ILRuntime/Generated&quot;);
+    }
+    AssetDatabase.Refresh();
+}
+
+static void InitILRuntime(ILRuntime.Runtime.Enviorment.AppDomain domain)
+{
+    // 这里需要注册所有热更DLL中用到的跨域继承Adapter，否则无法正确抓取引用
+    domain.RegisterCrossBindingAdaptor(new MonoBehaviourAdapter());
+    domain.RegisterCrossBindingAdaptor(new CoroutineAdapter());
+    domain.RegisterCrossBindingAdaptor(new TestClassBaseAdapter());
+    domain.RegisterValueTypeBinder(typeof(Vector3), new Vector3Binder());
+}
+</code></pre>
+<p>在 CLR 绑定代码生成之后，需要将这些绑定代码注册到 AppDomain 中才能使 CLR 绑定生效，但是一定要记得将 CLR 绑定的注册写在 CLR 重定向的注册后面，因为同一个方法只能被重定向一次，只有先注册的那个才能生效。</p>
+<h3 id="其他">其他</h3>
+<p>关于热更新 DLL 与主工程的交互还有委托、跨域继承、反射和 CLR 重定向。更详细的内容可以访问 ILRuntime 的<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/index.html">官方文档</a>。</p>
+<h2 id="ilruntime-注意点">ILRuntime 注意点</h2>
+<ol>
+<li>目前 ILRuntime 在处理逻辑数学计算的时候，效率低于 Lua，本质上是因为一个是 stack 虚拟机，一个是 register 虚拟机。所以尽量把数学计算多的部分转移到框架层。Hotfix 中不要写大量复杂的计算，特别是在 Update 之类的方法中。</li>
+<li>Xcode 调试会经常出现爆栈，因为 iPhone 的线程栈空间很小，稍微深一点的调用就会出现爆栈，可以将 Xcode 工程调成 Release 模式。</li>
+<li>热更代码需要尽量减少 foreach 的使用，由于原理限制，在热更中使用 foreach 无法避免产生 GC Alloc，请使用支持 for 循环的数据结构，或者用 List 等支持 for 遍历的结构辅助 Dictionary 等无法 for 遍历的结构。</li>
+<li>关闭 Development Build 选项来发布 Unity 项目。在 Editor 中或者开启 Development Build 选项发布会开启 ILRuntime 的 Debug 框架，以提供调用堆栈行号以及调试服务，这些都会额外耗用不少性能，因此正式发布的时候可以不加载 pdb 文件，以节省更多内存。</li>
+</ol>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/index.html">ILRuntime 官方文档</a></li>
+<li><a href="https://www.zhihu.com/column/p/20525151">Unity3D 为何能跨平台？聊聊 CIL (MSIL)</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/21328671">谁偷了我的热更新？Mono，JIT，iOS</a></li>
+<li><a href="https://www.zhihu.com/column/zblade">Unity ILRuntime 详解</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/260216935">使用 ILRuntime 遇到的一些问题</a></li>
+<li><a href="https://blog.csdn.net/baidu_28955655/article/details/52661698">Unity DLL 实现热更新</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/19972689">Unity 将来时：IL2CPP 是什么？</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[iOS 审核遇到的问题]]></title>
+        <id>https://lzhenhong.github.io/post/ios-shen-he-yu-dao-de-wen-ti/</id>
+        <link href="https://lzhenhong.github.io/post/ios-shen-he-yu-dao-de-wen-ti/">
+        </link>
+        <updated>2020-06-04T01:49:01.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近游戏上线了 iOS 版本，期间来来回回提审了 2、3 次，最终没有经历太多波折顺利上线，写下这篇文章记录下审核期间遇到的问题，方便以后查看和提前避免一些问题。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近游戏上线了 iOS 版本，期间来来回回提审了 2、3 次，最终没有经历太多波折顺利上线，写下这篇文章记录下审核期间遇到的问题，方便以后查看和提前避免一些问题。</p>
+<!-- more -->
+<h2 id="机审">机审</h2>
+<ol>
+<li><strong>ITMS-90683: Missing Purpose String in Info.plist</strong> - 这个问题是游戏使用的一个选图片的第三方库用到了 <code>NSPhotoLibraryUsageDescription</code> 和 <code>NSLocationWhenInUseUsageDescription</code> 权限，但是在 Info.plist 中没有声明，造成机审没过。</li>
+<li><strong>TMS-90809: Deprecated API Usage</strong> - 这个是因为 Apple 的政策，新提交审核的应用不能再使用 <code>UIWebView</code>，必须换成 <code>WKWebView</code>，这个对照着 <a href="https://github.com/cocos2d/cocos2d-x/commit/9df47ef6fdf30694ae4dccd53351c7dcbd9dfbec#diff-a9b7eb55473ca4904dafd82ad5aa03df">Cocos 官方库的修改</a>，将 Cocos 引擎的 <code>UIWebView</code> 升级到 <code>WKWebView</code>。</li>
+<li><strong>ITMS-90191: Missing beta entitlement</strong> - 这个问题是因为没有使用发布的证书打包，而是使用了 ad-hoc 证书，导致上传失败，使用发布证书打包就解决了问题。</li>
+</ol>
+<h2 id="人审">人审</h2>
+<ol>
+<li><strong>Guideline 4.8 - Design - Sign in with Apple</strong> - 这个也是 Apple 的政策，我们游戏接入了 Facebook 登录，Apple 的政策是如果你的游戏或者 App 有第三方的登录渠道，就必须也要接入 <code>Sign in with Apple</code>。解决方案：iOS 13 接入 AuthenticationServices，iOS 13 之前的设备不管。</li>
+<li><strong>Guideline 2.3.6 - Performance - Accurate Metadata</strong> - 这个是因为游戏填写的年龄评级不对。解决方案：修改年龄评级符合政策规范。</li>
+<li><strong>Guideline 2.1 - Information Needed</strong> - 这个是游戏提交审核的游戏内购买商品没有在游戏中体现，导致不能购买测试而被拒。解决方案：写测试代码，将所有的游戏内商品放在明显的位置，供 Apple 审核。</li>
+<li><strong>Guideline 2.1 - Performance - App Completeness</strong> - 这个刚好和上一点相反，这个是在游戏内出现的购买商品没有在 App Store Connect 后台提交审核，导致被拒。解决方案：将所有的游戏内购买商品都提交审核。</li>
+</ol>
+<h2 id="奇葩的事">奇葩的事</h2>
+<p>我们在修改了所有问题之后通过了 Apple 的审核，因为之前审核的包有测试代码，不能直接发布，随后我们就修改了最新的 iOS 包，然后再次提审准备发布我们的正式包，但是这个包的审核发生了一些奇怪的事情。</p>
+<figure data-type="image" tabindex="1"><img src="https://github.com/LZhenHong/BlogImages/blob/master/iOS-review.png?raw=true" alt="Apple 审核过程" loading="lazy"></figure>
+<p>可以看到我们在 5.22 提交了我们新的版本，Apple 随后就开始审核，在 5.23 告知我们被拒绝了，但是拒绝邮件并不像之前那样明确指出问题在哪，而是给出了下面图的理由。</p>
+<figure data-type="image" tabindex="2"><img src="https://github.com/LZhenHong/BlogImages/blob/master/iOS-resolution-center-mail.png?raw=true" alt="Apple 拒审邮件" loading="lazy"></figure>
+<p>这个邮件说需要更多时间来审核，但是又告知我们被拒，我们之后也重复申诉了，但是 Apple 回的邮件内容与上图都是相似的。没办法我们也只能等，等了一周的时间，在第一张图可以看到，Apple 在 5.30 又开始审核我们的游戏，并且在 5.31 告知我们审核通过。</p>
+<p>这个事情就很奇葩吧，但是也没办法，谁让咱们要靠着 Apple 吃饭呢 😔。</p>
+<p>Apple 每次发版本都需要重新审核的，在后续的审核中碰到问题，也会更新上来。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[热更新实现流程]]></title>
+        <id>https://lzhenhong.github.io/post/re-geng-xin-shi-xian-liu-cheng/</id>
+        <link href="https://lzhenhong.github.io/post/re-geng-xin-shi-xian-liu-cheng/">
+        </link>
+        <updated>2020-04-02T16:59:44.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近游戏的热更新出了一些问题，导致崩溃率有点上升，并且热更新有些文件没有生效。游戏中用的热更新模块是 Cocos 引擎提供的，就花了点时间去翻了 Cocos 的源码文件 AssetsManagerEx.cpp，了解了 Cocos 引擎处理热更新的流程以及问题，也借此机会思考下热更新的处理逻辑。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近游戏的热更新出了一些问题，导致崩溃率有点上升，并且热更新有些文件没有生效。游戏中用的热更新模块是 Cocos 引擎提供的，就花了点时间去翻了 Cocos 的源码文件 AssetsManagerEx.cpp，了解了 Cocos 引擎处理热更新的流程以及问题，也借此机会思考下热更新的处理逻辑。</p>
+<!-- more -->
+<h2 id="cocos-热更新的-manifest-文件">Cocos 热更新的 Manifest 文件</h2>
+<p>在 Cocos 的热更新中有一个重要的 Manifest 文件，检查热更新和下载热更新相关的信息都包含在这个文件中，App 包内有一个本地的 Local Manifest，同时里面有个 &quot;remoteManifestUrl&quot; 字段指向远程的 Remote Manifest，这个 Remote Manifest 当有热更新资源时会更新，Cocos 检查有新的热更新就会下载这个 Remote Manifest，然后判断是否新的热更新，有的话则下载新的热更新文件。随后将 Remote Manifest 缓存成 Cache Manifest。</p>
+<h3 id="local-manifest">Local Manifest</h3>
+<pre><code>{
+  &quot;packageUrl&quot;: &quot;http://xxx.com/&quot;,
+  &quot;remoteManifestUrl&quot;: &quot;http://xxx.com/AppUpdate/project?version=1.0.0&quot;,
+  &quot;remoteVersionUrl&quot;: &quot;http://xxx.com/AppUpdate/version?version=1.0.0&quot;,
+  &quot;version&quot;: &quot;1.0.0.0&quot;,
+  &quot;engineVersion&quot;: &quot;Cocos2d-JS v3.16&quot;
+}
+</code></pre>
+<p>这个一般是 App 包内的 Manifest 文件，这里主要申明的是 Version，热更新资源 CDN 地址， Remote Manifest 地址和 Version Url。</p>
+<h3 id="remote-manifest">Remote Manifest</h3>
+<pre><code>{
+    &quot;packageUrl&quot;: &quot;http://xxx.com/cdn&quot;,
+    &quot;remoteManifestUrl&quot;: &quot;http://xxx.com/AppUpdate/project?version=1.0.0&quot;,
+    &quot;remoteVersionUrl&quot;: &quot;http://xxx.com/AppUpdate/version?version=1.0.0&quot;,
+    &quot;version&quot;: &quot;1.0.0.2&quot;,
+    &quot;engineVersion&quot;: &quot;Cocos2d-JS v3.16&quot;,
+    &quot;groupVersions&quot;: {
+        &quot;1&quot;: &quot;1.0.0.1&quot;,
+        &quot;2&quot;: &quot;1.0.0.2&quot;
+    },
+    &quot;assets&quot;: {
+        &quot;src_1.0.0.1_f1b1d1040801913b99fd15ed208ed830.zip&quot;: {
+            &quot;md5&quot;: &quot;f1b1d1040801913b99fd15ed208ed830&quot;,
+            &quot;compressed&quot;: true,
+            &quot;group&quot;: &quot;1&quot;
+        },
+        &quot;src_1.0.0.2_e3d58ae365a5a1c2fe2220f3c5968c8e.zip&quot;: {
+            &quot;md5&quot;: &quot;e3d58ae365a5a1c2fe2220f3c5968c8e&quot;,
+            &quot;compressed&quot;: true,
+            &quot;group&quot;: &quot;2&quot;
+        }
+    },
+    &quot;searchPaths&quot;: []
+}
+</code></pre>
+<p>这个是在 1.0.0 版本发过两次热更的 Remote Manifest 文件，主要的是 version 字段、groupVersions 字段和 assets 字段，version 字段表示当前的热更新版本，这个是判断是否有新的热更资源最重要的字段，assets 对应的是热更新的 CDN 资源，下载热更热更新资源要使用到 packageUrl 和 assets 字段的组合。</p>
+<h2 id="cocos-热更新步骤">Cocos 热更新步骤</h2>
+<ol>
+<li>加载 App 包内的 Local Manifest，Cocos 会使用这个文件来判断是否有新的热更新资源。在加载 Local Manifest 的同时会尝试去加载 Cache Manifest，如果 Cache Manifest 存在，则会先判断这两个 Manifest 的 Version 字段。如果本地的 Manifest 文件比缓存的 Manifest 的文件 Version 要大或者等于，则删除热更新目录，Cocos 认为 App 的代码比热更新的代码要更新。如果本地的 Manifest 文件比缓存的 Manifest 文件的 Version 要小，则使用 Cache Manifest 去跟 Remote Manifest 做对比。如果没有 Cache Manifest，就继续用 Local Manifest 做对比。</li>
+<li>调用 jsb.AssetsManager 的 checkUpdate 方法开始检查是否有新的热更新资源。在检查之前会下载一个 Version Manifest 文件，这个文件主要的字段就是 Version 字段，Cocos 通过这个字段来判断是否有新的热更新资源，如果本地 Manifest 的 Version 比这个 Version Manifest 的 Version 要大或者等于的话，就直接删除临时热更新目录，并直接完成热更新流程。如果本地 Manifest 的 Version 比 Version Manifest 的 Version 要小，就开始下载 Remote Manifest。</li>
+<li>下载好 Remote Manifest 之后，开始比较 Remote Manifest 和 Local Manifest 的 Version 字段，Remote Manifest 的 Version 比 Local Manifest 的小或者等于，就直接删除临时热更新目前，完成热更新流程。如果 Remote Manifest 比 Local Manifest 要大，则开始现在热更新资源包。</li>
+<li>开始下载热更新的时，Cocos 会检查是否有未完成的热更新包，同时也会检查 MD5 值有变化的热更新包，生成一个下载队列。AssetsManager 中有一个 _maxConcurrentTask 属性来控制同时下载热更新包的数量。</li>
+<li>下载好一个热更新包之后，就开始解压 Zip 包，等所有的热更新 Zip 包下载完成后，就将热更新资源从临时路径拷贝到指定的缓存热更新路径。随后通知代理热更新下载完毕。</li>
+</ol>
+<h2 id="cocos-热更新问题">Cocos 热更新问题</h2>
+<p>按照理想的情况，Cocos 的热更新是可以正常运行。但是在游戏上线一段时间后，我们发现 Cocos 的热更新是存在问题的。如果一次性下载多个热更新包，Cocos 不能保证热更新包下载完成的先后顺序，这个就导致了如果两个热更新包包含同一个代码文件，但是新的代码文件比旧的代码文件先下载好，就会导致旧的代码文件将新的代码文件覆盖。这里的解决办法就是将 _maxConcurrentTask 属性设为 1，让 Cocos 每次只下载一个热更新包，这样来保证热更新包下载的顺序。Cocos 热更新组件还是有个问题，就是热更新组件维护热更新包下载顺序用的 <strong>unordered_map</strong>，并且插入热更新包资源用的是 <code>push_back</code>，这个就导致虽然热更新包是串行下载的，但是下载的顺序不能保证，解决方案是将维护下载顺序队列的维护成 <strong>map</strong>。</p>
+<h2 id="热更新的优化">热更新的优化</h2>
+<p>从 Cocos 的热更新系统，我自己也受了一点启发。虽然 Cocos 的热更新系统基本功能都有，但是还是存在一些问题，热更新是没办法回滚的，重发的热更也需要有新热更触发下载才会触发 MD5 值变化的下载，同时下载多个热更新包如何保证顺序，热更新流程的优化可以从这几方面入手。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[从零开始做游戏]]></title>
+        <id>https://lzhenhong.github.io/post/cong-ling-kai-shi-zuo-you-xi/</id>
+        <link href="https://lzhenhong.github.io/post/cong-ling-kai-shi-zuo-you-xi/">
+        </link>
+        <updated>2020-01-08T08:34:17.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近一年多的时间几乎都花在一款游戏上面，这款是自己一个人从零到一做起来的，现在已经完成的差不多了，最近准备正式上线，上线之后就会面临很多玩家，对游戏和自己都是很大的挑战。如何去处理好玩家反馈的问题，如何去更好的避免玩家遇到问题等等，这些都是后续需要提升的地方。先不说远了，在游戏正式上线之前就遇到很多问题，在这里记录一下完成这款游戏遇到的问题。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近一年多的时间几乎都花在一款游戏上面，这款是自己一个人从零到一做起来的，现在已经完成的差不多了，最近准备正式上线，上线之后就会面临很多玩家，对游戏和自己都是很大的挑战。如何去处理好玩家反馈的问题，如何去更好的避免玩家遇到问题等等，这些都是后续需要提升的地方。先不说远了，在游戏正式上线之前就遇到很多问题，在这里记录一下完成这款游戏遇到的问题。</p>
+<!-- more -->
+<h3 id="初印象">初印象</h3>
+<p>因为在做这款游戏之前，我自己就参与过两款游戏的开发，因为在之前的游戏开发过程没有遇到过特别难解决的问题，并且在出现的时候也有人可以求助，就导致自己盲目自信，认为自己从零做一款游戏应该问题不大。</p>
+<p>随后就与其他人一拍即合，自己做一款游戏，在定下来项目的方向之后，就创建好游戏的 git 仓库，不久就提交项目的 Init commit。完全没有做提前的调研，也没有提前研究游戏的技术难点。直接就开始对动手做项目，这也为后面埋下了很大的坑，导致后续花了很多时间去填补这些坑。</p>
+<h3 id="过程的困难">过程的困难</h3>
+<h4 id="开发引擎的选择">开发引擎的选择</h4>
+<p>因为之前接触的游戏引擎比较多的就是 Cocos-JS，所以这款游戏也就选用了这个引擎来做开发。Cocos-JS 引擎的特点就是上手容易，但是可能会遇到比较多的坑，这些坑掉进去了就很难爬出来。在开发过程中碰到印象比较深的问题有四个：</p>
+<ol>
+<li>
+<p>cc.eventManager 有个问题，就是有多个监听者的时候，接收的事件参数会有问题，查了很久也没有找到具体问题在哪，最后没办法，因为项目开始还不久，直接就把引擎升级到 3.16 版本来解决。至于升级 Cocos 引擎也是个巨坑。</p>
+</li>
+<li>
+<p>cc.TableView 删除 cc.TableViewCell 会导致 cell 上添加的 button 失去点击相响应，这个问题最开始我一直以为是我们自己代码有问题，也花费了不少时间，最后查到是引擎的 bug，在 remove cell 的时候 cleanup 了，但是 cell 是复用的，就导致这个被删掉的 cell 复用时不响应事件点击。<a href="https://github.com/cocos2d/cocos2d-x/issues/18423">更详细戳👈</a></p>
+</li>
+<li>
+<p>这个算是比较小众的问题，因为游戏的语言是泰语的，使用 Cocos 引擎会导致一些泰语字上面被截断，如下图所示：<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/15844405218446.jpg?raw=true" alt="泰语字体截断" loading="lazy"></p>
+<p>这个问题是因为 Cocos 引擎在 Android 层对文本尺寸进行计算的时候，高度没有算对，引擎在渲染文本的时候高度不够，导致截断。最后查到的问题是 Cocos2dxBitmap.java 中使用 StaticLayout 计算文本尺寸时有个参数 includepad 设置成了 false，导致 Android 计算时出现了文本截断，将参数改成 true 解决了问题。</p>
+</li>
+<li>
+<p>Cocos 热更新组件也是存在很多问题的，Cocos 的热更新组件支持同时下载多个热更新包，但是又没办法保证热更新下载解压的顺序，如果你在两个热更新包都包含同一个代码文件，就有可能造成新的热更新的代码文件被老的热更新包的代码文件覆盖。这个问题最开始的解决方案是限制热更新组件的下载，让热更新包串行下载 <code>this._assetsMgr.setMaxConcurrentTask(1);</code>。但是热更新组件还是有个问题，就是热更新组件维护热更新包下载顺序用的 <strong>unordered_map</strong>，并且插入热更新包资源用的是 <code>push_back</code>，这个就导致虽然热更新包是串行下载的，但是下载的顺序不能保证。解决方案是将维护下载顺序队列的维护成 <strong>map</strong>。</p>
+</li>
+</ol>
+<p>这些是在开发中遇到的印象比较深的问题，还有比较多大大小小的问题。开发中不是怕遇到问题，而是遇到问题之后找不到解决办法，Cocos 开发中遇到的问题有些很难找到解决办法，一方面可能是没有其他人讨论资料不好找，另一方面是有人讨论但是没有最终的解决方案，这些就是比较坑的地方。还有一点就是 Cocos 的引擎升级，基本上在开发初期定下来了引擎版本，后面基本上就没有升级的可能，这也就意味着引擎后续的 bug 修复，性能优化等等，这些都是享受不到。最最坑的地方就是，Cocos 引擎团队放弃了 Cocos 引擎的维护，将重点转到 Cocos Creator，并且在 4.0 版本移除了 JavaScript 的支持，这就意味着，项目中使用的 Cocos-JS 引擎出现问题，后续很难得到引擎团队的解决。</p>
+<!-- 还有些问题就是 Cocos 引擎本身的稳定性，也不如其他的引擎，在游戏上线之后崩溃率是比较高的，后续经过了一系列优化才降低到比较合理的水平。 -->
+<h4 id="开发中遇到的问题">开发中遇到的问题</h4>
+<ol>
+<li><strong>大量的冗余代码</strong>。这个问题是目前项目中比较严重的问题，因为前期项目时间紧张，就大量使用 <code>⌘+C</code> 和 <code>⌘+V</code>，最后造成很多重复的代码，只要代码出现问题或者需求出现变动，要改的地方就很多，也容易漏掉，这样也造成了很多 bug。这个问题的原因是前期搭建项目框架时，缺少基础框架的搭建，在有相同功能的代码时，要多使用继承和封装，尽量避免复制粘贴代码。前期需要对项目的基础架构进行封装，确定项目的大概结构，对常用的基础控件进行封装，一方面是保证项目中使用的统一性，另一方面对方便后期对控件进行统一修改。不要一上来就对着业务撸代码，这样会给后期代码维护和扩展造成很多麻烦和难以填补的坑。</li>
+<li><strong>资源管理混乱</strong>。这个也是项目做到中后期遇到的比较大的问题，在游戏初期，游戏的玩法少，活动少，所以资源就不多，前期就忽略了资源管理规范的重要性，在游戏开发的中后期需要对整体的资源进行梳理和优化，在后期资源很多的情况也是一件很麻烦的事情。所以在前期定好资源管理的规范和资源加载的处理方式，会对后期的开发有很大的帮助，也对内存占用优化有很大的帮助。</li>
+<li><strong>内存峰值优化</strong>。其实对于我们这种体量的游戏，几乎可以忽略这一块。在游戏上线之前都没有重视这一块，但是上线之后崩溃率很高，最开始一直以为是代码逻辑的问题，没有往内存占用这一块考虑。但是最后优化了内存占用之后，崩溃率就稳定在比较合理的水平。这个是因为游戏发行在泰国，泰国玩家的手机机型普遍不高端，所以手机内存少，就导致游戏在运行期间容易发生崩溃。但是游戏如果发行在国内，这种情况会好很多。所以内存占用要提前考虑好策略，在编写代码的同时也要兼顾到内存占用的优化。</li>
+</ol>
+<h4 id="公测中遇到的问题">公测中遇到的问题</h4>
+<ol>
+<li><strong>玩家反馈卡</strong>。游戏在上线测试之后，总是有玩家反馈网络卡顿。这个点我们花了很多时间去定位问题，然后去修复，都收效甚微，最终发现问题是因为前端在网络波动的情况下检测弱网和网络重连处理很慢，就网络波动的时候一直出现 loading，也不会触发重连，或者弱网出现重连的时间很久。就导致玩家的感受是游戏很卡，但是玩家反馈的很卡，其实有很多方面，游戏性能问题导致游戏卡顿，弱网情况下网络层出现问题导致玩家玩的时候很卡。所以在解决问题时，要先确定玩家具体的问题，再去检查问题，修复问题。前端发现问题之后，就很好修复，减少心跳包的间隔，建立 WebSocket 连接的检测等待时间缩短，压后台之后回到前台的策略优化。最后基本上解决了弱网情况下的游戏体验问题。</li>
+<li><strong>游戏崩溃率高</strong>。在游戏初期上线的时候，bugly 统计的崩溃率很高，这个有明确 log 上报，所以很好解决。但是后面玩家多了之后，崩溃率还是比较高，这个问题也是花了很多时间，从各个角度都考虑去解决，但是收效也是很小，最后还是内存占用的问题，因为泰国手机机型的特点，需要去优化内存占用。优化内存占用的时候也做了很多，动态加载图片资源，释放音频资源，最后都是没有把内存占用减下来。最后原因是 JS 引擎自动回收太慢的问题，导致游戏在运行期间不停生成中间对象，最后内存占用越来越高，泰国手机机型内存小，就很容易导致闪退。最后的解决方案就是 <code>cc.sys.garbageCollect()</code> 强制 JS 引擎回收内存，就能导致内存占用的峰值降下去，随后崩溃率就下降了很多。</li>
+</ol>
+<h3 id="游戏开发的基本步骤">游戏开发的基本步骤</h3>
+<ol>
+<li><strong>游戏引擎的调研</strong>，这个是非常重要的，因为这个关系着后面游戏的性能，引擎 bug 的修复，以及开发中遇到问题的解决效率。</li>
+<li><strong>确定游戏的设计分辨率</strong>，一开始就需要确定下来，与美术约定好设计分辨率，保证适配市面上大部分机型。</li>
+<li><strong>确定游戏的总体框架</strong> (MVC)，整体的游戏框架需要在撸代码之前就要确定下来，游戏如果没有整体的设计模式，会在后期的代码维护上面遇到很大问题。</li>
+<li><strong>基础控件的封装</strong>，这个一方面可以方便开发，另一方面可以减少冗余代码，在后期统一修改游戏的控件风格时，这种封装的优势就体现出来了。之前的项目，要统一调整按钮的样式，因为没有做封装，导致修改这个按钮样式费时费力。</li>
+<li><strong>资源加载和释放</strong>，这个问题在游戏开发中是很重要的一环，需要在最开始就考虑好项目的资源管理方式，异步加载资源还是同步加载资源，如果管理资源的释放，是一款游戏的基本素质。虽然这个玩家开不见摸不着，但是对玩家的影响还是比较大的，如果资源加载处理的不好，会导致耗电严重，手机发烫等等的问题。所以不管游戏体量的大小，每个游戏都应该要重视资源管理。</li>
+<li><strong>内存峰值的优化</strong>，这里有两个点需要注意，一个就是避免内存占用陡增，另一个就是使用的内存要释放，不能有内存泄漏。内存占用陡增一方面是会造成游戏卡顿，另一方面也是会增加崩溃的概率。内存泄漏这个是肯定不能有的，或者说影响不会很严重，不然在游戏运行期间内存占用一直会是增加的情况，最后也是会被系统杀掉进程的。</li>
+<li>根据项目实际情况<strong>优化游戏性能</strong>，这个每个游戏都不一样，根据游戏的实际情况和项目需求对游戏进行优化。例如：图片格式的优化 iOS 使用 PVR，Android 使用 ETC1 等等。</li>
+</ol>
+<h3 id="小结">小结</h3>
+<p>写下这篇文章主要是为了记录下这段时间踩过的坑，遇到的问题，让自己以后碰到类似的情况不至于再踩一次坑。目前能想到的点都写上去了，后续有想到其他的点，或者是新踩的坑，也会尽量更新到这里来。</p>
+<p>从零做一款游戏看似简单，但实际上还是会有许多问题。这也让我认识到自己的不足，也学习到了很多知识，果然人还是要踩过坑才知道做事情有难度。</p>
+<!-- 链接 -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[设备卡顿产生的原因]]></title>
+        <id>https://lzhenhong.github.io/post/she-bei-qia-dun-chan-sheng-de-yuan-yin/</id>
+        <link href="https://lzhenhong.github.io/post/she-bei-qia-dun-chan-sheng-de-yuan-yin/">
+        </link>
+        <updated>2018-01-06T05:56:32.000Z</updated>
+        <summary type="html"><![CDATA[<p>虽然当下的设备越来越强大，处理速度也越来越快，显示效果越来越好。但是如果处理不好，再强大的设备还是会有卡顿的可能性，所以了解卡顿产生的原因是很有必要的。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>虽然当下的设备越来越强大，处理速度也越来越快，显示效果越来越好。但是如果处理不好，再强大的设备还是会有卡顿的可能性，所以了解卡顿产生的原因是很有必要的。</p>
+<!-- more -->
+<h2 id="帧率和刷新率的区别">帧率和刷新率的区别</h2>
+<p>我们先来看一下显示器是如何显示图像的，CPU 将计算好的内容传递给 GPU，GPU 进行图像处理（GPU 对浮点计算做了优化），GPU 执行渲染之后将内容放入帧缓冲区，显示器需要显示图像时就会经过一系列操作获取帧缓冲区的内容，显示到屏幕上，展示给用户。如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/CPU_GPU_FB.png?raw=true' height=300 alt='CPU GPU' />
+</div>
+<p>接下来开始说帧率和刷新率，帧率指的是 GPU 绘制图片的速度，帧率 60FPS 指的是在 1 秒内绘制 60 张图片。刷新率指的是屏幕 1 秒内显示图片的次数， 刷新率 60Hz 指的是 1 秒内需要显示 60 张图片。我们举几个例子来更好的说明：</p>
+<ol>
+<li>如果 GPU 的帧率是 2FPS，显示器的刷新率是 1Hz，这个就会造成 GPU 1 秒内绘制的两张图片只会有一张被显示，因为当显示器第二次从帧缓存区中取图片数据的时候，帧缓存区中已经是 GPU 绘制的第三张图片了，GPU 绘制好的第二张图片被丢弃了。</li>
+<li>如果 GPU 的帧率是 1FPS，当显示器的刷新率是 2Hz，GPU 1 秒绘制一张图片，显示器 1 秒要显示两张图片，GPU 1 秒将绘制好的图片放入帧缓存区中，显示器第一次从帧缓存区中取出图片数据显示到屏幕上，当显示器第二次去帧缓存区中取图片时 GPU 才绘制好新一帧的一半，这就造成后面要说的画面撕裂。</li>
+</ol>
+<h2 id="屏幕撕裂">屏幕撕裂</h2>
+<p>屏幕撕裂也是画面撕裂，屏幕撕裂 (Screen Tearing) 是指显示器把两个或更多的帧显示在同一画面上。</p>
+<p>显示器的更新频率是固定的，通常是 60Hz。现在显卡效能大幅提高，游戏时输出的帧率可以非常高，如果显卡的输出高于 60FPS，上面我们提到过一个例子 GPU 的绘制速度恰好显示器的刷新速度的两倍，虽然 GPU 和显示器的频率不相同但是也不至于造成屏幕撕裂。但是事实上 GPU 和显示器的组合有很多种可能，如果 GPU 的帧率是 75FPS，显示器的刷新率是 60Hz，也会造成屏幕撕裂。</p>
+<div align=center>
+<img src='http://www.geforce.com/Active/en_US/shared/images/articles/introducing-the-geforce-gtx-680-gpu/Tearing2-650.png' height=350 alt='CPU GPU' />
+</div>
+<h2 id="如何解决屏幕撕裂">如何解决屏幕撕裂</h2>
+<h3 id="多个帧缓冲区">多个帧缓冲区</h3>
+<p>上面提到的屏幕撕裂的例子都是以单个帧缓冲区为前提条件，因为只有一个帧缓冲区，GPU 只能在这个帧缓冲区中绘制图像，就很容易造成上面所说的屏幕撕裂。</p>
+<p>引入多个帧缓冲区可以有效地<strong>缓解</strong>屏幕撕裂，多个帧缓冲区分为帧缓冲区和多个后备缓冲区，GPU 在一个缓冲区绘制完之后，就到下一个缓冲区中绘制，这样 GPU 新绘制的图像帧就不会影响前面的图像帧。显示器每次会从帧缓冲区中取出图像显示，当帧缓冲区的图像显示之后，会将后备缓冲区的图像覆盖到帧缓冲区。</p>
+<p>但多个帧缓冲区并不能真正的解决屏幕撕裂的问题，上面说到多个帧缓冲区只能<strong>缓解</strong>屏幕撕裂。以使用双缓冲区的设备为例，如果后备缓冲区绘制完成，就会开始将后备缓冲区的图像内容覆盖到帧缓冲区，此时帧缓冲区的图像还没有被显示器取出显示，在覆盖期间就会导致帧缓冲区的图像有 GPU 绘制的两帧的内容，如果这个时候显示器从帧缓冲区中取出图像同样会造成屏幕撕裂。</p>
+<p>这里当然可以再增加帧缓冲区来解决问题，但是没有真正的解决根本问题，就是 GPU 和显示器的同步问题。为了解决屏幕撕裂的问题，引入了垂直同步（V-Sync），有了这个机制之后就能彻底解决屏幕撕裂。</p>
+<h3 id="垂直同步v-sync">垂直同步（V-Sync）</h3>
+<p>上面我们提到的 GPU 的绘制与显示器的显示是完全独立的，中间只通过帧缓冲区来交互。垂直同步就是保证 GPU 的绘制和显示器的显示是同步的，GPU 绘制好的每一帧图像显示器都会显示，不会出现一帧没有显示就被后面的帧覆盖的情况。</p>
+<p>垂直同步的工作原理大概是：显示器在处理完当前图像帧，会向 GPU 发送 VSync 信号，当 GPU 接收到 VSync 信号之后，就会进行帧缓冲区的更新和新图像帧的绘制。这样就能保证 GPU 绘制的图像帧不会出现被覆盖的情况，也就解决了屏幕撕裂。</p>
+<p>垂直同步理想的工作状态如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/VSync-good.png?raw=true'  alt='VSync 理想情况' />
+</div>
+<p>如上图所示，CPU 和 GPU 能在两个 VSync 信号之间将显示器要显示的图像帧准备完成，就能保证显示器流畅的刷新，我们就不会感受到卡顿的情况。</p>
+<p>虽然垂直同步解决了 GPU 和显示器的同步问题，但是垂直同步也是有一定缺点的，显卡的性能再好也得看显示器的 VSync 信号的频率，所以垂直同步会限制 GPU 的性能；并且垂直同步也会消耗更多的计算资源，也会带来部分延迟。现在的设备通常是使用多缓冲区和垂直同步两种方式相结合，目前 iOS 设备使用的双缓冲区加垂直同步机制，Android 设备有使用双缓冲区或者三缓冲区加垂直同步机制。</p>
+<p>目前有更好的显示技术可以解决 GPU 和显示器的同步问题：Nvidia 提出的专利技术 G-Sync 以及 AMD 提出开放标准 FreeSync。关于这两个技术可以看：<a href="https://www.zhihu.com/question/48273439">显示器刷新率和显卡fps一定要很匹配吗？</a></p>
+<h2 id="卡顿的原因">卡顿的原因</h2>
+<p>上面我们提到理想状态下，显示器的刷新是流畅的。那在不理想的情况下就会造成要说的卡顿现象，专业的说法就是掉帧 🤨。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/VSync-bad.png?raw=true'  alt='VSync 卡顿情况' />
+</div>
+<p>从上图可以看出，CPU 和 GPU 在两个 VSync 信号之间不能将显示器要显示的图像帧准备好，就会造成掉帧的情况。如果 CPU 和 GPU 没有将图像帧准备好，这一帧就会被丢弃，等待下一次 VSync 信号的到来。显示屏就会保持当前的显示图像不变，如果这时界面是在不断变化的，我们就会感受到卡顿。</p>
+<h2 id="解决卡顿">解决卡顿</h2>
+<p>卡顿产生的原因是因为 CPU 和 GPU 在两个 VSync 信号之间，没有完成显示图像的提交。要解决卡顿就需要了解 CPU 和 GPU 在两个 VSync 信号做了什么事情。</p>
+<h3 id="cpu-相关的操作">CPU 相关的操作</h3>
+<ol>
+<li>
+<p>对象创建 - 对象的创建会分配内存、调整属性、甚至还有读取文件等操作，比较消耗 CPU 资源。</p>
+</li>
+<li>
+<p>对象销毁 - 对象的销毁虽然消耗资源不多，但累积起来也是不容忽视的。通常当容器类持有大量对象时，其销毁时的资源消耗就非常明显。</p>
+</li>
+<li>
+<p>布局计算 - 如果你的视图层级过于复杂，当视图呈现或者修改的时候，计算图层帧率就会消耗一部分时间。</p>
+</li>
+<li>
+<p>解压图片 - PNG 或者 JPEG 压缩之后的图片文件会比同质量的位图小得多。但是在图片绘制到屏幕上之前，必须把它扩展成完整的未解压的尺寸（通常等同于图片宽 x 长 x 4个字节）。</p>
+</li>
+<li>
+<p>....</p>
+</li>
+</ol>
+<h3 id="gpu-相关的操作">GPU 相关的操作</h3>
+<ol>
+<li>
+<p>纹理的渲染 - 所有的 Bitmap，包括图片、文本、栅格化的内容，最终都要由内存提交到显存，绑定为 GPU Texture。不论是提交到显存的过程，还是 GPU 调整和渲染 Texture 的过程，都要消耗不少 GPU 资源。</p>
+</li>
+<li>
+<p>视图的混合 - 当多个视图重叠在一起显示时，GPU 会首先把他们混合到一起。如果视图结构过于复杂，混合的过程也会消耗很多 GPU 资源。</p>
+</li>
+<li>
+<p>降低 GPU 性能的事情：</p>
+<ul>
+<li>
+<p>太多的几何结构 - 这发生在需要太多的三角板来做变换，以应对处理器的栅格化的时候。</p>
+</li>
+<li>
+<p>重绘 - 主要由重叠的半透明图层引起。GPU 的<em>填充比率</em>（用颜色填充像素的比率）是有限的，所以需要避免<em>重绘</em>（每一帧用相同的像素填充多次）的发生。</p>
+</li>
+<li>
+<p>离屏绘制 - 这发生在当不能直接在屏幕上绘制，并且必须绘制到离屏图片的上下文中的时候。离屏绘制发生在基于 CPU 或者是 GPU 的渲染，或者是为离屏图片分配额外内存，以及切换绘制上下文，这些都会降低 GPU 性能。</p>
+</li>
+<li>
+<p>过大的图片 - 如果视图绘制超出 GPU 支持的 2048x2048 或者 4096x4096 尺寸的纹理，就必须要用 CPU 在图层每次显示之前对图片预处理，同样也会降低性能。</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>知道了 CPU 和 GPU 做的操作，就可以针对相应的操作来进行优化。例如：限制每一帧对象的创建、优化图片的处理等等。</p>
+<h2 id="tipgpu-和显卡的区别">Tip：GPU 和显卡的区别</h2>
+<blockquote>
+<p>GPU 即 Graphic Processing Unit，图像处理器，是整个显卡的核心。显卡是由 GPU、显存等等组成的。大部分情况下，我们所说 GPU 就等于指显卡，但是实际情况是 GPU 是显卡的一个核心组成部分。</p>
+</blockquote>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://www.jianshu.com/p/5f93b8ed3bbb">番外——深入垂直同步机制(VSYNC)</a></li>
+<li><a href="http://www.jianshu.com/p/71cba1711de0">脑洞大开：为啥帧率达到 60 fps 就流畅？</a></li>
+<li><a href="https://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/">iOS 保持界面流畅的技巧</a></li>
+<li><a href="https://draveness.me/asdk-rendering">使用 ASDK 性能调优 - 提升 iOS 界面的渲染性能</a></li>
+<li><a href="https://zsisme.gitbooks.io/ios-/content/chapter12/cpu-versus-gpu.html">CPU VS GPU</a></li>
+<li><a href="https://www.zhihu.com/question/48273439">显示器刷新率和显卡fps一定要很匹配吗？</a></li>
+<li><a href="https://zhidao.baidu.com/question/1603727701553635587.html">显卡和 GPU 的区别</a></li>
+<li><a href="https://zhidao.baidu.com/question/90238623.html">帧率与刷新率的区别</a></li>
+<li><a href="http://www.geforce.cn/hardware/technology/adaptive-vsync/technology">自适应垂直同步</a></li>
+</ul>
+<!-- GPU 和显卡的区别 -->
+<!-- 图片 -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Objective-C 字面量]]></title>
+        <id>https://lzhenhong.github.io/post/objective-c-zi-mian-liang/</id>
+        <link href="https://lzhenhong.github.io/post/objective-c-zi-mian-liang/">
+        </link>
+        <updated>2017-09-01T11:46:05.000Z</updated>
+        <summary type="html"><![CDATA[<p>有段时间没看关于 iOS 的东西了，前段时间在翻 Instapaper 的时候看到了 [NSVALUE AND BOXED EXPRESSIONS][2] 这篇文章，就随便看了看，正好自己对这些也不是很了解，就记录下来。</p>
+<p>在 Apple LLVM Compiler 4.0 支持嵌套表达式 (Boxed Expressions)。即可以用 @(<expressions>) 的方式生成相应的对象，例如：@1 相当于 <code>[NSNumber numberWithInt:1];</code>，@1 称为 NSNumber 字面量。ObjC 中还有集合字面量，以及通过下标来访问 OC 对象。下面介绍在 OC 中字面量的使用。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>有段时间没看关于 iOS 的东西了，前段时间在翻 Instapaper 的时候看到了 <a href="https://lowlevelbits.org/nsvalue-and-boxed-expressions/">NSVALUE AND BOXED EXPRESSIONS</a> 这篇文章，就随便看了看，正好自己对这些也不是很了解，就记录下来。</p>
+<p>在 Apple LLVM Compiler 4.0 支持嵌套表达式 (Boxed Expressions)。即可以用 @(<expressions>) 的方式生成相应的对象，例如：@1 相当于 <code>[NSNumber numberWithInt:1];</code>，@1 称为 NSNumber 字面量。ObjC 中还有集合字面量，以及通过下标来访问 OC 对象。下面介绍在 OC 中字面量的使用。</p>
+<!-- more -->
+<h2 id="nsnumber-字面量">NSNumber 字面量</h2>
+<p><code>NSNumber</code> 字面量支持有符号、没有符号的整数 (char, short, int, long, long long)，支持浮点数 (float, double)，也支持布尔值 (BOOL, C++ bool)。在 Objective-C 中，任何字母、数字和布尔值的字面量前面有 @ 都会被当成指向用 @ 后面的值创建的 <code>NSNumber</code> 对象。</p>
+<pre><code>void main(int argc, const char *argv[]) {
+    // character literals.
+    NSNumber *theLetterZ = @'Z';          // equivalent to [NSNumber numberWithChar:'Z']
+
+    // integral literals.
+    NSNumber *fortyTwo = @42;             // equivalent to [NSNumber numberWithInt:42]
+    NSNumber *fortyTwoUnsigned = @42U;    // equivalent to [NSNumber numberWithUnsignedInt:42U]
+    NSNumber *fortyTwoLong = @42L;        // equivalent to [NSNumber numberWithLong:42L]
+    NSNumber *fortyTwoLongLong = @42LL;   // equivalent to [NSNumber numberWithLongLong:42LL]
+
+    // floating point literals.
+    NSNumber *piFloat = @3.141592654F;    // equivalent to [NSNumber numberWithFloat:3.141592654F]
+    NSNumber *piDouble = @3.1415926535;   // equivalent to [NSNumber numberWithDouble:3.1415926535]
+
+    // BOOL literals.
+    NSNumber *yesNumber = @YES;           // equivalent to [NSNumber numberWithBool:YES]
+    NSNumber *noNumber = @NO;             // equivalent to [NSNumber numberWithBool:NO]
+
+#ifdef __cplusplus
+    NSNumber *trueNumber = @true;         // equivalent to [NSNumber numberWithBool:(BOOL)true]
+    NSNumber *falseNumber = @false;       // equivalent to [NSNumber numberWithBool:(BOOL)false]
+#endif
+}
+</code></pre>
+<p>NSNumber 只支持数字前面带 @，举个例子：</p>
+<pre><code>#define INT_MAX   2147483647  /* max value for an int */
+#define INT_MIN   (-2147483647-1) /* min value for an int */
+</code></pre>
+<p>NSNumber 字面量支持 <code>@INT_MAX</code>，但是不支持 <code>@INT_MIN</code>，因为 <code>INT_MIN</code> 是一个表达式，<code>@INT_MIN</code> 称为嵌套表达式。NSNumber 字面量不支持 <code>long double</code>，所以类似于 <code>@123.23L</code> 这个写法是不合法，编译器会报错。</p>
+<p>以前，BOOL 值只是 <code>signed char</code> 的 <code>typedef</code>，YES 是 (BOOL)1，NO 是 (BOOL)0。但是为了支持 <code>@YES</code> 和 <code>@NO</code> 这种写法，这些宏被重新定义：</p>
+<pre><code>#if __has_feature(objc_bool)
+#define YES             __objc_yes
+#define NO              __objc_no
+#else
+#define YES             ((BOOL)1)
+#define NO              ((BOOL)0)
+#endif
+</code></pre>
+<p>Objective-C++ 还支持 <code>@true</code> 和 <code>@false</code> 表达式，跟 <code>@YES</code> 和 <code>@NO</code> 是相同的。</p>
+<h2 id="嵌套表达式">嵌套表达式</h2>
+<h3 id="nsstring">NSString</h3>
+<p>现在 iOS 开发中使用 OC 字符串，都可以很简单的创建：<code>NSString *str = @&quot;some string.&quot;;</code>，但是这个其实是 @ 加上一个 C 类型的字符串生成 <code>NSString</code>，这个也就是 <code>NSString</code> 字面量。跟前面的 <code>NSNumber</code> 很像，当 @ 后面跟的表达式是 <code>(char *)</code> 或者是 <code>(const char *)</code> 类型的，这个嵌套表达式的结果就是指向 <code>NSString</code> 对象的指针，这个 <code>NSString</code> 对象跟 C 字符串包含相同的字符，并且是以 <code>\0</code> 结尾和 UTF-8 编码。有个例子是将 C 字符串风格的命令行参数转成 <code>NSString</code>：</p>
+<pre><code>// Partition command line arguments into positional and option arguments.
+NSMutableArray *args = [NSMutableArray new];
+NSMutableDictionary *options = [NSMutableDictionary new];
+while (--argc) {
+    const char *arg = *++argv;
+    if (strncmp(arg, &quot;--&quot;, 2) == 0) {
+        options[@(arg + 2)] = @(*++argv);   // --key value
+    } else {
+        [args addObject:@(arg)];            // positional argument
+    }
+}
+</code></pre>
+<p>我们需要保证嵌套表达式中的 C 字符串是有效的，不能是 <code>NULL</code>，在运行时传递 <code>NULL</code> 会导致抛出异常。编译器也会尽可能拒绝向嵌套表达式中传递 <code>NULL</code>。</p>
+<h3 id="嵌套枚举">嵌套枚举</h3>
+<p>尽管枚举值是整数，但是枚举还是不能直接作为嵌套字面量使用，这样是为了避免前缀是 @ 符号的 Objective-C 关键字。枚举值必须放在嵌套表达式中，下面的例子表明了在字典中使用 <code>AVAudioRecorder</code> 枚举：</p>
+<pre><code>enum {
+  AVAudioQualityMin = 0,
+  AVAudioQualityLow = 0x20,
+  AVAudioQualityMedium = 0x40,
+  AVAudioQualityHigh = 0x60,
+  AVAudioQualityMax = 0x7F
+};
+
+- (AVAudioRecorder *)recordToFile:(NSURL *)fileURL {
+  NSDictionary *settings = @{ AVEncoderAudioQualityKey : @(AVAudioQualityMax) };
+  return [[AVAudioRecorder alloc] initWithURL:fileURL settings:settings error:NULL];
+}
+</code></pre>
+<p><code>@(AVAudioQualityMax)</code> 这种语法将 AVAudioQualityMax 转换成为整数类型，并转换成相应的值。如果枚举像下面一样申明了类型，则编译器会选择 <code>NSNumber</code> 正确的创建方法：</p>
+<pre><code>typedef enum: unsigned char {
+    Red,
+    Green,
+    Blue
+} Color;
+NSNumber *red = @(Red), *green = @(Green), *blue = @(Blue); // =&gt; [NSNumber numberWithUnsignedChar:]
+</code></pre>
+<h2 id="集合字面量">集合字面量</h2>
+<p>使用字面量方式创建集合对象，需要注意避免 <strong>nil</strong>，如果在编译时期发现 <strong>nil</strong>，编译器会发出警告。在运行时期发现 <strong>nil</strong>，会抛出错误。</p>
+<h3 id="nsarray">NSArray</h3>
+<p>使用字面量创建数组 <code>NSArray *array = @[@&quot;Hello&quot;, NSApp, [NSNumber numberWithInt:42]];</code></p>
+<p>用字面量创建集合对象更加安全。数组字面量语法实际上是调用 <code>+[NSArray arrayWithObjects:count:]</code> 方法，这个方法会保证所有数组中的对象都是<strong>非 nil</strong>。<code>+[NSArray arrayWithObjects:]</code> 这个方法使用 <strong>nil</strong> 作为结束符号，可能会造成不可预期的结果。</p>
+<p>数组对象还支持 C 语言的下标语法：</p>
+<pre><code>NSMutableArray *array = ...;
+NSUInteger idx = ...;
+id newObject = ...;
+id oldObject = array[idx];
+array[idx] = newObject;         // replace oldObject with newObject
+</code></pre>
+<p>访问数组的下标是整数类型，编译器会根据是读取元素还是覆写元素展开成不同的方法。如果是读取元素，则会转换成 <code>objectAtIndexedSubscript:</code> 方法。如果是覆写元素，这会转换成 <code>setObject:atIndexedSubscript:</code> 方法。对于 <code>NSArray</code> 来说，访问 <code>[0, array.count)</code> 之外的位置编译器会抛出异常。对于 <code>NSMutableArray</code> 来说，给范围之内的位置赋值，会替换成这个值，但是给范围之外的位置赋值会抛出异常。没有给可变的数组提供插入、增加、删除元素的语法。</p>
+<h3 id="nsdictionary">NSDictionary</h3>
+<p>使用字面量创建字典：</p>
+<pre><code>NSDictionary *dictionary = @{
+    @&quot;name&quot; : NSUserName(),
+    @&quot;date&quot; : [NSDate date],
+    @&quot;processInfo&quot; : [NSProcessInfo processInfo]
+};
+</code></pre>
+<p>字典字面量也相似，字典字面量使用 <code>+[NSDictionary dictionaryWithObjects:forKeys:count:] </code> 方法来创建字典对象，这个方法会保证所有的键值都<strong>非 nil</strong>。<code>+[NSDictionary dictionaryWithObjectsAndKeys:]</code> 方法也是使用 <strong>nil</strong> 来作为结束符。</p>
+<p><code>NSDictionary</code> 的键必须要实现 <code>&lt;NSCopying&gt;</code> 协议，值必须要是 Objective-C 的对象。</p>
+<p>字典对象同样支持下标范围元素：</p>
+<pre><code>NSMutableDictionary *dictionary = ...;
+NSString *key = ...;
+oldObject = dictionary[key];
+dictionary[key] = newObject;    // replace oldObject with newObject
+</code></pre>
+<p>访问字典的下标使用的对象，同样下标语法会根据读取还是覆写翻译成不用的方法。如果是读取元素，则会转换成 <code>objectForKeyedSubscript:</code> 方法。如果是覆写元素，这会转换成 <code>setObject:forKeyedSubscript:</code> 方法。</p>
+<h3 id="nsvalue">NSValue</h3>
+<p>NSValue 可以保存任何的数字类，例如：int/float/char，还可以保存对象和结构体，NSValue 永远都是不可变的。NSValue 是一个抽象类，真正发挥作用的是 NSValue 的子类，可以继承自 NSValue 类，但是 NSValue 不为子类提供存储空间，需要子类自己实现。此外，NSValue 子类还需要实现两个简单的方法。任何继承自 NSValue 的子类需要覆写 <code>valueWithBytes:objCType:</code> 和 <code>getValue:</code> 方法，这两个方法需要操作你提供的值的内存空间。NSValue 没有指定初始化函数，所以自定义的初始化函数只需要调用 <code>super</code> 的 <code>init</code> 方法就好了。NSValue 还遵守 <code>NSCopying</code> 和 <code>NSSecureCoding</code> 协议，如果子类需要支持 copying 和 coding，实现这两个协议的方法。</p>
+<p>如果需要 NSValue 支持集合，NSValue 还需要重写 <code>hash</code> 方法。</p>
+<p>如果你只想使用 NSValue 来包装你的数据结构，你可以不需要创建 NSValue 子类，使用分类是更好的选择。下面定义了 <code>Polyhedron</code> 结构体，并使用 NSValue 的分类方法来获得和储存 <code>Polyhedron</code> 结构体：</p>
+<pre><code>typedef struct {
+    int numFaces;
+    float radius;
+} Polyhedron;
+
+@interface NSValue (Polyhedron)
+@property (readonly) Polyhedron polyhedronValue;
+
++ (instancetype)valuewithPolyhedron:(Polyhedron)value;
+@end
+
+@implementation NSValue (Polyhedron)
++ (instancetype)valuewithPolyhedron:(Polyhedron)value {
+    return [self valueWithBytes:&amp;value objCType:@encode(Polyhedron)];
+}
+
+- (Polyhedron)polyhedronValue {
+    Polyhedron value;
+    [self getValue:&amp;value];
+    return value;
+}
+@end
+</code></pre>
+<h2 id="自定义的-c-结构体支持-boxed-value">自定义的 C 结构体支持 Boxed Value</h2>
+<p>上面说了嵌套表达式支持 <code>NSValue</code>，而 <code>NSValue</code> 是支持结构体的，唯一的要求就是将结构体标记为 <code>objc_boxable</code>。</p>
+<pre><code>struct __attribute__((objc_boxable)) Point {
+    // ...
+};
+
+typedef struct __attribute__((objc_boxable)) _Size {
+    // ...
+} Size;
+
+typedef struct _Rect {
+    // ...
+} Rect;
+
+struct Point p;
+NSValue *point = @(p);          // ok
+Size s;
+NSValue *size = @(s);           // ok
+
+Rect r;
+NSValue *bad_rect = @(r);       // error
+
+typedef struct __attribute__((objc_boxable)) _Rect Rect;
+
+NSValue *good_rect = @(r);      // ok
+</code></pre>
+<p>为了支持老版本的框架或者是第三方框架，需要使用 <code>typedef</code> 来添加这个特性，像这样 <code>typedef struct __attribute__((objc_boxable)) _Rect Rect;</code>。</p>
+<h2 id="警告">警告</h2>
+<p>使用字面量和嵌套表达式创建的对象，在运行时不能保证唯一性，也不能保证是重新分配的内存。因此直接使用地址来判断对象是否相等是有问题的，例如：== \ != \ &lt; \ &lt;= \ &gt; \ &gt;= 这些运算符。应该使用 <code>isEqual:</code> 或者 <code>compare:</code> 方法来判断。</p>
+<!-- This caveat applies to compile-time string literals as well. Historically, string literals (using the @"..." syntax) have been uniqued across translation units during linking. This is an implementation detail of the compiler and should not be relied upon. If you are using such code, please use global string constants instead (NSString * const MyConst = @"...") or use isEqual:. -->
+<p>还有一点就是要注意检查是否支持新语法：</p>
+<pre><code>#if __has_feature(objc_array_literals)
+    // new way.
+    NSArray *elements = @[ @&quot;H&quot;, @&quot;He&quot;, @&quot;O&quot;, @&quot;C&quot; ];
+#else
+    // old way (equivalent).
+    id objects[] = { @&quot;H&quot;, @&quot;He&quot;, @&quot;O&quot;, @&quot;C&quot; };
+    NSArray *elements = [NSArray arrayWithObjects:objects count:4];
+#endif
+
+#if __has_feature(objc_dictionary_literals)
+    // new way.
+    NSDictionary *masses = @{ @&quot;H&quot; : @1.0078,  @&quot;He&quot; : @4.0026, @&quot;O&quot; : @15.9990, @&quot;C&quot; : @12.0096 };
+#else
+    // old way (equivalent).
+    id keys[] = { @&quot;H&quot;, @&quot;He&quot;, @&quot;O&quot;, @&quot;C&quot; };
+    id values[] = { [NSNumber numberWithDouble:1.0078], [NSNumber numberWithDouble:4.0026],
+                    [NSNumber numberWithDouble:15.9990], [NSNumber numberWithDouble:12.0096] };
+    NSDictionary *masses = [NSDictionary dictionaryWithObjects:objects forKeys:keys count:4];
+#endif
+
+#if __has_feature(objc_subscripting)
+    NSUInteger i, count = elements.count;
+    for (i = 0; i &lt; count; ++i) {
+        NSString *element = elements[i];
+        NSNumber *mass = masses[element];
+        NSLog(@&quot;the mass of %@ is %@&quot;, element, mass);
+    }
+#else
+    NSUInteger i, count = [elements count];
+    for (i = 0; i &lt; count; ++i) {
+        NSString *element = [elements objectAtIndex:i];
+        NSNumber *mass = [masses objectForKey:element];
+        NSLog(@&quot;the mass of %@ is %@&quot;, element, mass);
+    }
+#endif
+
+#if __has_attribute(objc_boxable)
+    typedef struct __attribute__((objc_boxable)) _Rect Rect;
+#endif
+
+#if __has_feature(objc_boxed_nsvalue_expressions)
+    CABasicAnimation animation = [CABasicAnimation animationWithKeyPath:@&quot;position&quot;];
+    animation.fromValue = @(layer.position);
+    animation.toValue = @(newPosition);
+    [layer addAnimation:animation forKey:@&quot;move&quot;];
+#else
+    CABasicAnimation animation = [CABasicAnimation animationWithKeyPath:@&quot;position&quot;];
+    animation.fromValue = [NSValue valueWithCGPoint:layer.position];
+    animation.toValue = [NSValue valueWithCGPoint:newPosition];
+    [layer addAnimation:animation forKey:@&quot;move&quot;];
+#endif
+</code></pre>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="http://clang.llvm.org/docs/ObjectiveCLiterals.html#boxed-c-structures">Objective-C Literals</a></li>
+<li><a href="https://lowlevelbits.org/nsvalue-and-boxed-expressions/">NSVALUE AND BOXED EXPRESSIONS</a></li>
+<li><a href="http://blog.csdn.net/kindazrael/article/details/8091201">Objective-C LLVM 4.0 的新特性</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/nsvalue?language=objc">NSValue Class</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Cocos 的初级小坑]]></title>
+        <id>https://lzhenhong.github.io/post/cocos-de-chu-ji-xiao-keng/</id>
+        <link href="https://lzhenhong.github.io/post/cocos-de-chu-ji-xiao-keng/">
+        </link>
+        <updated>2017-08-25T04:39:48.000Z</updated>
+        <summary type="html"><![CDATA[<p>又是很久没有写博客了，所以再次写一篇来凑凑字数 😜，主要还是把自己最近刚知道的知识记录下来，方便以后来查看。</p>
+<p>因为开始做游戏开发，所以就开始学习 Cocos 相关的内容。最近在几个地方踩了坑，虽然是很小的知识点，但是记录下来也算是记录成长的历程 😶😶。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>又是很久没有写博客了，所以再次写一篇来凑凑字数 😜，主要还是把自己最近刚知道的知识记录下来，方便以后来查看。</p>
+<p>因为开始做游戏开发，所以就开始学习 Cocos 相关的内容。最近在几个地方踩了坑，虽然是很小的知识点，但是记录下来也算是记录成长的历程 😶😶。</p>
+<!-- more -->
+<h2 id="ignorecontentadaptwithsize">ignoreContentAdaptWithSize</h2>
+<p>这个其实不能算踩的坑，主要是当时看到这个觉得很奇怪，因为原来有做过 iOS 开发，觉得这种方式不能理解，当时在项目中看到这个代码的时候也是纠结了蛮久的，前段时间实在不爽，就把这个大概了解了下。因为 Cocos 是开源的，所以，要了解一个函数的详细用法，除了上网 Google 以外，还可以看源码。这在开发 iOS 是做不到的，虽然 iOS 的官方文档超级详细，但还是没有源码来的清晰。</p>
+<p>这个方法是 ccui.Widget 的方法，在文档中的描述就是会触发控件是否忽略自定义的 <code>contentSize</code>，在这个类中这个方法的定义如下：</p>
+<pre><code>ignoreContentAdaptWithSize: function(ignore) {
+    if (this._unifySize) {
+        this.setContentSize(this._customSize);
+        return;
+    }
+
+    if (this._ignoreSize === ignore)
+        return;
+
+    this._ignoreSize = ignore;
+    this.setContentSize(ignore ? this.getVirtualRendererSize() : this._customSize);
+}
+</code></pre>
+<p>在这个方法的实现中，我们可以看到，在最后一行代码根据传递的 bool 值来判断是否使用自定义的 <code>contentSize</code> 值，其实在 <code>setContentSize</code> 方法中也会根据 <code>this._ignoreSize</code> 来判断是否使用自定义的 <code>contentSize</code>，这里在改变了 <code>this._ignoreSize</code> 的值之后，要触发 <code>setContentSize</code> 方法来改变控件的 <code>contentSize</code>。在 ccui.Widget 中会在初始化时调用这个方法，并传递 true，意味着继承自 ccui.Widget 的控件默认都会使用 <code>getVirtualRendererSize</code> 方法返回的 <code>contentSize</code> 来作为控件的大小。</p>
+<p>关于 <code>getVirtualRendererSize</code> 方法，每个控件的实现方式不同，下面举两个控件的实现方式：</p>
+<pre><code>// UIButton.js:180
+getVirtualRendererSize: function() {
+    if (this._unifySize)
+        return this._getNormalSize();
+
+    if (!this._normalTextureLoaded) {
+        if (this._titleRenderer &amp;&amp; this._titleRenderer.getString().length &gt; 0) {
+            return this._titleRenderer.getContentSize();
+        }
+    }
+    return cc.size(this._normalTextureSize);
+}
+</code></pre>
+<p>从 Button 的实现可以看出，在忽略 <code>this._unifySize</code> 的情况下，如果 Button 没有加载过纹理，就用设置的文字的大小来作为 Button 的大小。如果加载过纹理，则使用纹理的 <code>contentSize</code> 来作为 Button 的 <code>contentSize</code>。</p>
+<pre><code>// UIText.js:341
+getVirtualRendererSize: function() {
+    return this._labelRenderer.getContentSize();
+}
+</code></pre>
+<p>Text 的实现方式相比于 Button 就更简单了，直接使用文字的大小来设置 Text 的大小。</p>
+<h3 id="强行小结">强行小结</h3>
+<p>在使用 ccui.Widget 的控件时，在控件大小需要跟图片大小、文字大小等相同时，我们就可以不用管这个方法，因为在初始化时就会调用此方法并传递 true。如果我们需要自定义控件的 <code>contentSize</code>，就需要手动调用这个方法，并传递 false，这样我们设置的 <code>contentSize</code> 才会生效。可以使用 <code>isIgnoreContentAdaptWithSize</code> 方法来获取是否忽略自定义的 <code>contentSize</code>。其实大部分情况下，默认方式就能满足我们的需求，这样也算是提高了一点点效率吧。</p>
+<h2 id="ignoreanchorpointforposition">ignoreAnchorPointForPosition</h2>
+<p>这算是结结实实踩的坑，在这个地方浪费了蛮多时间的，因为在界面上控件显示不出来，也不能像 iOS 开发那样有 Reveal 这样的工具，所以只能一点点去打印，但是打印的锚点依然是 (0.5, 0.5)。<s>WTF 🙄</s></p>
+<p>这个方法是在 Node 中定义的，这个方法在文档中的描述是：控制在设置 Node 位置时，锚点是否是始终为 (0, 0)；文档还说这个方法是内部使用的方法，只在 Layer 和 Scene 中使用，不要在外部调用此方法。在 Node 中的具体定义如下：</p>
+<pre><code>ignoreAnchorPointForPosition: function(newValue) {
+    if (newValue !== this._ignoreAnchorPointForPosition) {
+        this._ignoreAnchorPointForPosition = newValue;
+        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.transformDirty);
+    }
+}
+</code></pre>
+<p>这个方法会先设置 <code>this._ignoreAnchorPointForPosition</code> 的值，这个值在 Node 中默认为 false，但是在 Layer 和 Scene 中为 true。在 CCNode.js:157 中的注释描述到占据整个屏幕的控件像 Layer 和 Scene 需要将这个值设为 true。随后设置 CCNodeCanvasRenderCmd 的 flag，需要重新改变控件的 transform，在 CCNodeCanvasRenderCmd 的 <code>setDirtyFlag</code> 方法中，会将这个 CCNodeCanvasRenderCmd 放入 cc.renderer 的 <code>_transformNodePool</code> 中，随后在 cc.renderer 的 <code>transform</code> 方法中遍历 <code>_transformNodePool</code> 调用 CCNodeCanvasRenderCmd 的 <code>updateStatus</code> 方法，在 CCNodeCanvasRenderCmd 的 <code>updateStatus</code> 方法中调用 CCNodeCanvasRenderCmd 的 <code>transform</code> 方法，在这个方法中根据一些设置，其中包括 node 的 <code>_ignoreAnchorPointForPosition</code> 来调整 node 的锚点。</p>
+<h3 id="强行小结-2">强行小结</h3>
+<p>在大多数情况下，计算控件的位置都会受到锚点的影响。并且默认情况下，锚点的值都是 (0.5, 0.5)。但是还是有特殊情况的，虽然锚点是 (0.5, 0.5)，但是 <code>this._ignoreAnchorPointForPosition</code> 为 true，这样控件的位置就不受锚点的影响。Layer 跟 Scene 都是这样，设置锚点为 (0.5, 0.5)，但是同样设置了 <code>this._ignoreAnchorPointForPosition</code> 为 true。继承自这两个控件的控件也会有这样的问题，例如：ScrollView 和 TableView，设置锚点对这两个控件的位置计算没有影响。需要锚点有影响的话就需要调用 <code>ignoreAnchorPointForPosition</code> 方法，并传递 true。</p>
+<p>可以使用 <code>isIgnoreAnchorPointForPosition</code> 函数来获取 <code>this._ignoreAnchorPointForPosition</code>  的值。锚点只影响自身的位置，子控件始终以父控件的左下角为坐标原点。</p>
+<h2 id="cctableview">cc.TableView</h2>
+<p>关于 TableView 的坑，上面介绍的算一个，然后还有就是设置 TableView 的大小时，不能使用 <code>setContentSize</code> 去设置 TableView 的大小，TableView 继承自 ScrollView，其实这个是 ScrollView 的实现方式。在 iOS 中，设置控件大小的时候使用的是 <code>frame</code>，<code>contentSize</code> 是 UIScrollView 的特有属性，表示 UIScrollView 可滚动的区域大小。在 Cocos 中设置控件的大小使用的是 <code>contentSize</code>，但是在 ScrollView 和 TableView 这，<code>contentSize</code> 的含义变了，也是跟 iOS 中的 <code>contentSize</code> 相似，代表可滚动的区域大小。</p>
+<p>看下 ScrollView 中的 <code>setContentSize</code> 函数的实现：</p>
+<pre><code>setContentSize: function(size, height) {
+    if (this.getContainer() !== null) {
+        if (height === undefined)
+            this.getContainer().setContentSize(size);
+        else
+            this.getContainer().setContentSize(size, height);
+        this.updateInset();
+    }
+}
+</code></pre>
+<p>这里的 <code>setContentSize</code> 方法不会直接设置 ScrollView 的 <code>contentSize</code>，而是设置 container 的 <code>contentSize</code>，这个 container 默认是 Layer，代表 ScrollView 的内容。<code>setContentOffset</code> 改变的也是 container 的 <code>position</code>，所以 <code>setContentSize</code> 不能改变 ScrollView 和 TableView 的可视区域。改变可视区域的方法是 <code>setViewSize</code>，实现如下：</p>
+<pre><code>setViewSize: function(size) {
+    this._viewSize = size;
+    cc.Node.prototype.setContentSize.call(this, size);
+}
+</code></pre>
+<p>在创建 TableView 和 ScrollView 的时候，传递的 cc.size 就是可视区域的大小，如果没有给可视区域的大小，默认是 cc.size(200, 200)。</p>
+<h3 id="强行小结-3">强行小结</h3>
+<p>虽然 Cocos 的 TableView 和 ScrollView 跟 iOS 中的 UITableView 和 UIScrollView 有很多相似的地方，但是还是有很多不同点，不能简单的以 iOS 中的方式来带入到 Cocos 中。</p>
+<p>ScrollView 和 TableView 设置可视区域的函数是 <code>setViewSize</code>，设置内容大小的函数是 <code>setContentSize</code>。</p>
+<h2 id="不同对象引用同一对象">不同对象引用同一对象</h2>
+<p>这个算是 JS 层面的坑，在 Cocos-JS 中采用的是 <strong>John Resig's Simple Class Inheritance</strong> 继承来实现的。我们来看一下在 Cocos-JS 的自定义 Node 的实现方式：</p>
+<pre><code>var MyNode = (function() {
+
+    var node = cc.Node.extend({
+        data_: [],
+        ctor: function() {
+            this._super();
+            // do something with data_.
+        },
+        onExit: function() {
+            // release resources.
+            this._super();
+        }
+    });
+
+    return node;
+
+})();
+</code></pre>
+<p>上面这段代码看起来是没有什么问题的，但是我们如果创建多个 MyNode 对象，并同时对 data_ 进行了一些操作，我们就会发现 data_ 的数据跟我们预想的数据不太一样。这是因为这两个对象的 data_ 实际上实际上是同一个对象，这就导致其中一个 MyNode 对象对 data_ 进行了操作会影响到另一个对象的 data_ 数据。可以通过下面的方式来避免这个情况的发生：</p>
+<pre><code>var MyNode = (function() {
+
+    var node = cc.Node.extend({
+        data_: null,
+        ctor: function() {
+            this._super();
+
+            this.data_ = [];
+            // do something with data_.
+        },
+        onExit: function() {
+            // release resources.
+            this._super();
+        },
+    });
+
+    return node;
+
+})();
+</code></pre>
+<p>一个类的属性如果是 array / function / object，这个属性的初始化需要放到 <code>ctor</code> 方法中。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://blog.csdn.net/xuguangsoft/article/details/8425623">cocos2d-x AnchorPoint 锚点</a></li>
+<li><a href="http://www.jellythink.com/archives/727">菜鸟学习Cocos2d-x 3.x——锚点</a></li>
+<li><a href="https://boundary.cc/2014/02/cocos2d-x-jsb-cocos2d-html5-game-development-1-choice-of-engine/">Cocos2d-x JSB + Cocos2d-html5 跨平台游戏开发（一）—— 引擎选择</a></li>
+<li><a href="https://boundary.cc/2014/05/cocos2d-x-jsb-cocos2d-html5-game-development-2-pitfalls/">Cocos2d-x JSB + Cocos2d-html5 跨平台游戏开发（二）—— 遇到的坑</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Javascript 中的 apply/call/bind 函数]]></title>
+        <id>https://lzhenhong.github.io/post/javascript-zhong-de-apply-call-bind-han-shu/</id>
+        <link href="https://lzhenhong.github.io/post/javascript-zhong-de-apply-call-bind-han-shu/">
+        </link>
+        <updated>2017-07-05T15:23:58.000Z</updated>
+        <summary type="html"><![CDATA[<p>有很长一段时间没有写博客了，前一段时间做毕设，写论文，改论文，答辩，拍毕业照... 很多很多不喜欢的事情，再加上那段时间沉不下心，就很少有机会去写博客了。</p>
+<p>这周一刚进公司，开始做游戏，原来对游戏开发也不太了解，进公司这几天也一直都在学习各种东西，JS 语法，常见的 Cocos API 等等。今天在看 Cocos 的东西时，对 Cocos 的继承不是很了解，就去网上搜资料，在看 [John Resiq 的继承写法解析][1]的时候，对 <code>apply</code> 函数的用法不是很了解，于是又去查资料，这篇博客主要是记录自己对三个函数的理解，也让自己开始继续写博客。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>有很长一段时间没有写博客了，前一段时间做毕设，写论文，改论文，答辩，拍毕业照... 很多很多不喜欢的事情，再加上那段时间沉不下心，就很少有机会去写博客了。</p>
+<p>这周一刚进公司，开始做游戏，原来对游戏开发也不太了解，进公司这几天也一直都在学习各种东西，JS 语法，常见的 Cocos API 等等。今天在看 Cocos 的东西时，对 Cocos 的继承不是很了解，就去网上搜资料，在看 <a href="http://wiki.jikexueyuan.com/project/cocos2d-x-from-cplusplus-js/john-resiq-inheritance-of-written-resolution.html">John Resiq 的继承写法解析</a>的时候，对 <code>apply</code> 函数的用法不是很了解，于是又去查资料，这篇博客主要是记录自己对三个函数的理解，也让自己开始继续写博客。</p>
+<!-- more -->
+<p>关于这些函数网上的解析数不胜数，我这个 JS 方面的 green-hand 来写这三个函数，主要还是记录下自己的理解。</p>
+<p>这三个函数，其中 <code>apply</code> 与 <code>call</code> 函数的作用基本相同，就是改变某个函数运行时的上下文，只是这两个函数接收参数的方式不同。<code>apply</code> 函数接收的参数是包含多个参数的数组，<code>call</code> 函数接收的参数类型是多个参数的列表。</p>
+<ul>
+<li><code>apply</code> 函数的调用方式：<code>func.apply(thisArg, [argsArray])</code></li>
+<li><code>call</code> 函数的调用方式：<code>func.call(thisArg, arg1, arg2, ...)</code></li>
+</ul>
+<h2 id="apply-与-call-的相同点">apply 与 call 的相同点</h2>
+<p>从上面的两个函数的调用方式，就能得知这两个函数都是 JS 中函数对象原型 (prototype) 的方法。来看一下这两个函数的具体用法：</p>
+<h3 id="apply-函数的用法">apply 函数的用法</h3>
+<p>这个函数接收两个参数，第一个参数代表需要替换的上下文对象，第二个参数代表调用对象的参数数组。</p>
+<ul>
+<li>
+<p>不带参数的函数使用 <code>apply</code> ：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printName() {
+    console.log(this.name);
+}
+
+printName(); // log: lzh
+printName.apply(o); // log: eden
+</code></pre>
+</li>
+<li>
+<p>多个参数的函数使用 <code>apply</code>，将多个参数打包成数组作为第二个参数传入 <code>apply</code> 函数：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printHello(greeting, address) {
+    console.log(greeting + &quot;: &quot; + this.name + &quot;, Live in: &quot; + address);
+}
+
+printHello(&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: lzh, Live in: ShenZhen
+printHello.apply(o, [&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;]); // Hello. My name is: eden, Live in: ShenZhen
+</code></pre>
+</li>
+</ul>
+<h3 id="call-函数的用法">call 函数的用法</h3>
+<p>这个函数接收多个参数，参数不限，第一个参数跟 <code>apply</code> 函数的第一个参数相同，代表要替换掉的上下文对象，后面的参数都是调用函数的参数。</p>
+<ul>
+<li>
+<p>不带参数的函数使用 <code>call</code>，这里跟 <code>apply</code> 的使用基本上没有区别：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printName() {
+    console.log(this.name);
+}
+
+printName(); // log: lzh
+printName.call(o); // log: eden
+</code></pre>
+</li>
+<li>
+<p>多个参数的函数使用 <code>call</code>，这里跟 <code>apply</code> 有不同，调用函数的参数传入方式，<code>apply</code> 函数是利用数组，<code>call</code> 函数的参数是需要逐个传入：</p>
+<pre><code>var name = &quot;lzh&quot;;
+
+var o = {
+    name: &quot;eden&quot;
+};
+
+function printHello(greeting, address) {
+    console.log(greeting + &quot;: &quot; + this.name + &quot;, Live in: &quot; + address);
+}
+
+printHello(&quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: lzh, Live in: ShenZhen
+printHello.call(o, &quot;Hello. My name is&quot;, &quot;ShenZhen&quot;); // Hello. My name is: eden, Live in: ShenZhen
+</code></pre>
+</li>
+</ul>
+<h2 id="apply-与-call-的不同点">apply 与 call 的不同点</h2>
+<p>其实从上面两个函数的用法就可以看出来，两个函数的作用是相同的，就是改变函数执行的上下文对象，只是在有多个参数函数的用法上有区别。在参数个数不确定的情况下，就使用 <code>apply</code> 函数；在参数确定的情况下，使用两个函数都可以。</p>
+<p>我们看一个**<a href="https://segmentfault.com/a/1190000000375138?page=1#articleHeader1">面试题</a>**来看一下这两个函数的具体区别。这个面试题的题目是：「定义一个 log 函数，然后它可以代理 <code>console.log</code> 的方法」。我们首先想到的是在 log 函数中直接调用 <code>console.log</code> 方法，这种方式在只有一个参数的情况下能满足要求，但是有个参数，这个方式就只能打印第一个参数。</p>
+<pre><code>function log(msg)　{
+    console.log(msg);
+}
+
+log(&quot;lzh&quot;); // lzh
+log(&quot;lzh&quot;, &quot;eden&quot;); // lzh
+</code></pre>
+<p>更好的方式是使用 <code>apply</code> 函数，将 log 函数的隐藏参数 <code>arguments</code> 作为参数传递给 <code>console.log</code> 函数。下面代码是实现方式：</p>
+<pre><code>function log() {
+    // 在这里我有将参数列表中的 console 替换成其他对象，结果虽然是正确的
+    // 但是最好还是使用 console，因为不知道函数内部究竟有没有使用 console
+    console.log.apply(console, arguments);
+}
+
+log(&quot;lzh&quot;, &quot;eden&quot;); // lzh eden
+</code></pre>
+<p>这道面试题还有一部分：在每次输出的时候，在每一个 log 消息前添加一个 &quot;(app)&quot; 的前辍。</p>
+<pre><code>function log() {
+    // var args = [].slice.call(arguments);
+    var args = Array.prototype.slice.call(arguments); // 这里使用 apply 也是可以的
+    args.unshift('(app)');
+
+    console.log.apply(console, args);
+};
+</code></pre>
+<h2 id="bind-函数">bind 函数</h2>
+<p>首先我们来看下面的代码：</p>
+<pre><code>var o = {
+    name: &quot;lzh&quot;,
+    printName: function() {
+        console.log(this.name);
+    }
+};
+o.printName(); // lzh
+
+var name = &quot;eden&quot;;
+var f = o.printName;
+f(); // eden
+</code></pre>
+<p>从上面的输出结果就可以看出，将对象 o 的 <code>printName</code> 属性赋值给 f，再调用 f，此时输出的结果就不一样了，这是因为当调用 f 函数的时候，会查找。如果我们需要函数的上下文是某个指定的上下文对象，我们就需要使用 <code>bind</code> 来对函数进行一些操作。可以利用上面提到的 <code>apply</code> ／ <code>call</code>  函数，但是这两个函数会立马执行。在本节提到 <code>bind</code> 函数会生成新的函数，不会马上执行。</p>
+<p>上面的例子可以使用下面的代码来解决，这时 f 函数的上下文对象就是 o 而不是全局对象：</p>
+<pre><code>var o = {
+    name: &quot;lzh&quot;,
+    printName: function() {
+        console.log(this.name);
+    }
+};
+o.printName(); // lzh
+
+var name = &quot;eden&quot;;
+var f = o.printName.bind(o);
+f(); // lzh
+</code></pre>
+<p><code>bind</code> 函数的主要作用是创建绑定函数，使得这个函数不管怎么调用始终具有相同的 <code>this</code> 值。就像上面的示例代码。</p>
+<p>我原来以为 JS 中的函数中的对象都是在执行时才确定的，直到看到这篇文章 <strong><a href="https://github.com/mqyqingfeng/Blog/issues/3">JavaScript 深入之词法作用域和动态作用域</a></strong>，才意识到自己原来的理解错了。在 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind()</a> 有一段话：</p>
+<blockquote>
+<p>bind() 最简单的用法是创建一个函数，使这个函数不论怎么调用都有同样的 this 值。JavaScript新手经常犯的一个错误是将一个方法从对象中拿出来，然后再调用，希望方法中的 this 是原来的对象。（比如在回调中传入这个方法）如果不做特殊处理的话，一般会丢失原来的对象。</p>
+</blockquote>
+<p>这样的话并不能直接理解为 JS 函数的上下文对象是在调用时决定的，相反 JS 的作用域是采用静态作用域，函数的作用域是基于函数创建的位置。下面的例子就能证明：</p>
+<pre><code>// 来自 https://github.com/mqyqingfeng/Blog/issues/3
+var value = 1;
+function foo() {
+    console.log(value);
+}
+
+function bar() {
+    var value = 2;
+    foo();
+}
+bar(); // 1
+</code></pre>
+<h3 id="上下文切换导致对象丢失">上下文切换导致对象丢失</h3>
+<p>至于在 Cocos-JS 开发中经常使用的回调会导致上面说的对象的丢失，这种情况跟上面代码中的情况不同，因为这里涉及了函数执行上下文的问题，而不仅仅只是一个变量。在 <a href="https://github.com/mqyqingfeng/Blog/issues/4">JavaScript 深入之执行上下文栈</a> 提到 JS 引擎会创建一个上下文调用栈，每当一个函数执行时，会向这个栈中压入当前上下文。每个上下文都有三个重要的属性，如下图：<strong>变量对象</strong>、<strong>作用域链</strong>和 <strong>this</strong>，只有进入上下文中，这个上下文的变量对象才可以被访问。</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/Contexts.png?raw=true' width=300 alt='JS Contexts.' />
+</div>
+<pre><code>// HTTPService.js
+var httpService = (function() {
+    var service = {};
+    
+    service.getData = function(callback) {
+        if (callback) {
+            callback(data); // 1
+        }
+    };
+    
+    return service;
+})();
+
+// Test.js
+var mainView = cc.Node.extend({
+    data_: null,
+    onEnter: function() {
+        this._super();
+        
+        var self = this; // 2
+        httpService.getData(function(data) {
+            // this.data_ = data;
+            self.data_ = data;
+        });
+    }
+});
+</code></pre>
+<p>假设在 mainView 的 <code>onEnter</code> 方法中发送网络请求获取数据，因为网络请求是异步的，所以我们获取数据之后的操作需要以回调的方式实现。这个回调的调用是在 <code>HTTPService.js</code> 类中注释 1 那，但是在回调中如果像注释那里那样 <code>this.data_ = data;</code> 这样实现会有问题，因为在 <code>HTTPService.js</code> 类中，上下文已经切换了，所以 this 值不再是 <code>Test.js</code> 中的 this 值，因此会报错，this 获取不到 data_。如果像注释 2 那样写，self 不再依赖上下文，当调用回调时，需要使用 self，会到注释 2 获取，而不是直接取当前上下文的值，这是因为 JS 使用的是静态作用域。当然还可以像下面这样使用 <code>bind</code> 来实现，这样回调里面的 this 一直就会是 <code>Test.js</code> 中的 this。</p>
+<pre><code>// Test.js
+var mainView = cc.Node.extend({
+    data_: null,
+    onEnter: function() {
+        this._super();
+        
+        httpService.getData(function(data) {
+            this.data_ = data;
+        }.bind(this));
+    }
+});
+</code></pre>
+<h3 id="bind-函数小提示">bind 函数小提示</h3>
+<p>在<a href="https://www.cnblogs.com/coco1s/p/4833199.html">深入浅出妙用 Javascript 中 apply、call、bind</a>这篇博客中还提到，多次使用 <code>bind</code> 函数没有效果，看下面的例子：</p>
+<pre><code>// 来自 http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html
+var bar = function() {
+    console.log(this.x);
+};
+var foo = { x: 3 };
+var sed = { x: 4 };
+var func = bar.bind(foo).bind(sed);
+func(); // 3
+
+var fiv = { x: 5 };
+
+var func = bar.bind(foo).bind(sed).bind(fiv);
+func(); // 3
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>关于这三个函数的主要作用就是改变函数的上下文对象，其中 <code>apply</code> 和 <code>call</code> 函数会立马执行函数，这两个函数的区别就是接收的参数类型不同；而 <code>bind</code> 函数会生成新的函数，这在函数的回调非常有用。</p>
+<p>关于 JS 的继承，可以参考 <a href="http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html">JavaScript 继承详解</a>，这一系列文章对 JS 的继承介绍得很详细。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.cnblogs.com/coco1s/p/4833199.html">深入浅出妙用 Javascript 中 apply、call、bind</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/3">JavaScript 深入之词法作用域和动态作用域</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/4">JavaScript 深入之执行上下文栈</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/5">JavaScript 深入之变量对象</a></li>
+<li><a href="https://github.com/mqyqingfeng/Blog/issues/6">JavaScript 深入之作用域链</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">Function.prototype.apply()</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call">Function.prototype.call()</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind()</a></li>
+<li><a href="http://wiki.jikexueyuan.com/project/cocos2d-x-from-cplusplus-js/john-resiq-inheritance-of-written-resolution.html">John Resiq 的继承写法解析</a></li>
+<li><a href="http://www.cnblogs.com/sanshi/archive/2009/07/08/1519036.html">JavaScript 继承详解</a></li>
+</ul>
+<!-- 参考 -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ARC 的内存管理]]></title>
+        <id>https://lzhenhong.github.io/post/arc-de-nei-cun-guan-li/</id>
+        <link href="https://lzhenhong.github.io/post/arc-de-nei-cun-guan-li/">
+        </link>
+        <updated>2017-03-14T01:39:09.000Z</updated>
+        <summary type="html"><![CDATA[<p>ObjC 是使用引用计数来管理对象内存的，关于引用计数更加详细的解释，可以看 [理解 iOS 的内存管理][5]，这篇文章还讲了 ARC 下可能存在的内存管理问题。</p>
+<p>ARC 是编译器的特性，在编译的时候自动插入管理引用计数的代码，给 ObjC 对象提供自动内存管理，并生成相应的 <code>dealloc</code> 方法。ARC 可以让你更加专注于编写代码的逻辑而不是去管理内存，但是在 ARC 下遵循 ObjC 的命名规则就显得很重要了。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>ObjC 是使用引用计数来管理对象内存的，关于引用计数更加详细的解释，可以看 <a href="http://blog.devtang.com/2016/07/30/ios-memory-management/">理解 iOS 的内存管理</a>，这篇文章还讲了 ARC 下可能存在的内存管理问题。</p>
+<p>ARC 是编译器的特性，在编译的时候自动插入管理引用计数的代码，给 ObjC 对象提供自动内存管理，并生成相应的 <code>dealloc</code> 方法。ARC 可以让你更加专注于编写代码的逻辑而不是去管理内存，但是在 ARC 下遵循 ObjC 的命名规则就显得很重要了。</p>
+<!-- more -->
+<h2 id="arc-下内存管理变量关键字">ARC 下内存管理变量关键字</h2>
+<p>在 ARC 下，虽然编译器帮我们做了大部分的内存管理的工作，但是我们还是要了解在 ARC 下的内存管理关键字。</p>
+<h3 id="__strong">__strong</h3>
+<p>对一个对象进行强引用，表示拥有该对象，就像在 MRC 下进行 <code>retain</code> 是一样的，当一个对象没有强引用指针引用时，这个对象就再不被拥有，这时这个对象就会被销毁。</p>
+<pre><code>NSObject * __strong objc = [[NSObject alloc] init]; == NSObject * objc = [[NSObject alloc] init];
+</code></pre>
+<p>在 ARC 下，默认的指针就是强引用指针。</p>
+<h3 id="__weak">__weak</h3>
+<p>对一个对象进行弱引用，不会拥有该对象，不会改变这个对象的内存周期，即不会改变该对象的引用计数。当被引用的对象被销毁时，weak 指针会自动置空，这样就可以避免野指针访问错误。常用来解决循环引用问题。</p>
+<pre><code>__typeof__(self) __weak weakSelf = self;
+</code></pre>
+<p><code>__weak</code> 只在 iOS 5 以上版本可用，iOS 5 以下的版本用随后介绍的 <code>__unsafe_unretained</code>。</p>
+<h3 id="__unsafe_unretained">__unsafe_unretained</h3>
+<p>跟 <code>__weak</code> 相似，不会拥有指向的对象。但是指向的对象被销毁时不会置 nil，就会变成悬挂指针，即会发生野指针错误。</p>
+<pre><code>__typeof__(self) __unsafe_unretained weakSelf = self;
+</code></pre>
+<p>在现在的 iOS 版本下，这个内存管理关键字几乎没有用处，因为 <code>__weak</code> 总是更好的选择。但是如果你想在结构体中声明一个对象的成员变量，你就需要用到这个关键字来避免 Xcode 的编译错误，但是这样你就得花精力去管理这个成员变量的内存周期，所以使用类去实现是更好的选择。</p>
+<h3 id="__autoreleasing">__autoreleasing</h3>
+<p>使用这个关键字主要为了延长对象的存活周期，不要被过早的销毁。这个关键字常用来声明对象的指针。</p>
+<pre><code>NSError * __autoreleasing error = nil;
+</code></pre>
+<p>即使我们没有使用 <code>__autoreleasing</code> 声明，编译器还是会在编译器时期帮我们自动添加。</p>
+<pre><code class="language-mm">NSError *error; 
+NSError *__autoreleasing tempError = error;
+[data writeToFile:filename options:NSDataWritingAtomic error:&amp;tempError]；
+</code></pre>
+<p>在这里有个问题需要注意：</p>
+<pre><code>- (BOOL)doSomethingWithDictionary:(NSDictionary *)dictionary error:(NSError * __autoreleasing *)error {
+    // NSError * __block temp = nil;
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        // do sth with key &amp; obj
+        if (error &amp;&amp; [some error happened]) {
+            *error = [NSError errorWithDomain:@&quot;TestError&quot; code:1 userInfo:nil];
+            // tempError = [NSError errorWithDomain:@&quot;TestError&quot; code:1 userInfo:nil];
+        }
+    }];
+    
+    if (error) {
+        // *error = tempError;
+    }
+}
+</code></pre>
+<p>上面的代码看着好像没有什么问题，但是在 <code>enumerateKeysAndObjectsUsingBlock:</code> 的 block 里，会自动创建一个 <code>@autoreleasepool {}</code>， 当离开此次遍历，error 就会被释放掉，最后就不能得到想要的 error 信息。</p>
+<p>可按照上面注释掉的代码解决。</p>
+<h2 id="arc-内存管理问题">ARC 内存管理问题</h2>
+<p>虽然 ARC 的出现让我们不需要花太多的精力在内存管理上，但是有些内存管理问题 ARC 还是没有办法处理的。例如：循环引用和 Core Foundation。</p>
+<h3 id="循环引用">循环引用</h3>
+<p>循环引用就是两个对象相互强引用对方，造成两个对象都不能被释放，从而引起内存泄漏。</p>
+<h4 id="block-的循环引用">block 的循环引用</h4>
+<p>在 block 的使用中是最容易发生内存泄漏的地方，一个对象拥有这个 block，但是在这个 block 里又用到了该对象，block 会持有内部引用的对象，这样就会发生循环引用。</p>
+<p>在 block 中有两种方式来解决循环引用的问题：</p>
+<ol>
+<li>
+<p>主动断开循环引用：在 block 使用完，主动将 block 清空，这样就可以断开 block 对内部持有对象的强引用，也就断开了循环引用。</p>
+<pre><code>self.completionBlock = nil;
+</code></pre>
+</li>
+<li>
+<p>使用弱引用：弱引用不会影响引用对象的内存管理周期，并且在引用对象销毁时置 nil。</p>
+<pre><code>__typeof(self) __weak weakSelf = self;
+self.completionBlock = ^{
+  __typeof(weakSelf) strongSelf = weakSelf;
+ if (strongSelf) {
+   // do something with self
+  }
+};
+</code></pre>
+</li>
+</ol>
+<h4 id="nstimer">NSTimer</h4>
+<p>NSTimer Class Reference 指出 NSTimer 会强引用 target。并且官方的 Timer Programming Topics 指出： 我们不应该在 <code>dealloc</code> 中 invalidate timer。</p>
+<p>举一个例子，我们让 timer 在我们的 ViewController 中不断调用 <code>handleTimer</code> 方法.</p>
+<pre><code>.h
+@property (nonatomic, strong) NSTimer *timer;
+
+.m
+- (void)viewDidLoad {
+    [super viewDidload];
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(handleTimer:) userInfo:nil repeats:YES];
+}
+</code></pre>
+<p>这个时候，timer 和我们的 ViewController 就是循环引用的。即使我们在 <code>dealloc</code> 方法中 invalidate timer 也是没用的。因为 timer 强引用着 VC。而 <code>dealloc</code> 是在对象销毁的时候才会被调用。</p>
+<p>即使 VC 对 NSTimer 没有一个强引用，还是有可能会发生内存泄漏，如果一个 timer 添加到 runloop 中，runloop 会对 NSTimer 有一个强引用，如果我们不主动 invalidate timer 的话，runloop 持有 timer，timer 对 VC 也有一个强引用，就会导致内存泄漏。</p>
+<blockquote>
+<p>Note in particular that run loops maintain strong references to their timers, so you don’t have to maintain your own strong reference to a timer after you have added it to a run loop.</p>
+</blockquote>
+<p>因此在使用 NSTimer 时，特别是循环的 NSTimer 时。我们需要注意在什么地方 invalidate 计时器，在上面这个例子，我们可以在 <code>viewWillDisappear</code> 里面做这样的工作。</p>
+<h3 id="performselector">performSelector</h3>
+<p>在 <a href="http://ibloodline.com/articles/2016/01/15/memory.html">iOS 内存管理机制</a> 这篇文章中还提到了使用 <code>performSelector</code> 可能存在的内存泄漏。</p>
+<p>编译器不知道即将调用的 selector 是什么，不了解方法签名和返回值，所以编译器无法用 ARC 的内存管理规则来判断返回值是否应该释放。因此，ARC 采用了比较谨慎的做法，不添加释放操作，即在方法返回对象时就可能将其持有，从而可能导致内存泄露。</p>
+<h3 id="core-foundation">Core Foundation</h3>
+<p>ARC 不会去管理 Core Foundation 的对象，但是我们在 ARC 下编写代码也不可避免会碰到 Core Foundation 的对象，所以知道一定的 Core Foundation 内存管理对开发这很有帮助的。</p>
+<p>关于 Core Foundation 的内存管理：<a href="https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/CFMemoryMgmt.html#//apple_ref/doc/uid/10000127i">Memory Management Programming Guide for Core Foundation</a></p>
+<h2 id="arc-下的-dealloc-方法">ARC 下的 dealloc 方法</h2>
+<ul>
+<li>移除通知中心 (NSNotificationCenter) 的观察者：从 iOS 9 开始，不再需要移除通知中心 (NSNotificationCenter) 的观察者。如果你的 App 依然支持 iOS 8，你还是需要移除观察者。 More details: <a href="https://developer.apple.com/library/content/releasenotes/Foundation/RN-Foundation/index.html#10_11NotificationCenter">NSNotificationCenter automatic reregistration</a></li>
+<li>移除 KVO 观察者</li>
+<li>释放一些 Core Foundation 的对象</li>
+</ul>
+<p>不允许主动调用此方法，runtime 会在对象被销毁之前调用此方法。当应用直接结束的时候，对象可能不会接收到 <code>dealloc</code> 方法。</p>
+<p>在 ARC 下不需要也不允许编写 <code>[super dealloc];</code>，因为 ARC 下 runtime 会处理好父类的 <code>dealloc</code> 链；但是在 MRC 下必须要在 <code>dealloc</code> 方法的最后调用 <code>[super dealloc];</code> 来执行父类的清理操作。</p>
+<h2 id="扩展阅读">扩展阅读</h2>
+<ul>
+<li><a href="http://www.informit.com/articles/article.aspx?p=1765122&amp;seqNum=7">Simple Memory Management</a></li>
+<li><a href="https://github.com/100mango/zen/blob/master/iOS%E5%A4%AF%E5%AE%9E%EF%BC%9A%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/iOS%E5%A4%AF%E5%AE%9E%EF%BC%9A%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md">iOS夯实：内存管理</a></li>
+<li><a href="http://ibloodline.com/articles/2016/01/15/memory.html">iOS 内存管理机制</a></li>
+<li><a href="https://segmentfault.com/a/1190000006708291">iOS 与 OSX 内存管理：引用计数</a></li>
+</ul>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html">Transitioning to ARC Release Notes</a></li>
+<li><a href="http://www.samirchen.com/ios-arc/">iOS ARC 内存管理要点</a></li>
+<li><a href="https://iosguy.com/tag/__autoreleasing/">Natural Code Just Works</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/MemoryMgmt.html#//apple_ref/doc/uid/10000011-SW1">Advanced Memory Management Programming Guide</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[实现 NSFastEnumeration]]></title>
+        <id>https://lzhenhong.github.io/post/shi-xian-nsfastenumeration/</id>
+        <link href="https://lzhenhong.github.io/post/shi-xian-nsfastenumeration/">
+        </link>
+        <updated>2017-03-08T03:28:36.000Z</updated>
+        <summary type="html"><![CDATA[<p>关于 <code>NSFastEnumeration</code> 的基本介绍可以看这篇 [使自定义的类支持 iOS 的枚举方式][7]。</p>
+<p>不多说废话，直接进主题。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>关于 <code>NSFastEnumeration</code> 的基本介绍可以看这篇 <a href="https://lzhenhong.github.io/2017/02/27/Support-iOS-Enumeration/">使自定义的类支持 iOS 的枚举方式</a>。</p>
+<p>不多说废话，直接进主题。</p>
+<!-- more -->
+<h2 id="内部实现">内部实现</h2>
+<p>要实现 <code>NSFastEnumeration</code>  协议，我们先看下内部实现，将下面的代码 <code>clang -rewrite-objc main.m</code> 成 C++ 代码。</p>
+<pre><code>NSArray *array = @[@1, @2, @3];
+for (NSNumber *number in array) {
+   NSLog(@&quot;%@&quot;, number);
+}
+</code></pre>
+<p>得到的 main.cpp 文件，我将代码改了一下，看起来比较友好一点。</p>
+<pre><code>NSArray *array = @[@1, @2, @3];
+NSNumber *number;
+
+// NSFastEnumerationState
+struct __objcFastEnumerationState enumState = { 0 };
+// stackbuf
+id __rw_items[16];
+
+id l_collection = (id)array;
+// 调用 countByEnumeratingWithState:objects:count: 方法
+_WIN_NSUInteger limit = [l_collection countByEnumeratingWithState:&amp;enumState objects:(id *)__rw_items count:(_WIN_NSUInteger)16];
+
+// 判断是否遍历完毕，每次返回的是一个 C 数组，如果是 0 的话就不遍历
+if (limit) {
+    unsigned long startMutations = *enumState.mutationsPtr;
+    // 不停的调用 countByEnumeratingWithState:objects:count: 方法，直到遍历完成
+    do {
+        unsigned long counter = 0;
+        // 遍历获得的数组
+        do {
+            if (startMutations != *enumState.mutationsPtr) { // 判断数组是否被改变
+                objc_enumerationMutation(l_collection); // 抛出异常
+            }
+            number = (NSNumber *)enumState.itemsPtr[counter++];
+            NSLog(@&quot;%@&quot;, number);
+        } while (counter &lt; limit);
+    } while (limit = [l_collection countByEnumeratingWithState:&amp;enumState objects:(id *)__rw_items count:(_WIN_NSUInteger)16]);
+    number = ((NSNumber *)0);
+} else {
+    number = ((NSNumber *)0);
+}
+</code></pre>
+<p>从上面的代码中我们看到内部实现，两个 <code>do-while</code> 循环去遍历容器对象。第一个 <code>do-while</code> 循环是不断调用 <code>countByEnumeratingWithState:objects:count:</code> 判断返回的数值，查看容器对象是否遍历完成。第二个 <code>do-while</code> 是去遍历 <code>enumState</code> 中 <code>itemPtr</code> 指向的 C 数组。我们可以将容器对象中的元素分成多次通过 C 数组返回，这里 <code>itemPtr</code> 和 <code>countByEnumeratingWithState:objects:count:</code> 返回的数值组成第二个 <code>do-while</code> 循环要遍历的 C 数组。</p>
+<h2 id="编码实现-nsfastenumeration-协议">编码实现 NSFastEnumeration 协议</h2>
+<p>在看过内部实现之后，我们在实现 <code>countByEnumeratingWithState:objects:count:</code> 方法的时候就知道如何编写代码。</p>
+<p>实现 <code>countByEnumeratingWithState:objects:count:</code> 方法有两种方式，一种是容器对象中的元素在内存存储是连续的，那么可以将 <code>NSFastEnumerationState</code> 的 <code>itemPtr</code> 直接设成这个容器的首地址，但是注意必须要是 C 数组。另一种是内存存储中不是连续的，例如：链表，这时候就需要用到 <code>countByEnumeratingWithState:objects:count:</code> 提供的 <code>stackbuf</code> 数组，同时 <code>state-&gt;itemPtr = stackbuf;</code></p>
+<p>接下来看下具体代码实现：</p>
+<h3 id="在内存空间中是连续的">在内存空间中是连续的</h3>
+<pre><code>@interface TestArray: NSObject
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])stackbuf
+                                    count:(NSUInteger)len {
+    // 一次性将所有的元素都返回
+    if (state-&gt;state == 0) { // 1
+        __unsafe_unretained const id *const_array = _list.data();
+        state-&gt;itemsPtr = (__typeof__(state-&gt;itemsPtr))const_array; // 2
+        state-&gt;state = 1; // 3
+        state-&gt;mutationsPtr = &amp;state-&gt;extra[0]; // 4
+        return _numberList.size(); // 5
+    } else {
+        return 0; // 6
+    }
+}
+@end
+</code></pre>
+<ol>
+<li>利用 <code>NSFastEnumeration</code> 的 <code>state</code> 来判断是否是第一次调用 <code>countByEnumeratingWithState:objects:count:</code> 方法，在前面的 C++ 代码中，我们看到第一次调用此方法的时候，<code>NSFastEnumeration</code> 结构体都被初始化成 0；</li>
+<li>将内部容器对象转换成 C 数组，然后设置给 <code>NSFastEnumeration</code> 的 <code>itemPtr</code> 成员；</li>
+<li>将 <code>NSFastEnumeration</code> 的 <code>state</code> 设置成 1，代表不是第一次调用此方法；</li>
+<li>令 <code>mutationsPtr</code> 设成固定值，这里没有对遍历容器对象改变做保护；</li>
+<li>返回 <code>itemPtr</code> 指向的 C 数组的长度；</li>
+<li>返回 0 表示遍历已经完成。</li>
+</ol>
+<h3 id="在内存空间中是不连续的">在内存空间中是不连续的</h3>
+<pre><code>@interface TestLinkedList: NSObject
+@end
+
+@implementation TestLinkedList {
+    struct Node *head;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])stackbuf
+                                    count:(NSUInteger)len {
+    if (state-&gt;state == 0) {
+        state-&gt;mutationsPtr = &amp;state-&gt;mutationsPtr;
+        state-&gt;extra[0] = (long)head; // 1
+        state-&gt;state = 1;
+    }
+
+    struct Node *currentNode = (struct Node *)state-&gt;extra[0];
+    NSUInteger count = 0;
+
+    state-&gt;itemsPtr = stackbuf; // 2
+
+    while (currentNode &amp;&amp; count &lt; len) { // 3
+        *stackbuf++ = currentNode-&gt;value;
+        currentNode = currentNode-&gt;next;
+        count++;
+    }
+
+    if (currentNode) {
+        state-&gt;extra[0] = (long)currentNode-&gt;next; // 4
+    }
+
+    return count;
+}
+@end
+</code></pre>
+<p>这里的例子是从 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 复制过来的。</p>
+<ol>
+<li>第一次遍历的时候将 head 存进 <code>extra</code>，原因下面解释；</li>
+<li>因为这里是不连续的内存空间，所以我们需要用到 <code>stackbuf</code> 数组，将 <code>itemPtr</code> 指向 <code>stackbuf</code> 数组；</li>
+<li>这里不仅要判断当前的节点是否为 NULL，还要判断是否超出了 <code>stackbuf</code> 的长度，这也是为什么要将节点存入 <code>extra</code> 的原因，因为有可能不能一次性遍历完成；</li>
+<li>将当前节点的下一个节点存入 <code>extra</code>，以便下一次调用 <code>countByEnumeratingWithState:objects:count:</code> 的时候使用。</li>
+</ol>
+<h2 id="更多">更多</h2>
+<p>更多示例：<a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 和 <a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a>.</p>
+<p>需要注意的是在 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a> 这篇文章中利用 <code>state-&gt;mutationsPtr = (unsigned long *)self;</code> 来确保容器对象不会被改变是有一点问题的，关于这个有人在 <a href="https://twitter.com/gparker/status/316460848916865024">Twitter</a> 上说了。如果使用了 <code>isa-swizzling</code>，就可能会出现问题，所以使用 <code>state-&gt;mutationsPtr = &amp;state-&gt;extra[0]; </code> 或者 <code> state-&gt;mutationsPtr = &amp;state-&gt;mutationsPtr;</code> 是比较好一点的选择。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-16-implementing-fast-enumeration.html">Implementing Fast Enumeration</a></li>
+<li><a href="http://stackoverflow.com/a/4872564/5350993">Does anyone know how to implement the NSFastEnumeration protocol?</a></li>
+<li><a href="https://www.cocoawithlove.com/2008/05/implementing-countbyenumeratingwithstat.html">Implementing countByEnumeratingWithState:objects:count:</a></li>
+<li><a href="http://blog.leichunfeng.com/blog/2016/06/20/objective-c-fast-enumeration-implementation-principle/">Objective-C Fast Enumeration 的实现原理</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使自定义的类支持 iOS 的枚举方式]]></title>
+        <id>https://lzhenhong.github.io/post/shi-zi-ding-yi-de-lei-zhi-chi-ios-de-mei-ju-fang-shi/</id>
+        <link href="https://lzhenhong.github.io/post/shi-zi-ding-yi-de-lei-zhi-chi-ios-de-mei-ju-fang-shi/">
+        </link>
+        <updated>2017-02-27T01:43:21.000Z</updated>
+        <summary type="html"><![CDATA[<p>事先可以看一下 [Comparison of Objective-C Enumeration Techniques][1] 和 [NSFastEnumeration / NSEnumerator][2]，对比了 ObjC 中各种遍历方式。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>事先可以看一下 <a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-09-comparison-of-objective-c-enumeration-techniques.html">Comparison of Objective-C Enumeration Techniques</a> 和 <a href="http://nshipster.com/enumerators/">NSFastEnumeration / NSEnumerator</a>，对比了 ObjC 中各种遍历方式。</p>
+<!-- more -->
+<p>在 iOS 中主要有 4 种类型的遍历：</p>
+<ul>
+<li>C 语言风格</li>
+<li>NSEnumerator</li>
+<li>基于 block 的遍历</li>
+<li>NSFastEnumeration</li>
+</ul>
+<h2 id="c-语言风格">C 语言风格</h2>
+<pre><code>NSArray *nums = @[@1, @2, @3];
+for (int i = 0; i &lt; nums.count, ++i) {
+    NSLog(@&quot;%@&quot;, nums[i]);
+}
+</code></pre>
+<p>形如上面这样的利用 for 循环，然后使用下标去访问对象的方式，就是 C 语言风格的遍历。</p>
+<p>要支持这种 C 语言风格遍历就需要实现 <code>objectAtIndexedSubscript:</code> 方法，这是因为编译器会将 <code>someArray[0]</code> 解析成 <code>[someArray objectAtIndexedSubscript:0]</code>。</p>
+<pre><code>@interface TestArray: NSObject
+- (id)objectAtIndexedSubscript:(NSUInteger)idx;
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (id)objectAtIndexedSubscript:(NSUInteger)idx {
+    if (idx &gt;= _numberList.size()) {
+        // 抛出异常
+    }
+    return _numberList[idx];
+}
+@end
+</code></pre>
+<p>如果要支持使用键作为下标来访问值，就需要实现 <code>objectForKeyedSubscript:</code> 方法。</p>
+<h2 id="nsenumerator">NSEnumerator</h2>
+<pre><code>NSArray *numberArray = @[@1, @2, @3];
+NSEnumerator *enumerator = [numberArray objectEnumerator];
+NSNumber *number;
+while (number = [enumerator nextObject]) {
+    // 对 number 对象进行操作
+}
+</code></pre>
+<p>这是 ObjC 原来遍历集合的标准方式，但是这种写法很冗长。虽然现在基本上不用这种方式了，还是来看一下如何支持这种方式的遍历。</p>
+<p>要支持这种遍历方式主要还是实现一个 <code>objectEnumerator</code> 方法返回 <code>NSEnumerator</code> 对象。这里的 <code>NSEnumerator</code> 是抽象类，需要继承 <code>NSEnumerator</code> 然后实现 <code>-nextObject:</code> 方法。</p>
+<pre><code>@interface TestEnumerator: NSEnumerator
+@property (nonatomic, readonly) TestArray *array;
+
+- (instancetype)initWithTestArray:(TestArray *)array;
+@end
+
+@implementation TestEnumerator {
+    NSUInteger _currentIndex;
+}
+
+- (instancetype)initWithTestArray:(TestArray *)array {
+    if (self = [super init]) {
+        _array = array;
+        _currentIndex = 0;
+    }
+    return self;
+}
+
+- (id)nextObject {
+    if (_currentIndex &gt;= [self.array numberOfItems]) {
+        return nil;
+    } else {
+        return array[_currentIndex++]; // 假设 TestArray 实现了 `objectAtIndexedSubscript:` 方法
+    }
+}
+
+// 这里还需要注意的是 NSEnumerator 会自动实现 `-allObjects` 方法，将 `-nextObject` 方法返回的对象填入数组中
+@end
+
+
+@interface TestArray: NSObject
+- (NSEnumerator *)objectEnumerator;
+- (NSUInteger)numberOfItems;
+@end
+
+@implementation TestArray {
+    std::vector&lt;NSNumber *&gt; _numberList;
+}
+
+- (NSUInteger)numberOfItems {
+    return _numberList.size();
+}
+
+- (NSEnumerator *)objectEnumerator {
+    return [[TestEnumerator alloc] initWithTestArray:self];
+}
+@end
+</code></pre>
+<p><code>NSEnumerator</code> 也是遵守 <code>NSFastEnumeration</code> 协议，所以可以还可以使用 for-in 循环来遍历 <code>NSEnumerator</code> 对象。</p>
+<h2 id="基于-block-的遍历">基于 block 的遍历</h2>
+<pre><code>NSArray *array = @[@1, @2, @3];
+[array enumerateObjectsUsingBlock:^(id object, NSUInteger idx, BOOL *stop) {
+    NSLog(@&quot;%@&quot;, object);
+}];
+</code></pre>
+<p>这种遍历是现在经常使用的方式，而且这种方式还提供了很多有用的特性。</p>
+<pre><code>- (void)enumerateObjectsWithOptions:(NSEnumerationOptions)opts usingBlock:(void (^)(id obj, NSUInteger idx, BOOL *stop))block
+</code></pre>
+<p>上面这个方法就可以指定 <code>NSEnumerationOptions</code> 参数，可以反向遍历和并行遍历。同时系统会在这个方法的 block 里添加一个 <code>autoreleasepool</code>。</p>
+<p>这里不太懂，苹果官方给出的例子也就是简单的实现了 <code>enumerateObjectsUsingBlock:</code> 方法。苹果官方例子：<a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a>.</p>
+<h2 id="nsfastenumeration">NSFastEnumeration</h2>
+<pre><code>NSArray *array = @[@1, @2, @3];
+for (NSNumber *number in array) {
+    NSLog(@&quot;%@&quot;, number);
+}
+</code></pre>
+<p>利用 for-in 遍历容器对象也是非常常见的遍历方法，并且这种方式也是最快的，要让自定义的对象支持这种遍历模式还是比较麻烦的。</p>
+<p>支持这种遍历模式的对象需要遵守 <code>NSFastEnumeration</code> 协议，并实现方法：</p>
+<pre><code>- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len;
+</code></pre>
+<p>接下来详细解释下这些参数的含义：</p>
+<ul>
+<li>state: 这是个 <code>NSFastEnumerationState</code> 的结构体，申明如下：</li>
+</ul>
+<pre><code>typedef struct {
+    // 在第一次调用 `countByEnumeratingWithState:objects:count:` 方法时，state 为 0，
+    // 这个在遍历的时候用不到，可以用来存储额外信息
+    unsigned long state; 
+    // C 数组，`countByEnumeratingWithState:objects:count:` 方法调用者要去遍历的数组
+    id *itemsPtr;
+    // 用来检测遍历期间数组是否被修改
+    unsigned long *mutationsPtr;
+    // 存储额外信息
+    unsigned long extra[5]; 
+} NSFastEnumerationState;
+</code></pre>
+<ul>
+<li>stackbuf: <code>countByEnumeratingWithState:objects:count:</code> 方法调用者提供的数组，当我们数据结构是不连续的内存时，需要用到这个数组</li>
+<li>len: stackbuf 数组的长度，当使用到 stackbuf 数组时，需要用到 len 来检测</li>
+</ul>
+<p>实现 <code>countByEnumeratingWithState:objects:count:</code> 这个方法，还需要挺多要写的，打算另写一篇来说如何实现。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://www.mikeash.com/pyblog/friday-qa-2010-04-09-comparison-of-objective-c-enumeration-techniques.html">Comparison of Objective-C Enumeration Techniques</a></li>
+<li><a href="http://nshipster.com/enumerators/">NSFast​Enumeration / NSEnumerator</a></li>
+<li><a href="https://developer.apple.com/library/ios/#samplecode/FastEnumerationSample/Introduction/Intro.html">FastEnumerationSample</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[2016 总结]]></title>
+        <id>https://lzhenhong.github.io/post/2016-zong-jie/</id>
+        <link href="https://lzhenhong.github.io/post/2016-zong-jie/">
+        </link>
+        <updated>2016-12-31T15:59:08.000Z</updated>
+        <summary type="html"><![CDATA[<p>因为自己现在大四了，而且今年也发生了挺多的事情，第一次有想写总结的想法。所以就趁着 2016 年的尾巴来写一篇总结。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>因为自己现在大四了，而且今年也发生了挺多的事情，第一次有想写总结的想法。所以就趁着 2016 年的尾巴来写一篇总结。</p>
+<!-- more -->
+<p>今年主要发生的事情就是：</p>
+<ul>
+<li>找实习</li>
+<li>暑假实习</li>
+<li>找工作</li>
+</ul>
+<h3 id="大三下学期找实习">大三下学期找实习</h3>
+<p>因为大三的暑假学校要求必须实习，是有学分的，然后自己几乎在大三下学期刚开学就开始不停的投简历找实习。</p>
+<p>第一次电话面试是腾讯，因为是学长给内推的，所以三月份中旬就接到了电话面试的电话，是在两天之后，自己当时还是准备了一两天 iOS 的面试题，但是电面的时候一上来就让写快排，因为自己光准备 iOS 了，算法／数据结构之类根本没看，所以这题也就写个大概。然后还问很多关于计算机基础的知识点，例如：网络通信／操作系统／计算机组成／C 语言等。自己当时完全没有准备这些，所以自然而然就挂在电面上。</p>
+<p>在腾讯之后就是网易的 iOS 实习生，自己在有了一定的准备之后，通过了网易的笔试，虽然笔试的题目比较基础，但是还是给了我一定的信心。<s>通知我去面试，自己还闹出了一个比较大的笑话，这里就不说了。</s></p>
+<p>在腾讯和网易没有着落之后，自己就开始广撒网，在招聘网站不停的投简历，不停的被拒绝。有一段时间甚至不想去准备了，想着直接跟着学校去实习，完成暑假实习这个任务算了。但是看着身边的人也一直在不停的准备，自己还是慢慢的坚持下来了。那段时间，一直在准备面试的事，也学到了很多知识。不停的看数据结构和 iOS 面试相关的博客。最后再经过一番折腾之后，拿到了<a href="https://itunes.apple.com/cn/app/xia-chu-fang-mei-shi-cai-pu/id460979760?mt=8">下厨房</a>的 iOS 实习 offer。</p>
+<h3 id="暑假三个月实习">暑假三个月实习</h3>
+<p>在拿到<a href="https://itunes.apple.com/cn/app/xia-chu-fang-mei-shi-cai-pu/id460979760?mt=8">下厨房</a>的实习 offer 之后，自己还刻意准备了一些 iOS 相关的知识，例如：URL Loading System／Masonry 的使用等。</p>
+<p>在 7 月 15 日到达北京，在酒店住了两三天，然后在公司附近找到了租房，于是就开始了为期三个月的实习。三个月的实习虽然短暂，但是这是我的第一份工作，还是在这份工作中学习到了许多有用的知识：</p>
+<ul>
+<li>在公司中多人如何协同合作；</li>
+<li>在 iOS 专业知识上同事也给予了我很大的帮助；</li>
+<li><a href="https://itunes.apple.com/cn/app/xia-chu-fang-mei-shi-cai-pu/id460979760?mt=8">下厨房</a>项目涉及到 iOS 的方方面面，也增长了自己的见识。</li>
+</ul>
+<p>在实习期间，我还参加了百度的面试，虽然最后挂了 <s>😭😭</s>。但是在面试的过程中，还是让我认识到了自己的不足，以及对以后的人生没有明确的规划。在这次面试之后，自己也有思考以后的发展应该是怎样，在这里就不扯了。</p>
+<p>总之，暑假的三个月实习还是让我收获很多，让我对以后的规划有了认真的思考。</p>
+<h3 id="大四上学期找工作">大四上学期找工作</h3>
+<p>因为在北京实习，没有怎么参加学校的校招，就参加了百度的校招，还挂了，所以直到现在都还没有找到工作。现在也一直在不停的找工作，感觉回到了大三下学期。</p>
+<p>最近一段时间，也接受了爱奇艺和携程的电面，感觉也并不怎样。归根结底，还是自己的水平太次。虽然最近一段时间，自己也一直不断的在学习，但还是差得很远。</p>
+<p>近期，自己有了一个想法，不知道最后能不能实现，希望不要像以前一样半途而废。</p>
+<p>在这一段时期，我主要还是着重于自己需要提高的地方：</p>
+<ul>
+<li>算法／数据结构</li>
+<li>iOS 专业知识</li>
+<li>计算基础知识</li>
+<li>Python 的学习</li>
+</ul>
+<h3 id="总结">总结</h3>
+<p>不管怎样，人还是不要停下学习的脚步。前段时间看到过一句话，觉得很触动人心：</p>
+<p><strong>越努力的人，越幸运。</strong></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[UIResponder 拾遗：inputView 和 inputAccessoryView]]></title>
+        <id>https://lzhenhong.github.io/post/uiresponder-shi-yi-inputview-he-inputaccessoryview/</id>
+        <link href="https://lzhenhong.github.io/post/uiresponder-shi-yi-inputview-he-inputaccessoryview/">
+        </link>
+        <updated>2016-12-08T13:34:32.000Z</updated>
+        <summary type="html"><![CDATA[<p>前几天在看响应者链条的时候，看到 <code>UIResponder</code> 有两个很有用的属性，但是自己不熟悉，就是 <code>inputView</code> 和 <code>inputAccessoryView</code>。原来自己练手的时候，需要这样的功能，但是自己不知道这两个属性，导致自己花费了很多时间。所以，就写下这篇，算是对不知道的知识的补充。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>前几天在看响应者链条的时候，看到 <code>UIResponder</code> 有两个很有用的属性，但是自己不熟悉，就是 <code>inputView</code> 和 <code>inputAccessoryView</code>。原来自己练手的时候，需要这样的功能，但是自己不知道这两个属性，导致自己花费了很多时间。所以，就写下这篇，算是对不知道的知识的补充。</p>
+<!-- more -->
+<h2 id="uitextfield-的-inputview-和-inputaccessoryview">UITextField 的 inputView 和 inputAccessoryView</h2>
+<h3 id="uitextfield-的-inputview">UITextField 的 inputView</h3>
+<p>默认情况下，当 <code>UITextField</code> 对象成为第一响应者的时候，系统会唤出系统键盘来接收用户的输入。</p>
+<p>但是在有些时候，我们不希望唤出系统键盘，而是我们自定义的 view 来接收用户的输入，在这种情况下，<code>inputView</code> 就派上用场了。<code>inputView</code> 的作用就是让开发者提供自定义的 view 来获取用户的输入，当 <code>UITextField</code> 对象成为第一响应者的时候，系统会尝试唤出 <code>inputView</code>，如果 <code>inputView</code> 存在，就唤出开发者提供的 <code>inputView</code>；如果 <code>inputView</code> 不存在，也就是说这个属性的值是 nil（<code>inputView</code> 默认就是 nil），系统会唤出系统键盘。</p>
+<p>现在假设当我们点击 <code>UITextField</code> 之后，显示出来的是一个 <code>UIDatePicker</code>。大概的实现代码：</p>
+<pre><code>@interface ViewController ()
+@property (nonatomic, weak) IBOutlet UITextField *textField;
+@property (nonatomic, strong) UIDatePicker *datePicker;
+@end
+
+@implementation ViewController
+
+- (UIDatePicker *)datePicker {
+    if (!_datePicker) {
+        _datePicker = [[UIDatePicker alloc] init];
+        _datePicker.datePickerMode = UIDatePickerModeCountDownTimer;
+    }
+    return _datePicker;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.textField.inputView = self.datePicker;
+}
+
+@end
+</code></pre>
+<h3 id="uitextfield-的-inputaccessoryview">UITextField 的 inputAccessoryView</h3>
+<p>接下来说一下 <code>inputAccessoryView</code> 的作用，这个属性就是在 <code>inputView</code> 或者系统键盘上添加一个辅助的 view，例如下图高亮部分（图片截取自奇点）：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/inputAccessory_Example.png?raw=true' width=200 alt='inputAccessory Example' />
+<div align=left>
+<p>我们自己来添加一个 <code>inputAccessoryView</code>，大概的代码实现：</p>
+<pre><code>@interface ViewController () 
+@property (nonatomic, weak) IBOutlet UITextField *textField;
+@property (nonatomic, strong) UIToolbar *toolBar;
+@end
+
+@implementation ViewController
+
+- (UIToolbar *)toolBar {
+    if (!_toolBar) {
+        _toolBar = [[UIToolbar alloc] init];
+        _toolBar.bounds = (CGRect){CGPointZero, self.view.bounds.size.width, 49};
+        UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                   target:nil
+                                                                                   action:NULL];
+        UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                                                   target:self
+                                                                                   action:@selector(done)];
+        _toolBar.items = @[spaceItem, rightItem];
+    }
+    return _toolBar;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.textField.inputAccessoryView = self.toolBar;
+}
+
+- (void)done {
+    NSString *text = [NSString stringWithFormat:@&quot;%.2lf s&quot;, self.datePicker.countDownDuration];
+    if (self.textField.isFirstResponder) {
+        self.textField.text = text;
+        [self.textField resignFirstResponder];
+    }
+}
+
+@end
+</code></pre>
+<p><code>UITextView</code> 的自定义 <code>inputView</code>／<code>inputAccessoryView</code> 与 <code>UITextField</code> 类似。</p>
+<h2 id="uireponder-的-inputview-和-inputaccessoryview">UIReponder 的 inputView 和 inputAccessoryView</h2>
+<h3 id="uireponder-的-inputview">UIReponder 的 inputView</h3>
+<p>我们看一下  <code>inputView</code> 和 <code>inputAccessoryView</code> 在 <code>UIResponder</code> 的声明：</p>
+<pre><code>// Called and presented when object becomes first responder.  Goes up the responder chain.
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputView NS_AVAILABLE_IOS(3_2);
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputAccessoryView NS_AVAILABLE_IOS(3_2);
+</code></pre>
+<p>这里我们看到 <code>UIResponder</code> 将这两个属性声明为 <code>readonly</code>，所以当我们使用例如：<code>UIButton</code> 的时候，我们就需要继承这些类，然后重新将这两个属性声明称 <code>readwrite</code>。</p>
+<p>假设我们点击一个 button 时，要显示一个 <code>UIDatePicker</code>，大概的代码实现：</p>
+<pre><code>@interface TSButton : UIButton
+@property (nonatomic, strong, readwrite, nullable) UIView *inputView;
+@property (nonatomic, strong, readwrite, nullable) UIView *inputAccessoryView;
+@end
+
+@implementation TSButton
+// 1
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+// 2
+- (BOOL)canResignFirstResponder {
+    return YES;
+}
+@end
+
+@interface ViewController ()
+@property (nonatomic, weak) IBOutlet TSButton *showDatePickerButton;
+@property (nonatomic, strong) UIDatePicker *datePicker;
+@end
+
+@implementation ViewController
+
+- (UIDatePicker *)datePicker {
+    if (!_datePicker) {
+        _datePicker = [[UIDatePicker alloc] init];
+        _datePicker.datePickerMode = UIDatePickerModeCountDownTimer;
+    }
+    return _datePicker;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.showDatePickerButton.inputView = self.datePicker;
+}
+
+- (IBAction)showDatePicker {
+     // 3
+    [self.showDatePickerButton becomeFirstResponder];
+}
+
+@end
+</code></pre>
+<p>我们在这里要注意有注释的地方，除却 <code>UITextField</code> 和 <code>UITextView</code> 之外，因为这两个控件会自动成为第一响应者，其他的 <code>UIResponder</code> 子类想要成为第一响应者有两步要做：</p>
+<ol>
+<li>覆写 <code>canBecomeFirstResponder</code> 并返回 YES；</li>
+<li>主动调用 <code>becomeFirstResponder</code> 方法。</li>
+</ol>
+<p>因为只有成为第一响应者，系统才会去唤出 <code>inputView</code> 与 <code>inputAccessoryView</code>，所以我们需要主动调用 <code>becomeFirstResponder</code> 方法。</p>
+<h2 id="reloadinputviews-用法">reloadInputViews 用法</h2>
+<p>当对象是第一响应者时，调用这个方法来刷新 <code>inputView</code> 和 <code>inputAccessoryView</code>。这些 view 会立马被替换，没有动画。如果对象不是第一响应者，则这个方法就没有任何效果。</p>
+<h2 id="与-inputview-和-inputaccessoryview-相关的通知">与 inputView 和 inputAccessoryView 相关的通知</h2>
+<p>我们有时会监听与系统键盘相关的通知，以便在系统键盘出现的时候，来调整我们的 UI 界面。同样，自定义的 <code>inputView</code> 出现或者消失时也会触发键盘相关的通知。我们同样可以监听  <code>UIKeyboardWillShowNotification</code>, <code>UIKeyboardDidShowNotification</code>, <code>UIKeyboardWillHideNotification</code>, 和 <code>UIKeyboardDidHideNotification</code> 通知来调整 UI 视图。这里需要注意的是，当有 <code>inputAccessoryView</code> 时，通知的 <code>userInfo</code> 中的高度数据，是 <code>inputView</code> 的高度加上 <code>inputAccessoryView</code> 的高度。</p>
+<h2 id="最后">最后</h2>
+<p>在 <code>UIResponder</code> 还有 <code>inputViewController</code> 和 <code>inputAccessoryViewController</code> 属性，这两个属性跟自定义键盘有关。下面是它们在 <code>UIResponder</code> 中的声明：</p>
+<pre><code>// For viewController equivalents of -inputView and -inputAccessoryView
+// Called and presented when object becomes first responder.  Goes up the responder chain.
+@property (nullable, nonatomic, readonly, strong) UIInputViewController *inputViewController NS_AVAILABLE_IOS(8_0);
+@property (nullable, nonatomic, readonly, strong) UIInputViewController *inputAccessoryViewController NS_AVAILABLE_IOS(8_0);
+</code></pre>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/InputViews/InputViews.html#//apple_ref/doc/uid/TP40009542-CH12-SW5">Custom Views for Data Input</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/EventHandling/Conceptual/EventHandlingiPhoneOS/event_delivery_responder_chain/event_delivery_responder_chain.html#//apple_ref/doc/uid/TP40009541-CH4-SW1">The Responder Chain Is Made Up of Responder Objects</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[iOS 的响应者链条 ⛓️]]></title>
+        <id>https://lzhenhong.github.io/post/ios-de-xiang-ying-zhe-lian-tiao/</id>
+        <link href="https://lzhenhong.github.io/post/ios-de-xiang-ying-zhe-lian-tiao/">
+        </link>
+        <updated>2016-12-03T06:26:53.000Z</updated>
+        <summary type="html"><![CDATA[<p>响应者链条在刚学 iOS 的时候有学过，但是平常开发也很少去仔细思考，也没有发生过很大的错误，所以就更加不会去考虑 What Under The Hood。</p>
+<p>在实习的时候要做自定义 transition。我在 <code>UITransitionView</code> 上添加了一个 subview 作为背景 view，点击这个背景的 view，要 dismiss 掉 present 的 ViewController，给背景的 view 添加了一个 <code>UITapGestureRecognizer</code>，但是背景的 view 就是死活不响应点击。来来回回折腾了好久才找出原因：事件根本就没有传递给背景的 view 😭😭。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>响应者链条在刚学 iOS 的时候有学过，但是平常开发也很少去仔细思考，也没有发生过很大的错误，所以就更加不会去考虑 What Under The Hood。</p>
+<p>在实习的时候要做自定义 transition。我在 <code>UITransitionView</code> 上添加了一个 subview 作为背景 view，点击这个背景的 view，要 dismiss 掉 present 的 ViewController，给背景的 view 添加了一个 <code>UITapGestureRecognizer</code>，但是背景的 view 就是死活不响应点击。来来回回折腾了好久才找出原因：事件根本就没有传递给背景的 view 😭😭。</p>
+<!-- more -->
+<p>哎！还是基础不扎实的锅！！！就写下这篇来记录踩的坑。</p>
+<h2 id="响应者对象">响应者对象</h2>
+<p>当用户点击应用的控件时，硬件检测到物理接触并通知操作系统，<code>UIKit</code> 会创建相应的 <code>UIEvent</code> 对象，并将事件对象传递给正在运行的应用的事件队列。对于触摸事件，这个对象就是包含一系列 <code>UITouch</code> 对象的 <code>UIEvent</code> 对象。</p>
+<p>我们需要处理这些事件，来给用户正确的反馈。在 iOS 中，继承自 <code>UIResponder</code> 的对象，都可以作为响应者链条上的节点来响应事件。<code>UIResponder</code> 定义了一系列接口来处理事件响应，<code>UIView</code>／<code>UIViewController</code>／<code>UIApplication</code> 都是继承自 <code>UIResponder</code> 类。这里注意 Core Animation 的 Layer 不是响应者对象，<code>CALayer</code> 是直接继承自 <code>NSObject</code>。</p>
+<p><code>UIResponder</code> 的继承层级关系：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/UIKit-Framework.png?raw=true' alt='UIKit Framework' />
+<div align=left>
+<h2 id="确定-hit-testing-view">确定 hit-testing view</h2>
+<p>既然知道 iOS 中有许多对象可以响应事件，我们就需要确定哪一个响应者对象是最适合处理一个事件对象。对于触摸事件来说，系统会首先将触摸事件分发给触摸事件发生的视图来确认这个视图是否能处理这个事件对象，这个视图称为 hit-test view。</p>
+<p>寻找 hit-test view 的过程称为 hit-testing，这个过程会确定触摸事件发生的位置是否处于相关视图的边界内。如果在的话，就递归检测子视图。视图层级中包含触摸事件发生位置的最低层级的视图就是 hit-testing view。确认 hit-testing view 之后，<code>UIKit</code> 就会将事件传递给 hit-testing view，让 hit-testing view 来尝试处理这个事件。</p>
+<p>我们通过一个示例来演示 hit-testing 的过程。下图是 Apple 官方的例子：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/hit_testing_2x.png?raw=true' width=240 alt='Hit Testing' />
+<div align=left>
+<p>假设用户点击了视图 E，系统按照以下顺序来查找 hit-test view：</p>
+<ol>
+<li>点击事件发生在视图 A 的边界内，所以检测子视图 B 和 C；</li>
+<li>点击事件不在视图 B 的边界内，但在视图 C 的边界范围内，所以检测子视图 D 和 E；</li>
+<li>点击事件不在视图 D 的边界内，但在视图 E 的边界范围内。</li>
+</ol>
+<p>视图 E 是包含触摸点的视图层次架构中最底层的视图，所以它就是 hit-test view。</p>
+<p>在 hit-testing 过程中，会调用 <code>hitTest:withEvent:</code> 方法，并传入 <code>CGPoint</code> 和 <code>UIEvent</code> 对象。这个 <code>hitTest:withEvent:</code> 方法先要调用 <code>pointInside:withEvent:</code> 方法。如果 <code>pointInside:withEvent:</code> 返回 YES，那么就会递归子视图的 <code>hitTest:withEvent:</code> 方法来进一步确定 hit-testing view。</p>
+<p>如果方法 <code>pointInside:withEvent:</code> 返回 NO，那么这个 view 的整个分支都会被忽略。这就意味着超出父视图的子视图的范围，是没有办法接收到触摸事件。</p>
+<h2 id="响应者链条">响应者链条</h2>
+<p>在触摸事件下，<code>UIApplication</code> 对象最先从事件队列中取出最前面的事件，然后将其分发给 key window，随后 key window 将事件传递到 hit-testing view，让 hit-testing view 有第一机会来处理这个触摸事件，如果这个 hit-testing view 不能处理这个触摸事件，hit-testing view 就会将这个触摸事件沿着响应者链条传递，直到找到能处理这个触摸事件的响应者或者被丢弃。</p>
+<p>响应者链条的构成与 App 的视图层级有密切的关系，所以，在 App 视图层级结构构建起来的同时，响应者链条也逐渐构建完成。</p>
+<p>我们接下来看两个 Apple 官方的例子，如下图所示：</p>
+<div align=center>
+<img src='https://github.com/LZhenHong/BlogImages/blob/master/iOS_responder_chain_2x.png?raw=true' width=540 alt='iOS Responder Chain' />
+<div align=left>
+<p>我们来分析一下右边的视图就可以了：</p>
+<ol>
+<li>initial view 尝试处理触摸事件。如果它不能处理这个事件，它就传递给 <code>superView</code>，这个 <code>superView</code> 就是 initial view 的 <code>nextResponder</code>。</li>
+<li>superView 尝试处理触摸事件。如果不能的话，就传递给管理这个 view 的 <code>UIViewController</code>，因为这个 view 是 <code>UIViewController</code> 的 top most view。</li>
+<li><code>UIViewController</code> 对象会尝试处理这个触摸事件。如果不能，<code>UIViewController</code> 就会将这个事件传递给自己 top most view 的 <code>superView</code>。</li>
+<li>这个 top most view 尝试处理这个触摸事件。如果不能，因为这个 view 也是 <code>UIViewController</code> 的 top most view，它就会将事件传递给 <code>UIViewController</code>。</li>
+<li><code>UIViewController</code> 对象尝试处理触摸事件。如果不能，它会将事件传递给 key window，因为这个 key window 的 <code>rootViewController</code> 是这个 <code>UIViewController</code> 对象。</li>
+<li>key window 尝试处理触摸事件。如果不能，它会将事件传递给 <code>UIApplication</code> 对象。</li>
+<li><code>UIApplication</code> 对象尝试处理事件。如果不能，事件就被丢弃。</li>
+</ol>
+<h2 id="总结">总结</h2>
+<p>在实际开发中，我们会碰到响应者对象不能响应事件时，可以先从一下几点排除：</p>
+<ul>
+<li>先看响应者对象下面的属性是否设置正确：
+<ul>
+<li><code>userInteractionEnabled != NO</code></li>
+<li><code>hidden != YES</code></li>
+<li><code>alpha != 0.0 ~ 0.01</code></li>
+</ul>
+</li>
+<li><code>UIImageView</code> 的 <code>userInteractionEnabled</code> 默认是 NO，<code>UIImageView</code> 默认是不能接收事件，因此其子控件也不能接收触摸事件。</li>
+<li>如果到了这一步就好好分析一下响应者链条吧。</li>
+</ul>
+<p>这里仅仅介绍了如何寻找 hit-testing view 和响应者链条的构建。更多关于 <code>UIResponder</code> 的分析可以看 <a href="http://southpeak.github.io/2015/03/07/cocoa-uikit-uiresponder/">UIKit: UIResponder | 南峰子的技术博客</a> 或者 <a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIResponder_Class">UIResponder Class Reference</a>。</p>
+<h2 id="相关链接">相关链接</h2>
+<ul>
+<li><a href="http://zhoon.github.io/ios/2015/04/12/ios-event.html">深入浅出 iOS 事件机制</a></li>
+<li><a href="http://southpeak.github.io/2015/03/07/cocoa-uikit-uiresponder/">UIKit: UIResponder | 南峰子的技术博客</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/EventHandling/Conceptual/EventHandlingiPhoneOS/event_delivery_responder_chain/event_delivery_responder_chain.html#//apple_ref/doc/uid/TP40009541-CH4-SW2">Event Delivery: The Responder Chain</a></li>
+<li><a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIResponder_Class">UIResponder Class Reference</a></li>
+<li><a href="https://www.zybuluo.com/MicroCai/note/66142">iOS Events and Responder Chain</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[App Programming Guide for iOS - Background Execution]]></title>
+        <id>https://lzhenhong.github.io/post/app-programming-guide-for-ios-background-execution/</id>
+        <link href="https://lzhenhong.github.io/post/app-programming-guide-for-ios-background-execution/">
+        </link>
+        <updated>2016-11-25T12:27:43.000Z</updated>
+        <summary type="html"><![CDATA[<p>我们知道 iOS App 有五种状态：not running／inactive／active／background／suspended，当用户按下 Home 键的时候，App 就会进入 background 状态，随后进入 suspended 状态。在 suspended 状态下，我们没有办法对 App 进行任何操作。所以，我们会尽量在 background 状态下就做好 App 的一些清理等操作，来使 App 有进入 suspended 的准备。但是，iOS 系统分配给 App 的 background 状态下的时间是有限的，我们需要做一些自定义的操作来向 iOS 系统申请更多的后台时间，或者直接常驻后台。例如一些音乐类 App，当我们退出这类 App，我们还是可以听到 🎵 的播放，这些 App 就属于常驻后台的 App。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>我们知道 iOS App 有五种状态：not running／inactive／active／background／suspended，当用户按下 Home 键的时候，App 就会进入 background 状态，随后进入 suspended 状态。在 suspended 状态下，我们没有办法对 App 进行任何操作。所以，我们会尽量在 background 状态下就做好 App 的一些清理等操作，来使 App 有进入 suspended 的准备。但是，iOS 系统分配给 App 的 background 状态下的时间是有限的，我们需要做一些自定义的操作来向 iOS 系统申请更多的后台时间，或者直接常驻后台。例如一些音乐类 App，当我们退出这类 App，我们还是可以听到 🎵 的播放，这些 App 就属于常驻后台的 App。</p>
+<!-- more -->
+<p>iOS 为三类适合在后台运行的 App 提供很好的支持，这三类 App 分别是：</p>
+<ul>
+<li>App 在前台的时候开启了一个持续时间较短的任务，当 App 进入后台的时候希望能继续执行完成。</li>
+<li>App 在前台初始化一个下载操作，当 App 进入后台时，将下载操作的控制权交给系统。这样 App 就能在下载操作继续的情况下被挂起或者结束。</li>
+<li>支持特定的在后台执行任务的 App 要先声明它们支持的一个或者多个后台运行模式。</li>
+</ul>
+<h2 id="executing-finite-length-tasks">Executing Finite-Length Tasks</h2>
+<p>当 App 进入到 background 状态，系统期望尽快将 App 转入 suspended 状态。但是如果这个时候 App 还需要更多时间来做一些操作，我们就需要向系统申请额外的后台运行时间。iOS 为 <code>UIApplication</code> 对象提供了 <code>beginBackgroundTaskWithName:expirationHandler:</code> 和 <code>beginBackgroundTaskWithExpirationHandler:</code> 方法来申请额外的后台时间，调用任意一个方法都会延缓 App 进入 suspended 状态，当任务完成之后，你需要调用 <code>UIApplication</code> 对象的 <code>endBackgroundTask:</code> 方法来告诉系统，你的 App 已经准备好可以进入 suspended 状态。</p>
+<p>需要注意的是，<code> beginBackgroundTaskWithName:expirationHandler:</code> 和<br>
+<code>beginBackgroundTaskWithExpirationHandler:</code> 这两个方法的调用都会为相应的后台 task 创建唯一的 token，这个 token 是 <code>endBackgroundTask:</code> 需要的参数，如果调用 <code>endBackgroundTask:</code> 失败会导致 App 直接被终止。我们在申请额外后台时间的时候，可以提供一个 expirationHandler，当额外时间消耗完，task 这时还是没有完成的话，系统就会调用这个 handler 来给你最后的机会做一些清理操作。</p>
+<p>你不需要等到 App 进入后台状态才去调用 <code> beginBackgroundTaskWithName:expirationHandler:</code> 或者 <code>beginBackgroundTaskWithExpirationHandler:</code> 方法，你可以在开始一个 task 之前就可以调用这两个方法中的任意一个，然后在 task 完成之后尽快调用 <code>endBackgroundTask:</code>。当 App 还在前台的时候就可以这样做。</p>
+<p><strong>Starting a background task at quit time</strong></p>
+<pre><code>@property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    bgTask = [application beginBackgroundTaskWithName:@&quot;MyTask&quot; expirationHandler:^{
+        // App 已经快要没有后台运行时间
+        // 在这里尽快清理没有完成的 task
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // 做一些操作来完成 task
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    });
+}
+</code></pre>
+<p>在原来经常用这种方式来处理一些网络上传和下载操作，系统通常情况下会给大概 10 mins 的时间，但是系统并不保证一定会给 10 mins，实际的后台运行时间是由 iOS 系统决定的，可以通过 <code>backgroundTimeRemaining</code> 来查看剩余的后台运行时间。现在可以用 <code>NSURLSession</code> 来处理网络请求，即使 App 进入 suspended 状态 <code>NSURLSession</code> 还是可以继续运行。More about NSURLSession: <a href="https://www.raywenderlich.com/110458/nsurlsession-tutorial-getting-started">NSURLSession Tutorial: Getting Started</a>.</p>
+<p>严格来说这个并不算后台模式，因为它只是申请一些额外的后台运行时间，并不能常驻后台，最后还是要进入 suspended 状态。</p>
+<h2 id="downloading-content-in-the-background">Downloading Content in the Background</h2>
+<p>前面提到过，下载网络数据使用 <code>NSURLSession</code>，可以在 App 被挂起或者停止的时候将控制权交给系统。</p>
+<p>为了支持后台下载，你需要为 <code>NSURLSession</code> 做一些配置。</p>
+<ol>
+<li>用 <code>NSURLSessionConfiguration</code> 的 <code>backgroundSessionConfigurationWithIdentifier:</code> 方法来创建一个 <code>NSURLSession</code> 的配置对象。</li>
+<li>设置 <code>NSURLSessionConfiguration</code> 对象的 <code>sessionSendsLaunchEvents</code> 属性为 YES。</li>
+<li>如果 App 在前台开始这个请求，最好将 <code>NSURLSessionConfiguration</code> 对象的 <code> discretionary</code> 属性也设置为 YES。</li>
+<li>正确设置 <code>NSURLSessionConfiguration</code> 对象的其他属性。</li>
+<li>用创建好的 <code>NSURLSessionConfiguration</code> 对象来创建 <code>NSURLSession</code> 对象。</li>
+</ol>
+<p>用这个配置好的 <code>NSURLSession</code> 创建的上传 &amp; 下载操作都可以在恰当的时机将控制权交给系统。对于所有后台上传 &amp; 下载的 task，你必须要提供一个遵守 <code>NSURLSessionDownloadDelegate</code> 协议的 delegate，如果你不需要 delegate 提供的额外特性，在创建 session 对象的时候给 delegate 参数传递 nil (session 对象在 App 退出或者你使 session 对象无效之前会对 delegate 有一个强应用)。</p>
+<p>当 task 完成之后，如果 App 在运行，不管是前台还是后台，都会通知 session 对象的 delegate。如果 task 还没有完成，这时系统结束 App，系统还会继续在后台管理 tasks，当 session 相关的 tasks 都完成之后，系统会重新唤醒 App 并调用 <code>application:handleEventsForBackgroundURLSession:completionHandler:</code> 方法。如果是用户主动结束 App，系统会取消等待执行的 tasks，不会继续在后台管理 session 相关的  tasks。</p>
+<p>在  Stack Overflow 找了几篇关于用户主动退出 App，后台下载操作是否会继续执行的讨论，感兴趣的话可以看一下：<a href="http://stackoverflow.com/questions/25047427/does-nsurlsession-continue-file-transfer-if-the-app-is-killed-from-task-manager?answertab=votes#tab-top">第一篇</a>／<a href="http://stackoverflow.com/questions/20159471/ios-does-force-quitting-the-app-disables-background-upload-using-nsurlsession">第二篇</a>／<a href="http://stackoverflow.com/questions/31904182/how-to-resume-nsurlsession-download-process-after-app-force-quit-and-app-relaunc">第三篇</a>。</p>
+<h2 id="implementing-long-running-tasks">Implementing Long-Running Tasks</h2>
+<p>一些特定类型的 App 需要一直运行在前台或者后台，不进入 suspended 状态，这种类型 App 需要向系统申请后台运行权限，可以在项目 setting 的 Capabilities 选项的来声明特定类型的后台应用。只有特定的几种允许常驻后台：</p>
+<ul>
+<li><em><a href="#location">需要一直得到用户位置更新信息的 App</a></em>。</li>
+<li><em><a href="#audio">播放音频或者记录音频的 App</a></em>。</li>
+<li><em><a href="#fetch">定时下载和处理数据的 App</a></em>。</li>
+<li><em><a href="#VoIP">支持 Voice over Internet Protocol (VoIP) 的 App</a></em>。</li>
+<li><em><a href="#accessory">接收外设更新的 App</a></em>。</li>
+</ul>
+<p><span id='location'></span></p>
+<h3 id="tracking-the-users-location">Tracking the User’s Location</h3>
+<p>在后台跟踪用户的位置有好几种方法，大部分都不需要 App 一直运行在后台：</p>
+<ul>
+<li>用户的位置信息有显著的更新才通知 App，当 App 不需要特别精确的位置信息，Apple 强烈推荐使用这种方法。</li>
+<li>只在前台获取用户的位置信息。</li>
+<li>后台获取用户位置。</li>
+</ul>
+<p>当 App 使用第一种服务，有显著的位置信息更新时，如果 App 处于 suspended 状态，系统会将 App 变成  background 状态以便来处理位置信息的更新。如果 App 使用这种位置服务的时候，被系统完全退出，当有位置信息更新时系统就会启动 App 来处理，并调用 <code>CLLocationManager</code> delegate 的 <code>locationManager:didUpdateLocations:</code> 方法。</p>
+<p>前台或者后台位置服务都是使用标准的 Core Location 服务来取得位置数据。不同的是，使用前台服务的 App 在应用被挂起之后就不会再接收到位置信息更新。</p>
+<p>当你在 Xcode 项目的 Capabilities 选项中勾选了 <strong>Location Update</strong>，这样做并不会阻止 App 进入 suspended 状态，而是在位置信息更新的时候唤醒 App 来处理位置数据。</p>
+<p>对Map 方面了解比较少。More about location services: <a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009497">Location and Maps Programming Guide</a>.</p>
+<p><span id='audio'></span></p>
+<h3 id="playing-and-recording-background-audio">Playing and Recording Background Audio</h3>
+<p>这类 App 可以在后台播放或者记录音频，但是 App 播放的音频必须是有声的。<s>因为以前有些 App 会通过播放一段没有声音的音频来获取后台运行权限。</s></p>
+<p>典型的音频类 App 包括：</p>
+<ul>
+<li>音乐播放 App。</li>
+<li>记录音频 App。</li>
+<li>支持 AirPlay 播放音频 &amp; 视频的 App。</li>
+<li>VoIP App。</li>
+</ul>
+<p>当你将 App 声明为这类应用，系统的 media frameworks 会自动阻止你的 App 进入 suspended 状态。因为 App 一直处理后台，这时处理回调和在前台没有区别，但是在回调中你应该只处理播放相关的数据，并且尽可能快的返回。当播放或者记录停止，系统就会让 App 进入 suspended 状态。</p>
+<p>可能会有多个 App 属于音频类型，系统会决定这些 App 的优先级。前台的 App 的优先级适中比后台高。在后台同时播放音频是有可能的，这要取决于每个 App 的 audio session 对象的配置。你应该要时刻准备好音频播放被打断的打算，并且提供相应的操作来处理打断和一些其他音频相关的通知。More about configuring audio session objects for background execution: <a href="https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40007875">Audio Session Programming Guide</a>.</p>
+<p><span id='fetch'></span></p>
+<h3 id="background-fetch">Background Fetch</h3>
+<p>这类 App 需要时不时的检查是否有新数据，并且在有新数据的时候初始化下载操作来下载新内容。当你在 Xcode 中将 App 声明成这类应用并不能保证系统会给 App 分配时间来执行 background fetch。系统会决定在恰当的时候来执行 background fetch。</p>
+<p>当有好机会的时候，系统会唤醒或者启动 App 到 background 状态，然后调用 <code>UIApplication</code> 代理的 <code>application:performFetchWithCompletionHandler:</code> 方法，在这个方法中来检查是否有新内容需要下载。当你完成新内容的下载之后，要尽快调用提供的 completion handler 块，并且传递参数来表明是否有新数据，如果传递的是 <code> UIBackgroundFetchResultNewData</code> 可能会让 iOS 对应用做一次截图操作。执行这个 block 会告诉系统可以将 App 变成 suspended 状态了。</p>
+<p><span id='VoIP'></span></p>
+<h3 id="implementing-a-voip-app">Implementing a VoIP App</h3>
+<p>VoIP 应用可以让用户使用网络连接来通话，而不是使用蜂窝服务。这样的 App 需要维护与服务器维护一个长连接。iOS 系统不会让 VoIP 应用一直保持运行，而是提供工具来监测 sockets，并且会在需要的时候唤醒 VoIP 应用，并将 socket 的控制权交给 VoIP 应用。</p>
+<p>More about VoIP: <a href="http://jpache.com/2016/03/18/iOS-VoIP-VoIP-Push-%E5%BC%80%E5%8F%91%E9%9B%86%E6%88%90/">iOS VoIP (VoIP Push)开发集成</a> &amp; <a href="http://www.jianshu.com/p/3bf73a293535/comments/5271525">iOS Call Kit for VoIP</a> &amp; <a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/StrategiesforImplementingYourApp/StrategiesforImplementingYourApp.html#//apple_ref/doc/uid/TP40007072-CH5-SW13">Tips for Developing a VoIP App</a>.</p>
+<h3 id="using-push-notifications-to-initiate-a-download">Using Push Notifications to Initiate a Download</h3>
+<p>当服务器发送远程通知来告诉 App 有新内容，你可以告诉系统在后台运行你的应用来开始下载新内容。</p>
+<p>为了触发这样的操作，服务器发出的 notification payload 中一定要有 <code>content-available</code> 字段，并且设置为 1。当这样的字段出现，系统会唤醒或者启动 App 到 background 状态，并且调用相应的代理方法来让你做一些操作。</p>
+<p><span id='accessory'></span></p>
+<h3 id="communicating-with-external-accessory">Communicating with External Accessory</h3>
+<p>对这一块真的没有一点接触，所以我就不瞎说了 😛😛。给出<a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW53">官方文档</a>。</p>
+<h3 id="downloading-newsstand-content-in-the-background">Downloading Newsstand Content in the Background</h3>
+<p>现在好像已经看不到这种应用，记得在 iOS 7 的时候还下过一个。感兴趣可以看一下<a href="https://developer.apple.com/reference/newsstandkit">官方文档</a>。</p>
+<h2 id="being-a-responsible-background-app">Being a Responsible Background App</h2>
+<ul>
+<li>Do not make any OpenGL ES calls from your code.</li>
+<li>Cancel any Bonjour-related services before being suspended.</li>
+<li>Be prepared to handle connection failures in your network-based sockets.</li>
+<li>Save your app state before moving to the background.</li>
+<li>Remove strong references to unneeded objects when moving to the background.</li>
+<li>Stop using shared system resources before being suspended.</li>
+<li>Avoid updating your windows and views.</li>
+<li>Respond to connect and disconnect notifications for external accessories.</li>
+<li>Clean up resources for active alerts when moving to the background.</li>
+<li>Remove sensitive information from views before moving to the background.</li>
+<li>Do minimal work while running in the background.</li>
+</ul>
+<p><a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW8">More details</a>.</p>
+<h2 id="opting-out-of-background-execution">Opting Out of Background Execution</h2>
+<p>如果你一点也不想 App 运行在 background 状态下，你可以在 Info.plist 文件中添加 <code>UIApplicationExitsOnSuspend</code> 键并且设置为 YES，这样 App 只有 not running／inactive／active 状态。当用户按了 Home 键之后，<code>applicationWillTerminate:</code> 方法就会调用。Apple 不推荐这样实现。</p>
+<h2 id="summary">Summary</h2>
+<p>废话了很多，我自己看到这里都很辛苦了 😅😅。这里有一篇知乎的 <a href="https://www.zhihu.com/question/20258088">所谓的iOS「伪多任务」和Android的多任务处理的区别在哪？</a>感兴趣的话可以看一下。</p>
+<p>Apple 官方文档还有一节关于 <a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW7">Understanding When Your App Gets Launched into the Background</a>。同样，感兴趣的话可以看一下。</p>
+<p>还有关于 Background Execution  的实践，可以看 <a href="https://www.raywenderlich.com/143128/background-modes-tutorial-getting-started">Background Modes Tutorial: Getting Started</a>.</p>
+<h2 id="related-link">Related Link</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/BackgroundExecution/BackgroundExecution.html#//apple_ref/doc/uid/TP40007072-CH4-SW1">Background Execution</a></li>
+<li><a href="https://www.raywenderlich.com/143128/background-modes-tutorial-getting-started">Background Modes Tutorial: Getting Started</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[UIScrollView And Autolayout]]></title>
+        <id>https://lzhenhong.github.io/post/uiscrollview-and-autolayout/</id>
+        <link href="https://lzhenhong.github.io/post/uiscrollview-and-autolayout/">
+        </link>
+        <updated>2016-11-12T04:00:35.000Z</updated>
+        <summary type="html"><![CDATA[<p>这一篇介绍如何将 Autolayout 应用到 UIScrollView 上。</p>
+<p>在 [UIScrollView Tutorial: Getting Started][2] 这篇文章中的 <strong>Scrolling and Zooming a Large Image</strong> 这节中，给 UIScrollView 添加 top／bottom／leading／trailing 的约束，确定 UIScrollView 的 frame。再给 UIScrollView 中的 UIImageView 添加 constant 为 0 的 top／bottom／leading／trailing 约束，运行之后，UIScrollView 中的 contentSize 就是图片的大小，可以滚动查看所有内容。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>这一篇介绍如何将 Autolayout 应用到 UIScrollView 上。</p>
+<p>在 <a href="https://www.raywenderlich.com/122139/uiscrollview-tutorial">UIScrollView Tutorial: Getting Started</a> 这篇文章中的 <strong>Scrolling and Zooming a Large Image</strong> 这节中，给 UIScrollView 添加 top／bottom／leading／trailing 的约束，确定 UIScrollView 的 frame。再给 UIScrollView 中的 UIImageView 添加 constant 为 0 的 top／bottom／leading／trailing 约束，运行之后，UIScrollView 中的 contentSize 就是图片的大小，可以滚动查看所有内容。</p>
+<!-- more -->
+<p>添加的约束如下图。</p>
+<figure data-type="image" tabindex="1"><img src="https://github.com/LZhenHong/BlogImages/blob/master/UIScrollViewWithAutolayout.png?raw=true" alt="UIScrollViewWithAutolayout" loading="lazy"></figure>
+<p>看到这里比较好奇 UIScrollView 是如何使用 Autolayout 来自动计算 <code>contentSize</code> 的。所以去网上搜了一下相关资料，加上一些自己的理解整理出来这篇文章。</p>
+<h2 id="key-point">Key Point</h2>
+<p>UIScrollView 使用 Autolayout 主要是用来自动确定自身的 <code>frame</code> 与 <code>contentSize</code>，<code>frame</code> 是根据 UIScrollView 自己的约束来确定，而 <code>contentSize</code> 是根据子视图与 UIScrollView 之间的约束来确定的。所以，UIScrollView 的子视图添加的约束一定要能确定 UIScrollView 的 <code>contentSize</code>。</p>
+<p>这点跟 self-sizing cell 有点相似，cell 可以根据完整的内部约束来确定自己的高度，只是 cell 的宽度与 UITableView 的宽度是相同的，所以我们不需要显示地去表明子视图具体的宽度，只需要确定 leading 和 trailing 的约束就可以确定子视图的 width，再添加好垂直方向上的约束，系统就可以根据我们添加的约束自动算出 cell 的高度。</p>
+<blockquote>
+<p>The trick to getting Auto Layout to work on a UITableViewCell is to ensure you have constraints to pin each subview on all sides - that is, each subview should have leading, top, trailing and bottom constraints.</p>
+</blockquote>
+<p>上面这段来自 <a href="https://www.raywenderlich.com/129059/self-sizing-table-view-cells">Self-sizing Table View Cells</a>。表示 cell 自动算高度需要的约束条件，感兴趣的话可以了解一下。</p>
+<h2 id="in-depth-explanation">In Depth Explanation</h2>
+<p>一般来说，Autolayout 认为视图的 top／bottom／leading／trailing 边界是可见 (我的理解是这里的可见相对于 UIScrollView 的 content view  的边界而言的，因为这个 content view 是不可见的) 的边界。也就是说，如果你把一个视图固定在 superview 的左边界，你其实是把视图固定在 superview 的 bounds 的最小 x 值。改变 superview 的 bounds 的 origin 值不会改变视图的位置。</p>
+<p>UIScrollView 通过改变 bounds 的 origin 值来滚动它的内容。为了让 UIScrollView 能与 Autolayout 协同工作，UIScrollView 的 top／bottom／leading／trailing 边界代表 UIScrollView 的 content view 的边界。</p>
+<blockquote>
+<ul>
+<li>Position and size your scroll view with constraints external to the scroll view.</li>
+<li>Use constraints to lay out the subviews within the scroll view, being sure that the constraints tie to all four edges of the scroll view and do not rely on the scroll view to get their size.</li>
+</ul>
+</blockquote>
+<p>上面两点来自 <a href="https://developer.apple.com/library/content/technotes/tn2154/_index.html#//apple_ref/doc/uid/DTS40013309-CH1-MIXED_APPROACH">UIScrollView And Autolayout</a>。解释起来就是 UIScrollView 需要自己来确定自身的大小和位置，不能依靠子视图的约束。UIScrollView 的子视图需要自己明确自己的大小，不能依赖 UIScrollView 来决定大小。</p>
+<p>拿我在最前面提到的例子来解释一下：</p>
+<ol>
+<li>我们先给 UIScrollView 添加 top／bottom／leading／trailing 的约束，这样就可以确定 UIScrollView 自身的 <code>frame</code>。这里没有用到子视图的信息来确定 <code>frame</code>。</li>
+<li>我们添加 UIImageView 到 UIScrollView 中，然后给 UIImageView 设置图片内容。</li>
+<li>给 UIImageView 添加 top／bottom／leading／trailing 的 constant 为 0 的约束。确定 UIScrollView 的 <code>contentSize</code>。</li>
+</ol>
+<p>这样就👌👌了，UIImageView 有一个固有内容大小，默认与图片的大小相等，所以这里我们不需要明确指出 UIImageView 的宽高，只需要添加与 UIScrollView 边界的间距来确定 <code>contentSize</code> 的大小。</p>
+<p>如果这里我们添加的是 UIView 的话，就需要添加 width／height 的约束来明确指出 UIView 的大小，例如：添加 width=50，height=50 的约束来指明 UIView 大小，然后再添加与 UIScrollView 的约束。我们可以这样理解：添加在 UIScrollView 自身的约束，是作用在 UIScrollView 可见的边界上。子视图与 UIScrollView 之间的约束中，是作用于子视图与不可见的 content view 上，而这个 content view 的大小是不确定的，需要根据子视图之间的约束来得出。</p>
+<h2 id="for-example">For Example</h2>
+<p>这跟我们平常使用 Autolayout 有点不太一样。下面举例来说明 Autolayout 在 UIScrollView 上使用的不同。</p>
+<h3 id="use-autolayout-in-common-view">Use Autolayout in Common View</h3>
+<p>(红色 view 是 UIView)<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/FirstExample.png?raw=true" alt="FirstExample" loading="lazy"></p>
+<p>大概的代码实现，数值是我随便给的，运行结果不一定和上面一样。</p>
+<pre><code>self.view.backgroundColor = [UIColor blueColor];
+  
+UIView *redView = [[UIView alloc] init];
+redView.backgroundColor = [UIColor redColor];
+[self.view addSubview:redView];
+[redView mas_makeConstraints:^(MASConstraintMaker *make) {
+   make.edges.equalTo(self.view).insets(UIEdgeInsetsMake(100, 50, 100, 50));
+}];
+    
+UIView *yellowView = [[UIView alloc] init];
+yellowView.backgroundColor = [UIColor yellowColor];
+[redView addSubview:yellowView];
+[yellowView mas_makeConstraints:^(MASConstraintMaker *make) {
+   make.edges.equalTo(redView).insets(UIEdgeInsetsMake(200, 50, 20, 20));
+}];
+</code></pre>
+<p>如果我们需要确定黄色 view 的 <code>frame</code>，添加如上的约束就可以得到。这是我们平常使用 Autolayout 添加的约束，如果视图可以根据自身内容得出固有内容大小，例如：UILabel／UIButton／UIImageView 等，那么只需要确定视图的位置就 👌。</p>
+<h3 id="autolayout-in-uiscrollview">Autolayout in UIScrollView</h3>
+<pre><code>self.view.backgroundColor = [UIColor blueColor];
+    
+self.scrollView = [[UIScrollView alloc] init];
+self.scrollView.bounces = NO;
+self.scrollView.clipsToBounds = NO;
+self.scrollView.backgroundColor = [UIColor redColor];
+[self.view addSubview:self.scrollView];
+    
+[self.scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+   make.edges.equalTo(self.view).insets(UIEdgeInsetsMake(100, 50, 100, 50));
+}];
+    
+UIView *yellowView = [[UIView alloc] init];
+yellowView.backgroundColor = [UIColor yellowColor];
+[self.scrollView addSubview:yellowView];
+[yellowView mas_makeConstraints:^(MASConstraintMaker *make) {
+   make.top.equalTo(self.scrollView).offset(200);
+   make.bottom.equalTo(self.scrollView).offset(-200);
+   make.leading.equalTo(self.scrollView).offset(50);
+   make.trailing.equalTo(self.scrollView).offset(-200);
+   // Important
+   make.width.and.height.equalTo(@100);
+}];
+</code></pre>
+<p>(红色的 view 是 UIScrollView)<br>
+<img src="https://github.com/LZhenHong/BlogImages/blob/master/SecondExampleUIScrollView.png?raw=true" alt="SecondExampleUIScrollVie" loading="lazy"></p>
+<p>这是上面代码的运行结果，我把 scrollView 的 <code>clipsToBounds</code> 设置为 NO，方便我们查看。如果我们不添加 <code>make.width.and.height.equalTo(@100);</code> 这行代码的话，黄色 view 是不会出现的，因为 scrollView 的 <code>contentSize</code> 不确定。</p>
+<p>我们结合下面这张图来分析一下。(红色的 view 是 UIScrollView)</p>
+<figure data-type="image" tabindex="2"><img src="https://github.com/LZhenHong/BlogImages/blob/master/SecondExample.png?raw=true" alt="SecondExample" loading="lazy"></figure>
+<p>黑色边框代表 scrollView 的 <code>contentSize</code> ，我们不能假设这个值是已知的，这个是未知量，需要我们给出完整的约束来计算。所以，<code>contentSize</code> 不知道，不用黑色约束的话，就无法得出黄色 view 的大小，黄色 view 就不显示。</p>
+<h2 id="summary">Summary</h2>
+<p>UIScrollView 的子视图需要自己明确自己的大小，不能依赖 UIScrollView 来决定大小。UIScrollView 是需要依靠子视图的约束来确定 <code>contentSize</code> 的，所以在 UIScrollView 上使用 Autolayout 需要注意子视图的约束是否足够完整来确定 <code>contentSize</code>。</p>
+<p>UIScrollView 与同级视图或者父视图之间的约束只能确定 UIScrollView 的 <code>frame</code>，不能确定 <code>contentSize</code>。</p>
+<h2 id="related-link">Related Link</h2>
+<ul>
+<li><a href="https://developer.apple.com/library/content/technotes/tn2154/_index.html#//apple_ref/doc/uid/DTS40013309-CH1-MIXED_APPROACH">UIScrollView And Autolayout</a></li>
+<li><a href="https://www.raywenderlich.com/122139/uiscrollview-tutorial">UIScrollView Tutorial: Getting Started</a></li>
+<li><a href="https://bestswifter.com/uiscrollviewwithautolayout/">史上最简单的UIScrollView+Autolayout出坑指南</a></li>
+<li><a href="http://adad184.com/2015/12/01/scrollview-under-autolayout/">UIScrollview与Autolayout的那点事</a></li>
+<li><a href="https://github.com/nixzhu/dev-blog/blob/master/autolayout-tips.md#tip-2">AutoLayout Tips</a></li>
+</ul>
+]]></content>
+    </entry>
+</feed>
