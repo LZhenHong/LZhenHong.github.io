@@ -19,7 +19,7 @@ This privacy policy applies to Americano ("the app"), a macOS menu bar utility d
 
 ## Data Stored on Your Device
 
-Your settings — durations, battery thresholds, and other preferences — are stored locally in macOS user defaults and never leave your Mac. Deleting the app removes the app itself; to also remove its settings, run `defaults delete io.lzhlovesjyq.Americano` in Terminal.
+Your settings — durations, battery thresholds, and other preferences — are stored locally in macOS user defaults and never leave your Mac. Deleting the app removes the app itself; the settings stay behind in macOS user defaults and can be removed by running `defaults delete io.lzhlovesjyq.Americano` in Terminal.
 
 ## Network Access
 

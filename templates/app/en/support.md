@@ -22,7 +22,8 @@ Please include your device model, OS version, and app version so the issue can b
 
 <!-- TODO: add real Q&A for the app, or remove this section -->
 **Q: How do I restore my purchase?**
-A: Open the app's Settings and tap "Restore Purchases".
+
+A: Open the app's Settings and choose "Restore Purchases".
 
 ## Legal
 
