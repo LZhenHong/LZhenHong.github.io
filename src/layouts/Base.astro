@@ -1,6 +1,6 @@
 ---
 import '../styles/main.css';
-import { htmlLang, locales, localeNames, type Locale } from '../i18n';
+import { htmlLang, locales, localeNames, ui, type Locale } from '../i18n';
 
 interface Props {
   title: string;
@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { title, description = '', locale, alternates } = Astro.props;
+const t = ui[locale];
 ---
 
 <!doctype html>
@@ -22,23 +23,43 @@ const { title, description = '', locale, alternates } = Astro.props;
   </head>
   <body>
     <main class="container">
-      <nav class="lang-switch" aria-label="Language">
-        {
-          locales.map((l, i) => (
-            <Fragment>
-              {i > 0 && <span class="sep">·</span>}
-              {l === locale ? (
-                <span class="current">{localeNames[l]}</span>
-              ) : (
-                <a href={alternates[l]} hreflang={htmlLang[l]}>
-                  {localeNames[l]}
-                </a>
-              )}
-            </Fragment>
-          ))
-        }
+      <nav class="lang-menu" aria-label={t.langMenuLabel}>
+        <details>
+          <summary>{localeNames[locale]}</summary>
+          <ul>
+            {
+              locales.map((l) => (
+                <li>
+                  {l === locale ? (
+                    <span class="current" aria-current="true">
+                      {localeNames[l]}
+                    </span>
+                  ) : (
+                    <a href={alternates[l]} hreflang={htmlLang[l]}>
+                      {localeNames[l]}
+                    </a>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </details>
       </nav>
       <slot />
     </main>
+    <script is:inline>
+      // Progressive enhancement: the <details> language menu already works
+      // without JS; this adds outside-click and Escape dismissal.
+      (() => {
+        const menu = document.querySelector('.lang-menu > details');
+        if (!menu) return;
+        document.addEventListener('click', (event) => {
+          if (menu.open && !menu.contains(event.target)) menu.open = false;
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') menu.open = false;
+        });
+      })();
+    </script>
   </body>
 </html>
