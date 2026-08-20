@@ -1,6 +1,6 @@
 ---
 import '../styles/main.css';
-import { htmlLang, locales, localeNames, ui, type Locale } from '../i18n';
+import { defaultLocale, htmlLang, locales, localeNames, ui, type Locale } from '../i18n';
 
 interface Props {
   title: string;
@@ -18,8 +18,41 @@ const t = ui[locale];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      locale === defaultLocale && (
+        <script define:vars={{ alternates }}>
+          // Auto-locale: on default-locale pages, send first-time visitors to
+          // the browser's preferred locale (navigator.languages). An explicit
+          // pick in the language menu (localStorage 'preferred-locale') wins
+          // and disables auto-detection from then on.
+          (() => {
+            try {
+              const stored = localStorage.getItem('preferred-locale');
+              const toLocale = (lang) => {
+                const l = String(lang || '').toLowerCase();
+                if (l.startsWith('zh')) {
+                  return l.includes('hant') || /-(tw|hk|mo)(-|$)/.test(l) ? 'zh-tw' : 'zh-cn';
+                }
+                return l.startsWith('en') ? 'en' : null;
+              };
+              let detected = null;
+              const langs = navigator.languages || [];
+              for (let i = 0; i < langs.length && !detected; i++) detected = toLocale(langs[i]);
+              const target = stored || detected || toLocale(navigator.language) || 'en';
+              if (target !== 'en' && alternates[target]) location.replace(alternates[target]);
+            } catch {}
+          })();
+        </script>
+      )
+    }
     <title>{title}</title>
     <meta name="description" content={description} />
+    {
+      locales.map((l) => (
+        <link rel="alternate" hreflang={htmlLang[l]} href={new URL(alternates[l], Astro.site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocale], Astro.site)} />
   </head>
   <body>
     <main class="container">
@@ -35,7 +68,7 @@ const t = ui[locale];
                       {localeNames[l]}
                     </span>
                   ) : (
-                    <a href={alternates[l]} hreflang={htmlLang[l]}>
+                    <a href={alternates[l]} hreflang={htmlLang[l]} data-locale={l}>
                       {localeNames[l]}
                     </a>
                   )}
@@ -49,8 +82,16 @@ const t = ui[locale];
     </main>
     <script is:inline>
       // Progressive enhancement: the <details> language menu already works
-      // without JS; this adds outside-click and Escape dismissal.
+      // without JS; this adds outside-click and Escape dismissal, plus
+      // remembering explicit picks for the head auto-locale script.
       (() => {
+        document.querySelectorAll('.lang-menu a[data-locale]').forEach((link) => {
+          link.addEventListener('click', () => {
+            try {
+              localStorage.setItem('preferred-locale', link.dataset.locale);
+            } catch {}
+          });
+        });
         const menu = document.querySelector('.lang-menu > details');
         if (!menu) return;
         document.addEventListener('click', (event) => {

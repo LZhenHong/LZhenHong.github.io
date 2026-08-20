@@ -16,6 +16,14 @@ unprefixed (`/apps/<slug>/`); other locales are prefixed
 (`/zh-cn/apps/<slug>/`). A page missing its translation falls back to the
 English content under the localized URL.
 
+Default-locale pages carry an inline `<head>` script (`Base.astro`) that
+redirects first-time visitors to the browser's preferred locale
+(`navigator.languages`; `zh-Hant`/TW/HK/MO -> `zh-tw`, other `zh*` -> `zh-cn`).
+An explicit pick in the language menu is stored in `localStorage`
+(`preferred-locale`) and takes precedence over auto-detection. Every page emits
+`<link rel="alternate" hreflang>` tags for all locales (plus `x-default` ->
+`en`).
+
 - Framework: [Astro](https://astro.build) 7 (`astro` is the only dependency).
 - Output: fully static HTML in `dist/`; client-side JavaScript only as
   progressive enhancement (pages must stay usable without it).
@@ -146,9 +154,9 @@ Locale rules:
   `src/styles/main.css`. Prefer adding a rule there over inline styles.
 - Static-first with progressive enhancement: pages must remain fully usable
   without JavaScript, but small client-side scripts are welcome where they
-  genuinely improve interaction (e.g. dismissing the language menu on outside
-  click / Escape). No UI frameworks or new runtime dependencies without an
-  explicit reason.
+  genuinely improve interaction (e.g. locale auto-detection, dismissing the
+  language menu on outside click / Escape). No UI frameworks or new runtime
+  dependencies without an explicit reason.
 
 ## Deployment
 
