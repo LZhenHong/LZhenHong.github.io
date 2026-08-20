@@ -17,7 +17,8 @@ unprefixed (`/apps/<slug>/`); other locales are prefixed
 English content under the localized URL.
 
 - Framework: [Astro](https://astro.build) 7 (`astro` is the only dependency).
-- Output: fully static HTML in `dist/`, **no client-side JavaScript**.
+- Output: fully static HTML in `dist/`; client-side JavaScript only as
+  progressive enhancement (pages must stay usable without it).
 - Styling: a single hand-written stylesheet (`src/styles/main.css`), light/dark
   aware via `prefers-color-scheme`, inlined into each page at build time.
 - TypeScript: `astro/tsconfigs/strict` (see `tsconfig.json`); used only for the
@@ -93,6 +94,20 @@ kind: support                     # support | privacy
 Breaking the schema fails the build, so `npm run build` doubles as content
 validation.
 
+Body conventions:
+
+- The first paragraph after `# Title` is rendered as a muted lede — use it for
+  the one-line intro (support) or the effective date (privacy).
+- FAQ entries are a bold-only question paragraph, a blank line, then the
+  answer paragraph. The blank line is what makes the pair render as a unit.
+- Punctuation: zh prose uses full-width punctuation (comma, colon, semicolon,
+  question mark, parentheses); half-width is kept only for code, URLs, emails,
+  YAML front matter, and keyboard shortcuts (e.g. `⌘,`). Quotes: "" for
+  zh-cn, 「」 for zh-tw. English content uses half-width throughout.
+- Outbound links prefer the page locale's version when one exists (e.g.
+  GitHub Docs `/zh/`, Apple `/legal/privacy/szh/` and `/tzh/`); otherwise
+  link the English original.
+
 Locale rules:
 
 - `en` is **required** for every app — it is the fallback when a translation
@@ -120,20 +135,20 @@ Locale rules:
    - Support URL: `https://lzhenhong.github.io/apps/<app-slug>/`
    - Privacy Policy URL: `https://lzhenhong.github.io/apps/<app-slug>/privacy/`
 
-`src/content/apps/example/` is a filled-in sample derived from the template
-(English only, demonstrating the fallback for untranslated locales).
-
 ## Code style
 
 - Language of code, comments, and docs: English.
 - `.astro` files: frontmatter script at the top, markup below; pages compose
   `layouts/Base.astro` and the shared components rather than duplicating markup.
 - CSS: theme values live as CSS custom properties in `:root` (with a
-  `prefers-color-scheme: dark` override); 4-space indentation in
+  `prefers-color-scheme: dark` override); spacing uses the documented
+  `--space-*` scale (4px base); 4-space indentation in
   `src/styles/main.css`. Prefer adding a rule there over inline styles.
-- Keep the site static: do not add client-side JavaScript, UI frameworks, or
-  new dependencies without an explicit reason — the current design goal is
-  plain HTML + inlined CSS.
+- Static-first with progressive enhancement: pages must remain fully usable
+  without JavaScript, but small client-side scripts are welcome where they
+  genuinely improve interaction (e.g. dismissing the language menu on outside
+  click / Escape). No UI frameworks or new runtime dependencies without an
+  explicit reason.
 
 ## Deployment
 
