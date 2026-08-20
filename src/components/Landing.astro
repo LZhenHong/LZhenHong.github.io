@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, pageUrls, localePrefix, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  cards: { app: string; slug: string }[];
+}
+
+const { locale, cards } = Astro.props;
+const t = ui[locale];
+---
+
+<Base
+  title={t.siteTitle}
+  description="Support pages and privacy policies for Eden's apps."
+  locale={locale}
+  alternates={pageUrls()}
+>
+  <header class="site-header">
+    <h1>{t.siteTitle}</h1>
+    <p class="muted">{t.tagline}</p>
+  </header>
+
+  <ul class="app-list">
+    {
+      cards.map(({ slug, app }) => (
+        <li>
+          <a class="card" href={`${localePrefix(locale)}/apps/${slug}/`}>
+            <span class="card-title">{app}</span>
+            <span class="card-sub muted">{t.cardSub}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <footer class="site-footer muted">
+    <p>{t.footerPrefix} <a href="https://github.com/LZhenHong">Eden</a></p>
+  </footer>
+</Base>

@@ -1,0 +1,8 @@
+---
+import Landing from '../components/Landing.astro';
+import { getAppCards } from '../lib/content';
+
+const cards = await getAppCards();
+---
+
+<Landing locale="en" cards={cards} />

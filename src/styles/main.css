@@ -1,0 +1,142 @@
+:root {
+    --bg: #f5f5f7;
+    --fg: #1d1d1f;
+    --muted: #6e6e73;
+    --card: #ffffff;
+    --border: #d2d2d7;
+    --link: #0066cc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #000000;
+        --fg: #f5f5f7;
+        --muted: #98989d;
+        --card: #1c1c1e;
+        --border: #38383a;
+        --link: #2997ff;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 20px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+a {
+    color: var(--link);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.site-header {
+    margin-bottom: 32px;
+}
+
+.site-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.site-header p {
+    margin: 0;
+}
+
+.app-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.card {
+    display: block;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--fg);
+}
+
+.card:hover {
+    text-decoration: none;
+    border-color: var(--link);
+}
+
+.card-title {
+    display: block;
+    font-weight: 600;
+}
+
+.card-sub {
+    display: block;
+    font-size: 14px;
+}
+
+.site-footer {
+    margin-top: 48px;
+    font-size: 14px;
+}
+
+/* Article pages (support / privacy policy) */
+article h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+}
+
+article h2 {
+    font-size: 19px;
+    margin: 32px 0 8px;
+}
+
+article p,
+article ul {
+    margin: 8px 0;
+}
+
+.updated {
+    font-size: 14px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+/* Language switcher */
+.lang-switch {
+    text-align: right;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.lang-switch .sep {
+    color: var(--muted);
+    margin: 0 8px;
+}
+
+.lang-switch .current {
+    color: var(--muted);
+}

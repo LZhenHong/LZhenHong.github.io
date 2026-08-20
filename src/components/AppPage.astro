@@ -1,0 +1,28 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { ui, pageUrls, localePrefix } from '../i18n';
+import type { AppPageProps } from '../lib/content';
+
+type Props = AppPageProps;
+
+const { locale, appSlug, kind, entry } = Astro.props;
+const { Content } = await render(entry);
+const t = ui[locale];
+
+const isSupport = kind === 'support';
+const backHref = isSupport ? `${localePrefix(locale)}/` : pageUrls(appSlug)[locale];
+const backLabel = isSupport ? t.allApps : t.supportBack(entry.data.app);
+---
+
+<Base
+  title={entry.data.title}
+  description={entry.data.description}
+  locale={locale}
+  alternates={pageUrls(appSlug, kind === 'privacy')}
+>
+  <a class="back-link" href={backHref}>{backLabel}</a>
+  <article>
+    <Content />
+  </article>
+</Base>

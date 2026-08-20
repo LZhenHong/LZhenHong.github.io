@@ -1,0 +1,18 @@
+---
+import AppPage from '../../components/AppPage.astro';
+import { getAppPageProps } from '../../lib/content';
+import { defaultLocale } from '../../i18n';
+
+export async function getStaticPaths() {
+  // Default-locale app pages, served unprefixed: /apps/<slug>/, /apps/<slug>/privacy/
+  const pages = await getAppPageProps(defaultLocale);
+  return pages.map((page) => ({
+    params: { slug: page.kind === 'privacy' ? `${page.appSlug}/privacy` : page.appSlug },
+    props: page,
+  }));
+}
+
+const props = Astro.props;
+---
+
+<AppPage {...props} />
