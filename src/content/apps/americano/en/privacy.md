@@ -11,7 +11,7 @@ Effective date: 2026-08-20
 
 ## Overview
 
-This privacy policy applies to Americano ("the app"), a macOS menu bar utility developed by YuQing Jiang. It explains what information the app collects, how it is used, and the choices you have.
+This privacy policy applies to Americano ("the app"), a macOS menu bar utility developed by Eden. It explains what information the app collects, how it is used, and the choices you have.
 
 ## Information the App Collects
 
