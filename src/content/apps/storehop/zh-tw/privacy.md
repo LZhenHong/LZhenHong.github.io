@@ -23,11 +23,11 @@ kind: privacy
 
 ## 網路存取
 
-本 App 自身不進行任何網路連線。切換商店地區時，App 只是請作業系統打開一個 App Store 連結；此後的網路活動發生在 App Store App 與 Apple 之間，受 [Apple 隱私權政策](https://www.apple.com/legal/privacy/tzh/）約束。
+本 App 自身不進行任何網路連線。切換商店地區時，App 只是請作業系統打開一個 App Store 連結；此後的網路活動發生在 App Store App 與 Apple 之間，受 [Apple 隱私權政策](https://www.apple.com/legal/privacy/tzh/)約束。
 
 ## 第三方服務
 
-本 App 不整合任何第三方分析、廣告或當機回報服務。透過 App Store 下載本 App 受 [Apple 隱私權政策](https://www.apple.com/legal/privacy/tzh/）約束。
+本 App 不整合任何第三方分析、廣告或當機回報服務。透過 App Store 下載本 App 受 [Apple 隱私權政策](https://www.apple.com/legal/privacy/tzh/)約束。
 
 ## 兒童隱私
 

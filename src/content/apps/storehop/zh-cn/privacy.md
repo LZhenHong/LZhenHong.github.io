@@ -23,11 +23,11 @@ kind: privacy
 
 ## 网络访问
 
-本应用自身不进行任何网络连接。切换商店地区时，应用只是请操作系统打开一个 App Store 链接；此后的网络活动发生在 App Store 应用与 Apple 之间，受 [Apple 隐私政策](https://www.apple.com/legal/privacy/szh/）约束。
+本应用自身不进行任何网络连接。切换商店地区时，应用只是请操作系统打开一个 App Store 链接；此后的网络活动发生在 App Store 应用与 Apple 之间，受 [Apple 隐私政策](https://www.apple.com/legal/privacy/szh/)约束。
 
 ## 第三方服务
 
-本应用不集成任何第三方分析、广告或崩溃上报服务。通过 App Store 下载本应用受 [Apple 隐私政策](https://www.apple.com/legal/privacy/szh/）约束。
+本应用不集成任何第三方分析、广告或崩溃上报服务。通过 App Store 下载本应用受 [Apple 隐私政策](https://www.apple.com/legal/privacy/szh/)约束。
 
 ## 儿童隐私
 
