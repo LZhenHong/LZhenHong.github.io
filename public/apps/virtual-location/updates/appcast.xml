@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>VirtualLocation</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Tue, 20 Oct 2026 10:27:05 +0800</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Initial in-app update support.
+]]></description>
+            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.0-1.dmg" length="31760238" type="application/octet-stream" sparkle:edSignature="HkdU6XsT0UA3gTevrNMAU6xUam3MBazcbSArqy7KPPOX1AGw94YfPlSGIONvP9SxU87vShoaRDZIYFQUQeHAAA=="/>
+        </item>
+    </channel>
+</rss>
