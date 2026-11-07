@@ -1,8 +1,8 @@
 ---
 import Landing from '../components/Landing.astro';
-import { getAppCards } from '../lib/content';
+import { getProducts } from '../data/products';
 
-const cards = await getAppCards();
+const products = getProducts();
 ---
 
-<Landing locale="en" cards={cards} />
+<Landing locale="en" products={products} />

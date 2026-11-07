@@ -1,0 +1,21 @@
+---
+import ProductPage from '../../../components/ProductPage.astro';
+import { getProducts } from '../../../data/products';
+import { defaultLocale, locales, type Locale } from '../../../i18n';
+
+export function getStaticPaths() {
+  const products = getProducts();
+  return locales
+    .filter((locale) => locale !== defaultLocale)
+    .flatMap((locale) =>
+      products.map((product) => ({
+        params: { locale, slug: product.slug },
+        props: { locale: locale as Locale, product },
+      })),
+    );
+}
+
+const { locale, product } = Astro.props;
+---
+
+<ProductPage locale={locale} product={product} />

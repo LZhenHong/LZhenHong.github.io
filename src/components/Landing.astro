@@ -1,13 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
-import { ui, pageUrls, localePrefix, type Locale } from '../i18n';
+import { ui, pageUrls, productPageUrls, type Locale } from '../i18n';
+import type { Product } from '../data/products';
 
 interface Props {
   locale: Locale;
-  cards: { app: string; slug: string }[];
+  products: Product[];
 }
 
-const { locale, cards } = Astro.props;
+const { locale, products } = Astro.props;
 const t = ui[locale];
 ---
 
@@ -16,26 +17,56 @@ const t = ui[locale];
   description={t.metaDescription}
   locale={locale}
   alternates={pageUrls()}
+  home
 >
-  <header class="site-header">
-    <h1>{t.siteTitle}</h1>
-    <p class="muted">{t.tagline}</p>
-  </header>
+  <div class="site-width">
+    <header class="home-hero">
+      <h1>{t.heroTitle}</h1>
+      <p class="muted">{t.heroBody}</p>
+    </header>
 
-  <ul class="app-list">
-    {
-      cards.map(({ slug, app }) => (
-        <li>
-          <a class="card" href={`${localePrefix(locale)}/apps/${slug}/`}>
-            <span class="card-title">{app}</span>
-            <span class="card-sub muted">{t.cardSub}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-
-  <footer class="site-footer muted">
-    <p>{t.footerPrefix}<a href="https://github.com/LZhenHong">Eden</a></p>
-  </footer>
+    <section id="apps" aria-labelledby="apps-heading">
+      <h2 id="apps-heading" class="visually-hidden">{t.apps}</h2>
+      {
+        products.length > 0 ? (
+          <ul class="product-grid">
+            {
+              products.map((product) => (
+                <li>
+                  <a class="product-card" href={productPageUrls(product.slug)[locale]}>
+                    <img
+                      class="product-card__icon"
+                      src={product.icon.src}
+                      width={product.icon.width}
+                      height={product.icon.height}
+                      alt=""
+                      decoding="async"
+                    />
+                    <span class="product-card__text">
+                      <span class="product-card__name">{product.name}</span>
+                      <span class="product-card__description">{product.cardDescription[locale]}</span>
+                      <span class="product-card__platform muted">{product.platform}</span>
+                    </span>
+                    <svg
+                      class="product-card__chevron"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="m7 4 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        ) : (
+          <p class="empty-catalog muted">{t.emptyCatalog}</p>
+        )
+      }
+    </section>
+  </div>
 </Base>

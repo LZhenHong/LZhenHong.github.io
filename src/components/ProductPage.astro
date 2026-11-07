@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import { localePrefix, pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import type { Product } from '../data/products';
+
+interface Props {
+  locale: Locale;
+  product: Product;
+}
+
+const { locale, product } = Astro.props;
+const t = ui[locale];
+const supportHref = product.supportUrls?.[locale] ?? pageUrls(product.slug)[locale];
+const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, true)[locale];
+---
+
+<Base
+  title={`${product.name} — Eden`}
+  description={product.tagline[locale]}
+  locale={locale}
+  alternates={productPageUrls(product.slug)}
+>
+  <div class="site-width product-page">
+    <a class="back-link" href={`${localePrefix(locale)}/#apps`}>{t.allApps}</a>
+
+    <section class="product-hero" aria-labelledby="product-title">
+      <div class="product-hero__text">
+        <img
+          class="product-hero__icon"
+          src={product.icon.src}
+          width={product.icon.width}
+          height={product.icon.height}
+          alt=""
+          decoding="async"
+        />
+        <h1 id="product-title">{product.name}</h1>
+        <p class="product-tagline muted">{product.tagline[locale]}</p>
+        <p class="product-platform muted">{product.platform}</p>
+        <div class="product-actions">
+          <a class="primary-action" href={product.primaryAction.href}>
+            {product.primaryAction.label[locale]}
+          </a>
+          <div class="product-hero__links">
+            <a href={supportHref}>{t.support}</a>
+            {
+              product.secondaryAction && (
+                <a href={product.secondaryAction.href}>{product.secondaryAction.label[locale]}</a>
+              )
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-well">
+        <img
+          src={product.screenshot.src}
+          width={product.screenshot.width}
+          height={product.screenshot.height}
+          alt={product.screenshot.alt[locale]}
+          decoding="async"
+        />
+      </div>
+    </section>
+
+    <section class="product-features" aria-labelledby="features-heading">
+      <h2 id="features-heading">{t.features}</h2>
+      <ul class="features-grid">
+        {
+          product.features.map((feature) => (
+            <li>
+              <h3>{feature.title[locale]}</h3>
+              <p class="muted">{feature.description[locale]}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="product-utility-row">
+      <a href={supportHref}>{t.support}</a>
+      <a href={privacyHref}>{t.privacy}</a>
+    </div>
+  </div>
+</Base>

@@ -1,6 +1,6 @@
 ---
 import Landing from '../../components/Landing.astro';
-import { getAppCards } from '../../lib/content';
+import { getProducts } from '../../data/products';
 import { locales, defaultLocale, type Locale } from '../../i18n';
 
 export function getStaticPaths() {
@@ -10,7 +10,7 @@ export function getStaticPaths() {
 }
 
 const { locale } = Astro.props;
-const cards = await getAppCards();
+const products = getProducts();
 ---
 
-<Landing locale={locale} cards={cards} />
+<Landing locale={locale} products={products} />

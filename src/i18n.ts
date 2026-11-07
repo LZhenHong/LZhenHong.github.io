@@ -17,42 +17,62 @@ export const localeNames: Record<Locale, string> = {
 interface UiStrings {
   siteTitle: string;
   metaDescription: string;
-  tagline: string;
-  cardSub: string;
-  footerPrefix: string;
+  heroTitle: string;
+  heroBody: string;
+  apps: string;
   allApps: string;
+  support: string;
+  privacy: string;
+  features: string;
+  emptyCatalog: string;
+  footerMaintained: string;
   supportBack: (app: string) => string;
   langMenuLabel: string;
 }
 
 export const ui: Record<Locale, UiStrings> = {
   en: {
-    siteTitle: 'App Support & Privacy',
-    metaDescription: "Support pages and privacy policies for Eden's apps.",
-    tagline: 'Support pages and privacy policies for my apps. Select an app below.',
-    cardSub: 'Support & Privacy Policy',
-    footerPrefix: 'Maintained by ',
+    siteTitle: 'Eden — Apps for Mac, iPhone, and iPad',
+    metaDescription: 'A collection of focused tools for Mac, iPhone, and iPad.',
+    heroTitle: 'Useful apps, thoughtfully made.',
+    heroBody: 'A collection of focused tools for Mac, iPhone, and iPad.',
+    apps: 'Apps',
     allApps: '← All apps',
+    support: 'Support',
+    privacy: 'Privacy',
+    features: 'Features',
+    emptyCatalog: 'Apps are on the way.',
+    footerMaintained: 'Maintained by Eden',
     supportBack: (app) => `← ${app} Support`,
     langMenuLabel: 'Language',
   },
   'zh-cn': {
-    siteTitle: '应用支持与隐私',
-    metaDescription: 'Eden 的各款应用的技术支持与隐私政策。',
-    tagline: '我的各款应用的技术支持与隐私政策，请选择应用。',
-    cardSub: '技术支持与隐私政策',
-    footerPrefix: '维护者：',
+    siteTitle: 'Eden 的应用',
+    metaDescription: 'Eden 的实用工具合集，为 Mac、iPhone 和 iPad 打造。',
+    heroTitle: '实用应用，用心打造。',
+    heroBody: 'Eden 的工具合集，为 Mac、iPhone 和 iPad 解决具体问题。',
+    apps: '应用',
     allApps: '← 全部应用',
+    support: '技术支持',
+    privacy: '隐私政策',
+    features: '功能',
+    emptyCatalog: '更多应用正在路上。',
+    footerMaintained: '由 Eden 维护',
     supportBack: (app) => `← ${app} 技术支持`,
     langMenuLabel: '语言',
   },
   'zh-tw': {
-    siteTitle: '應用支援與隱私',
-    metaDescription: 'Eden 的各款應用程式的技術支援與隱私權政策。',
-    tagline: '我的各款應用程式的技術支援與隱私權政策，請選擇應用程式。',
-    cardSub: '技術支援與隱私權政策',
-    footerPrefix: '維護者：',
-    allApps: '← 全部應用程式',
+    siteTitle: 'Eden 的 App',
+    metaDescription: 'Eden 的實用工具合集，為 Mac、iPhone 和 iPad 打造。',
+    heroTitle: '實用 App，用心打造。',
+    heroBody: 'Eden 的工具合集，為 Mac、iPhone 和 iPad 解決具體問題。',
+    apps: 'App',
+    allApps: '← 全部 App',
+    support: '技術支援',
+    privacy: '隱私權政策',
+    features: '功能',
+    emptyCatalog: '更多 App 正在路上。',
+    footerMaintained: '由 Eden 維護',
     supportBack: (app) => `← ${app} 技術支援`,
     langMenuLabel: '語言',
   },
@@ -63,10 +83,19 @@ export function localePrefix(locale: Locale): string {
   return locale === defaultLocale ? '' : `/${locale}`;
 }
 
-/** Every locale's URL for the same page (landing, or an app's support/privacy page). */
-export function pageUrls(appSlug?: string, privacy = false): Record<Locale, string> {
-  const path = appSlug ? `/apps/${appSlug}/${privacy ? 'privacy/' : ''}` : '/';
+function urlsForPath(path: string): Record<Locale, string> {
   return Object.fromEntries(
     locales.map((locale) => [locale, `${localePrefix(locale)}${path}`]),
   ) as Record<Locale, string>;
+}
+
+/** Every locale's URL for the home page or an existing support/privacy page. */
+export function pageUrls(appSlug?: string, privacy = false): Record<Locale, string> {
+  const path = appSlug ? `/apps/${appSlug}/${privacy ? 'privacy/' : ''}` : '/';
+  return urlsForPath(path);
+}
+
+/** Every locale's URL for a product page. */
+export function productPageUrls(productSlug: string): Record<Locale, string> {
+  return urlsForPath(`/products/${productSlug}/`);
 }

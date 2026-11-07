@@ -11,7 +11,7 @@ const { Content } = await render(entry);
 const t = ui[locale];
 
 const isSupport = kind === 'support';
-const backHref = isSupport ? `${localePrefix(locale)}/` : pageUrls(appSlug)[locale];
+const backHref = isSupport ? `${localePrefix(locale)}/#apps` : pageUrls(appSlug)[locale];
 const backLabel = isSupport ? t.allApps : t.supportBack(entry.data.app);
 ---
 
@@ -21,8 +21,10 @@ const backLabel = isSupport ? t.allApps : t.supportBack(entry.data.app);
   locale={locale}
   alternates={pageUrls(appSlug, kind === 'privacy')}
 >
-  <a class="back-link" href={backHref}>{backLabel}</a>
-  <article>
-    <Content />
-  </article>
+  <div class="article-page">
+    <a class="back-link" href={backHref}>{backLabel}</a>
+    <article>
+      <Content />
+    </article>
+  </div>
 </Base>

@@ -31,11 +31,3 @@ export async function getAppPageProps(locale: Locale): Promise<AppPageProps[]> {
   }
   return pages;
 }
-
-/** Landing-page cards: app display names always come from the default locale. */
-export async function getAppCards(): Promise<{ app: string; slug: string }[]> {
-  const entries = await getCollection('apps', ({ id }) => id.endsWith(`/${defaultLocale}/support`));
-  return entries
-    .map((entry) => ({ slug: entry.id.split('/')[0], app: entry.data.app }))
-    .sort((a, b) => a.app.localeCompare(b.app));
-}
