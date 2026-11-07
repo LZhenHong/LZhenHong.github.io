@@ -1,6 +1,7 @@
 export const defaultLocale = 'en' as const;
 export const locales = ['en', 'zh-cn', 'zh-tw'] as const;
 export type Locale = (typeof locales)[number];
+export type AppPageKind = 'support' | 'privacy' | 'terms' | 'refund';
 
 export const htmlLang: Record<Locale, string> = {
   en: 'en',
@@ -23,6 +24,8 @@ interface UiStrings {
   allApps: string;
   support: string;
   privacy: string;
+  terms: string;
+  refund: string;
   features: string;
   emptyCatalog: string;
   footerMaintained: string;
@@ -40,6 +43,8 @@ export const ui: Record<Locale, UiStrings> = {
     allApps: '← All apps',
     support: 'Support',
     privacy: 'Privacy',
+    terms: 'Terms',
+    refund: 'Refund',
     features: 'Features',
     emptyCatalog: 'Apps are on the way.',
     footerMaintained: 'Maintained by Eden',
@@ -55,6 +60,8 @@ export const ui: Record<Locale, UiStrings> = {
     allApps: '← 全部应用',
     support: '技术支持',
     privacy: '隐私政策',
+    terms: '服务条款',
+    refund: '退款政策',
     features: '功能',
     emptyCatalog: '更多应用正在路上。',
     footerMaintained: '由 Eden 维护',
@@ -70,6 +77,8 @@ export const ui: Record<Locale, UiStrings> = {
     allApps: '← 全部 App',
     support: '技術支援',
     privacy: '隱私權政策',
+    terms: '服務條款',
+    refund: '退款政策',
     features: '功能',
     emptyCatalog: '更多 App 正在路上。',
     footerMaintained: '由 Eden 維護',
@@ -89,9 +98,11 @@ function urlsForPath(path: string): Record<Locale, string> {
   ) as Record<Locale, string>;
 }
 
-/** Every locale's URL for the home page or an existing support/privacy page. */
-export function pageUrls(appSlug?: string, privacy = false): Record<Locale, string> {
-  const path = appSlug ? `/apps/${appSlug}/${privacy ? 'privacy/' : ''}` : '/';
+/** Every locale's URL for the home page or an app article. */
+export function pageUrls(appSlug?: string, kind: AppPageKind = 'support'): Record<Locale, string> {
+  const path = appSlug
+    ? `/apps/${appSlug}/${kind === 'support' ? '' : `${kind}/`}`
+    : '/';
   return urlsForPath(path);
 }
 

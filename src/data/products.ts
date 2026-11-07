@@ -31,6 +31,8 @@ export interface Product {
   secondaryAction?: ProductAction;
   supportUrls?: Record<Locale, string>;
   privacyUrls?: Record<Locale, string>;
+  termsUrls?: Record<Locale, string>;
+  refundUrls?: Record<Locale, string>;
   features: [ProductFeature, ProductFeature, ProductFeature];
 }
 
@@ -293,18 +295,25 @@ const products: Product[] = [
         'zh-tw': '下載 Mac 版',
       },
     },
-    // TODO: Migrate VirtualLocation support/privacy into this repo; until then,
-    // preserve the live App Review URLs. The old site has no zh-tw pages, so
-    // both Chinese locales intentionally use its zh-cn version for now.
     supportUrls: {
-      en: 'https://virtual-location.apps.air.build/support/',
-      'zh-cn': 'https://virtual-location.apps.air.build/zh-cn/support/',
-      'zh-tw': 'https://virtual-location.apps.air.build/zh-cn/support/',
+      en: '/apps/virtual-location/',
+      'zh-cn': '/zh-cn/apps/virtual-location/',
+      'zh-tw': '/zh-tw/apps/virtual-location/',
     },
     privacyUrls: {
-      en: 'https://virtual-location.apps.air.build/privacy/',
-      'zh-cn': 'https://virtual-location.apps.air.build/zh-cn/privacy/',
-      'zh-tw': 'https://virtual-location.apps.air.build/zh-cn/privacy/',
+      en: '/apps/virtual-location/privacy/',
+      'zh-cn': '/zh-cn/apps/virtual-location/privacy/',
+      'zh-tw': '/zh-tw/apps/virtual-location/privacy/',
+    },
+    termsUrls: {
+      en: '/apps/virtual-location/terms/',
+      'zh-cn': '/zh-cn/apps/virtual-location/terms/',
+      'zh-tw': '/zh-tw/apps/virtual-location/terms/',
+    },
+    refundUrls: {
+      en: '/apps/virtual-location/refund/',
+      'zh-cn': '/zh-cn/apps/virtual-location/refund/',
+      'zh-tw': '/zh-tw/apps/virtual-location/refund/',
     },
     features: [
       {

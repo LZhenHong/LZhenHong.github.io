@@ -19,7 +19,7 @@ const backLabel = isSupport ? t.allApps : t.supportBack(entry.data.app);
   title={entry.data.title}
   description={entry.data.description}
   locale={locale}
-  alternates={pageUrls(appSlug, kind === 'privacy')}
+  alternates={pageUrls(appSlug, kind)}
 >
   <div class="article-page">
     <a class="back-link" href={backHref}>{backLabel}</a>

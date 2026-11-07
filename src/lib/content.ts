@@ -1,12 +1,12 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { defaultLocale, type Locale } from '../i18n';
+import { defaultLocale, type AppPageKind, type Locale } from '../i18n';
 
 export type AppEntry = CollectionEntry<'apps'>;
 
 export interface AppPageProps {
   locale: Locale;
   appSlug: string;
-  kind: 'support' | 'privacy';
+  kind: AppPageKind;
   entry: AppEntry;
 }
 
@@ -21,7 +21,7 @@ export async function getAppPageProps(locale: Locale): Promise<AppPageProps[]> {
 
   const pages: AppPageProps[] = [];
   for (const appSlug of appSlugs) {
-    for (const kind of ['support', 'privacy'] as const) {
+    for (const kind of ['support', 'privacy', 'terms', 'refund'] as const) {
       const entry =
         byId.get(`${appSlug}/${locale}/${kind}`) ?? byId.get(`${appSlug}/${defaultLocale}/${kind}`);
       if (entry) {

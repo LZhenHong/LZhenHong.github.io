@@ -11,7 +11,9 @@ interface Props {
 const { locale, product } = Astro.props;
 const t = ui[locale];
 const supportHref = product.supportUrls?.[locale] ?? pageUrls(product.slug)[locale];
-const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, true)[locale];
+const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, 'privacy')[locale];
+const termsHref = product.termsUrls?.[locale];
+const refundHref = product.refundUrls?.[locale];
 ---
 
 <Base
@@ -79,6 +81,8 @@ const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, true
     <div class="product-utility-row">
       <a href={supportHref}>{t.support}</a>
       <a href={privacyHref}>{t.privacy}</a>
+      {termsHref && <a href={termsHref}>{t.terms}</a>}
+      {refundHref && <a href={refundHref}>{t.refund}</a>}
     </div>
   </div>
 </Base>
