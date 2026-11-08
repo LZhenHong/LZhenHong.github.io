@@ -83,36 +83,103 @@ interface LandingCopy {
   };
 }
 
-export const virtualLocationMedia = {
-  teleport: {
-    src: '/apps/virtual-location/landing/teleport.webp',
-    width: 1400,
-    height: 900,
-    alt: '',
-  },
-  move: {
-    src: '/apps/virtual-location/landing/move.webp',
-    width: 1400,
-    height: 900,
-    alt: '',
-  },
-  joystick: {
-    src: '/apps/virtual-location/landing/joystick.webp',
-    width: 1400,
-    height: 900,
-    alt: '',
-  },
-  batch: {
-    src: '/apps/virtual-location/landing/batch.webp',
-    width: 1400,
-    height: 900,
-    alt: '',
-  },
-} as const;
+interface LocalizedMedia {
+  src: string;
+  width: 1400;
+  height: 900;
+  heroAlt?: string;
+  fullAlt?: string;
+  alt?: string;
+}
 
-// WIP: supply final, per-image alt text only after reviewing the actual
-// recaptured screenshots. Until then, empty alt attributes keep the images
-// decorative; the adjacent copy remains accessible and makes no visual claims.
+export const virtualLocationMedia: Record<Locale, {
+  teleport: LocalizedMedia;
+  move: LocalizedMedia;
+  joystick: LocalizedMedia;
+  batch: LocalizedMedia;
+}> = {
+  en: {
+    teleport: {
+      src: '/apps/virtual-location/landing/en/teleport.png',
+      width: 1400,
+      height: 900,
+      heroAlt: 'VirtualLocation Teleport window with the Target Location pin on the map and the Teleport Here button.',
+      fullAlt: 'Complete VirtualLocation Teleport window showing the Target Location pin, connected devices, saved Places, and the Teleport Here button.',
+    },
+    move: {
+      src: '/apps/virtual-location/landing/en/move.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation Move card showing a blue route with numbered stops on the map and the saved Routes list.',
+    },
+    joystick: {
+      src: '/apps/virtual-location/landing/en/joystick.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation Joystick card showing the on-screen control disc, steering status, and speed set to 12 km/h.',
+    },
+    batch: {
+      src: '/apps/virtual-location/landing/en/batch-saved.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation Batch card showing three checked devices and the saved Places list.',
+    },
+  },
+  'zh-cn': {
+    teleport: {
+      src: '/apps/virtual-location/landing/zh-cn/teleport.png',
+      width: 1400,
+      height: 900,
+      heroAlt: 'VirtualLocation 简体中文界面，地图中已标出目标位置，并提供传送操作。',
+      fullAlt: 'VirtualLocation 简体中文完整窗口，显示目标位置、已连接设备、已保存地点和传送操作。',
+    },
+    move: {
+      src: '/apps/virtual-location/landing/zh-cn/move.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 简体中文移动界面，地图显示蓝色路线和多个站点，以及已保存路线。',
+    },
+    joystick: {
+      src: '/apps/virtual-location/landing/zh-cn/joystick.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 简体中文摇杆界面，显示控制盘、转向状态和 12 公里/时速度。',
+    },
+    batch: {
+      src: '/apps/virtual-location/landing/zh-cn/batch-saved.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 简体中文批量界面，显示三台已勾选设备和已保存地点。',
+    },
+  },
+  'zh-tw': {
+    teleport: {
+      src: '/apps/virtual-location/landing/zh-tw/teleport.png',
+      width: 1400,
+      height: 900,
+      heroAlt: 'VirtualLocation 繁體中文介面，地圖中已標出目標位置，並提供傳送操作。',
+      fullAlt: 'VirtualLocation 繁體中文完整視窗，顯示目標位置、已連接裝置、已儲存地點和傳送操作。',
+    },
+    move: {
+      src: '/apps/virtual-location/landing/zh-tw/move.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 繁體中文移動介面，地圖顯示藍色路線和多個站點，以及已儲存路線。',
+    },
+    joystick: {
+      src: '/apps/virtual-location/landing/zh-tw/joystick.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 繁體中文搖桿介面，顯示控制盤、轉向狀態和 12 公里/小時速度。',
+    },
+    batch: {
+      src: '/apps/virtual-location/landing/zh-tw/batch-saved.png',
+      width: 1400,
+      height: 900,
+      alt: 'VirtualLocation 繁體中文批次介面，顯示三台已勾選裝置和已儲存地點。',
+    },
+  },
+};
 
 export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   en: {

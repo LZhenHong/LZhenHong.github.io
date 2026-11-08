@@ -15,6 +15,7 @@ interface Props {
 
 const { locale, product } = Astro.props;
 const copy = virtualLocationLanding[locale];
+const media = virtualLocationMedia[locale];
 const t = ui[locale];
 const downloadAction = product.secondaryAction;
 
@@ -31,9 +32,9 @@ const refundMailto = 'mailto:leeden.dev@gmail.com';
 const supportLegalLabel = `${t.support}, ${t.terms}, ${t.refund}`;
 const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}`;
 const miniFeatures = [
-  { copy: copy.features.move, media: virtualLocationMedia.move },
-  { copy: copy.features.joystick, media: virtualLocationMedia.joystick },
-  { copy: copy.features.batch, media: virtualLocationMedia.batch },
+  { copy: copy.features.move, media: media.move, crop: 'move' },
+  { copy: copy.features.joystick, media: media.joystick, crop: 'joystick' },
+  { copy: copy.features.batch, media: media.batch, crop: 'batch' },
 ];
 ---
 
@@ -62,7 +63,14 @@ const miniFeatures = [
             <p class="vl-eyebrow">{copy.hero.eyebrow}</p>
           </div>
         </div>
-        <h1 id="vl-hero-title">{copy.hero.title}</h1>
+        <h1 id="vl-hero-title" class={`vl-hero-title vl-hero-title-${locale}`}>
+          {locale === 'en' ? copy.hero.title : (
+            <>
+              <span class="hero-title-lead">{locale === 'zh-cn' ? '在 Mac 上，设置' : '在 Mac 上，設定'}</span>{' '}
+              <span class="hero-title-product">iPhone 的</span><span class="hero-title-tail">{locale === 'zh-cn' ? '虚拟定位。' : '虛擬定位。'}</span>
+            </>
+          )}
+        </h1>
         <p class="vl-hero-body">{copy.hero.body}</p>
         <div class="vl-hero-actions">
           <a class="vl-button vl-button-primary" href={downloadAction.href}>
@@ -87,10 +95,10 @@ const miniFeatures = [
       <div class="vl-hero-media">
         <div class="vl-hero-shot">
           <img
-            src={virtualLocationMedia.teleport.src}
-            width={virtualLocationMedia.teleport.width}
-            height={virtualLocationMedia.teleport.height}
-            alt={virtualLocationMedia.teleport.alt}
+            src={media.teleport.src}
+            width={media.teleport.width}
+            height={media.teleport.height}
+            alt={media.teleport.heroAlt}
             fetchpriority="high"
             decoding="async"
           />
@@ -151,10 +159,10 @@ const miniFeatures = [
         </div>
         <div class="vl-feature-free-shot">
           <img
-            src={virtualLocationMedia.teleport.src}
-            width={virtualLocationMedia.teleport.width}
-            height={virtualLocationMedia.teleport.height}
-            alt={virtualLocationMedia.teleport.alt}
+            src={media.teleport.src}
+            width={media.teleport.width}
+            height={media.teleport.height}
+            alt={media.teleport.fullAlt}
             loading="lazy"
             decoding="async"
           />
@@ -163,9 +171,9 @@ const miniFeatures = [
 
       <div class="vl-feature-grid">
         {
-          miniFeatures.map(({ copy: feature, media }) => (
-            <article class="vl-feature-mini">
-              <div class="vl-feature-mini-media">
+          miniFeatures.map(({ copy: feature, media, crop }) => (
+            <article class={`vl-feature-mini vl-feature-mini-${crop}`}>
+              <div class={`vl-feature-mini-media vl-crop vl-crop-${crop}`}>
                 <img
                   src={media.src}
                   width={media.width}

@@ -220,11 +220,6 @@
     line-height: 1.035;
 }
 
-html[lang^="zh"] .vl-hero h1 {
-    letter-spacing: -0.035em;
-    line-height: 1.12;
-}
-
 .vl-hero-body {
     max-width: 470px;
     margin: 0;
@@ -394,12 +389,6 @@ html[lang^="zh"] .vl-hero h1 {
     line-height: 1.08;
 }
 
-html[lang^="zh"] .vl-section-heading h2,
-html[lang^="zh"] .vl-closing-copy h2 {
-    letter-spacing: -0.025em;
-    line-height: 1.18;
-}
-
 .vl-section-heading > p:last-child:not(.vl-section-kicker) {
     margin: 14px 0 0;
     color: var(--muted);
@@ -524,8 +513,6 @@ html[lang^="zh"] .vl-closing-copy h2 {
 }
 
 .vl-feature-mini-media {
-    --vl-media-fit: cover;
-    --vl-media-position: center top;
     position: relative;
     height: 190px;
     overflow: hidden;
@@ -535,12 +522,27 @@ html[lang^="zh"] .vl-closing-copy h2 {
 
 .vl-feature-mini-media img {
     position: absolute;
-    inset: 0;
-    width: 100%;
+    top: 0;
+    left: 0;
+    width: 168%;
     max-width: none;
-    height: 100%;
-    object-fit: var(--vl-media-fit);
-    object-position: var(--vl-media-position);
+    height: auto;
+}
+
+.vl-feature-mini-media.vl-crop-move img {
+    left: auto;
+    right: 0;
+    transform: translateY(-18%);
+}
+
+.vl-feature-mini-media.vl-crop-joystick img {
+    top: auto;
+    bottom: 0;
+    left: -24%;
+}
+
+.vl-feature-mini-media.vl-crop-batch img {
+    width: 100%;
 }
 
 .vl-feature-mini-body {
@@ -1011,10 +1013,6 @@ html[lang^="zh"] .vl-closing-copy h2 {
         line-height: 1.04;
     }
 
-    html[lang^="zh"] .vl-hero h1 {
-        line-height: 1.14;
-    }
-
     .vl-hero-body {
         font-size: 16px;
     }
@@ -1179,6 +1177,65 @@ html[lang^="zh"] .vl-closing-copy h2 {
     .vl-plan-price small {
         display: block;
         margin: 7px 0 0;
+    }
+}
+
+/* Chinese hero: preserve the approved semantic phrases at each breakpoint. */
+html[lang="zh-CN"] .vl-hero h1,
+html[lang="zh-TW"] .vl-hero h1 {
+    font-size: 50px;
+    letter-spacing: -0.035em;
+    line-height: 1.06;
+    text-wrap: pretty;
+}
+
+html[lang="zh-CN"] .hero-title-lead,
+html[lang="zh-TW"] .hero-title-lead {
+    display: block;
+}
+
+html[lang="zh-CN"] .hero-title-lead,
+html[lang="zh-CN"] .hero-title-product,
+html[lang="zh-CN"] .hero-title-tail,
+html[lang="zh-TW"] .hero-title-lead,
+html[lang="zh-TW"] .hero-title-product,
+html[lang="zh-TW"] .hero-title-tail {
+    white-space: nowrap;
+}
+
+@media (min-width: 961px) and (max-width: 1399px) {
+    html[lang="zh-CN"] .vl-hero h1,
+    html[lang="zh-TW"] .vl-hero h1 {
+        font-size: clamp(38px, 4vw, 44px);
+    }
+
+    html[lang="zh-CN"] .hero-title-product,
+    html[lang="zh-CN"] .hero-title-tail,
+    html[lang="zh-TW"] .hero-title-product,
+    html[lang="zh-TW"] .hero-title-tail {
+        display: block;
+    }
+}
+
+@media (max-width: 760px) {
+    html[lang="zh-CN"] .vl-hero h1,
+    html[lang="zh-TW"] .vl-hero h1 {
+        font-size: 38px;
+        line-height: 1.08;
+    }
+
+    html[lang="zh-CN"] .hero-title-product,
+    html[lang="zh-CN"] .hero-title-tail,
+    html[lang="zh-TW"] .hero-title-product,
+    html[lang="zh-TW"] .hero-title-tail {
+        display: block;
+    }
+}
+
+@media (max-width: 360px) {
+    html[lang="zh-CN"] .vl-hero h1,
+    html[lang="zh-TW"] .vl-hero h1 {
+        font-size: 35px;
     }
 }
 
