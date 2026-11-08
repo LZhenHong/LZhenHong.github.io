@@ -10,6 +10,10 @@ interface Props {
 
 const { locale, products } = Astro.props;
 const t = ui[locale];
+const heroProduct = products.find((product) => product.slug === 'virtual-location');
+const commaIndex = t.heroTitle.search(/[,，]/);
+const heroLead = commaIndex >= 0 ? t.heroTitle.slice(0, commaIndex + 1) : t.heroTitle;
+const heroAccent = commaIndex >= 0 ? t.heroTitle.slice(commaIndex + 1).trimStart() : '';
 ---
 
 <Base
@@ -20,44 +24,97 @@ const t = ui[locale];
   home
 >
   <div class="site-width">
-    <header class="home-hero">
-      <h1>{t.heroTitle}</h1>
-      <p class="muted">{t.heroBody}</p>
-    </header>
+    <section
+      class={heroProduct ? 'home-hero' : 'home-hero home-hero--empty'}
+      aria-labelledby="home-title"
+    >
+      <div class="hero-copy">
+        <h1 id="home-title">
+          <span class="hero-title__lead">{heroLead}</span>
+          {heroAccent && <span class="hero-title__accent">{heroAccent}</span>}
+        </h1>
+        <p class="hero-subcopy">{t.heroBody}</p>
+      </div>
 
-    <section id="apps" aria-labelledby="apps-heading">
-      <h2 id="apps-heading" class="visually-hidden">{t.apps}</h2>
+      {
+        heroProduct && (
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit"></div>
+            <div class="hero-screen">
+              <img
+                src={heroProduct.screenshot.src}
+                width={heroProduct.screenshot.width}
+                height={heroProduct.screenshot.height}
+                alt=""
+                fetchpriority="high"
+                decoding="async"
+              />
+            </div>
+            {
+              products.map((product) => (
+                <div class={`hero-float-icon hero-float-icon--${product.slug}`}>
+                  <img
+                    src={product.icon.src}
+                    width={product.icon.width}
+                    height={product.icon.height}
+                    alt=""
+                    decoding="async"
+                  />
+                </div>
+              ))
+            }
+          </div>
+        )
+      }
+    </section>
+
+    <section class="apps-section" id="apps" aria-labelledby="apps-heading">
+      <h2 id="apps-heading">{t.apps}</h2>
       {
         products.length > 0 ? (
           <ul class="product-grid">
             {
               products.map((product) => (
-                <li>
-                  <a class="product-card" href={productPageUrls(product.slug)[locale]}>
-                    <img
-                      class="product-card__icon"
-                      src={product.icon.src}
-                      width={product.icon.width}
-                      height={product.icon.height}
-                      alt=""
-                      decoding="async"
-                    />
-                    <span class="product-card__text">
-                      <span class="product-card__name">{product.name}</span>
-                      <span class="product-card__description">{product.cardDescription[locale]}</span>
-                      <span class="product-card__platform muted">{product.platform}</span>
-                    </span>
-                    <svg
-                      class="product-card__chevron"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path d="m7 4 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                <li
+                  class={`product-card product-card--${product.slug}`}
+                  style={`--screenshot-ratio: ${product.screenshot.width} / ${product.screenshot.height}`}
+                >
+                  <a
+                    class="card-link"
+                    href={productPageUrls(product.slug)[locale]}
+                    aria-label={t.learnMore(product.name)}
+                  >
+                    <div class="screenshot-stage">
+                      <div class="shot-frame">
+                        <img
+                          src={product.screenshot.src}
+                          width={product.screenshot.width}
+                          height={product.screenshot.height}
+                          alt={product.screenshot.alt[locale]}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="card-copy">
+                      <div class="card-title">
+                        <img
+                          class="card-icon"
+                          src={product.icon.src}
+                          width={product.icon.width}
+                          height={product.icon.height}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <h3>{product.name}</h3>
+                      </div>
+                      <p class="card-description">{product.cardDescription[locale]}</p>
+                      <div class="card-meta">
+                        <span>{product.platform}</span>
+                        <span class="card-arrow" aria-hidden="true">→</span>
+                      </div>
+                    </div>
                   </a>
                 </li>
               ))

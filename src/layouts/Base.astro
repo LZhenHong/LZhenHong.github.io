@@ -66,11 +66,17 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
     <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocale], Astro.site)} />
   </head>
   <body>
+    <a class="skip-link" href="#main">{t.skipContent}</a>
+
     <header class="site-header">
       <div class="site-width header-inner">
         <a class="brand" href={homeUrl}>Eden</a>
         <div class="header-actions">
-          <a class="apps-link" href={appsUrl} aria-current={home ? 'page' : undefined}>
+          <a
+            class={home ? 'apps-link is-current' : 'apps-link'}
+            href={appsUrl}
+            aria-current={home ? 'page' : undefined}
+          >
             {t.apps}
           </a>
           <nav class="lang-menu" aria-label={t.langMenuLabel}>
@@ -85,7 +91,12 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
                           {localeNames[l]}
                         </span>
                       ) : (
-                        <a href={alternates[l]} hreflang={htmlLang[l]} data-locale={l}>
+                        <a
+                          href={alternates[l]}
+                          hreflang={htmlLang[l]}
+                          lang={l === 'zh-cn' ? 'zh-Hans' : l === 'zh-tw' ? 'zh-Hant' : 'en'}
+                          data-locale={l}
+                        >
                           {localeNames[l]}
                         </a>
                       )}
@@ -99,14 +110,17 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
       </div>
     </header>
 
-    <main>
+    <main id="main" tabindex="-1">
       <slot />
     </main>
 
     <footer class="site-footer">
       <div class="site-width footer-inner muted">
         <span>{t.footerMaintained}</span>
-        <a href="https://github.com/LZhenHong">GitHub</a>
+        <span class="footer-github">
+          <span class="footer-slash" aria-hidden="true">/</span>
+          <a href="https://github.com/LZhenHong">GitHub</a>
+        </span>
       </div>
     </footer>
 
@@ -128,7 +142,10 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
           if (menu.open && !menu.contains(event.target)) menu.open = false;
         });
         document.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape') menu.open = false;
+          if (event.key !== 'Escape' || !menu.open) return;
+          event.preventDefault();
+          menu.open = false;
+          menu.querySelector('summary')?.focus();
         });
       })();
     </script>

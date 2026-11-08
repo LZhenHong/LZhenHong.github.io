@@ -25,7 +25,11 @@ const refundHref = product.refundUrls?.[locale];
   <div class="site-width product-page">
     <a class="back-link" href={`${localePrefix(locale)}/#apps`}>{t.allApps}</a>
 
-    <section class="product-hero" aria-labelledby="product-title">
+    <section
+      class={`product-hero product-hero--${product.slug}`}
+      style={`--screenshot-ratio: ${product.screenshot.width} / ${product.screenshot.height}`}
+      aria-labelledby="product-title"
+    >
       <div class="product-hero__text">
         <img
           class="product-hero__icon"
@@ -33,34 +37,39 @@ const refundHref = product.refundUrls?.[locale];
           width={product.icon.width}
           height={product.icon.height}
           alt=""
+          fetchpriority="high"
           decoding="async"
         />
         <h1 id="product-title">{product.name}</h1>
-        <p class="product-tagline muted">{product.tagline[locale]}</p>
-        <p class="product-platform muted">{product.platform}</p>
+        <p class="product-tagline">{product.tagline[locale]}</p>
+        <p class="product-platform">{product.platform}</p>
         <div class="product-actions">
-          <a class="primary-action" href={product.primaryAction.href}>
+          <a class="product-action primary-action" href={product.primaryAction.href}>
             {product.primaryAction.label[locale]}
           </a>
-          <div class="product-hero__links">
-            <a href={supportHref}>{t.support}</a>
-            {
-              product.secondaryAction && (
-                <a href={product.secondaryAction.href}>{product.secondaryAction.label[locale]}</a>
-              )
-            }
-          </div>
+          {
+            product.secondaryAction && (
+              <a class="product-action secondary-action" href={product.secondaryAction.href}>
+                {product.secondaryAction.label[locale]}
+              </a>
+            )
+          }
+          <a class="product-action secondary-action" href={supportHref}>{t.support}</a>
         </div>
       </div>
 
-      <div class="screenshot-well">
-        <img
-          src={product.screenshot.src}
-          width={product.screenshot.width}
-          height={product.screenshot.height}
-          alt={product.screenshot.alt[locale]}
-          decoding="async"
-        />
+      <div class="product-visual">
+        <div class="product-screen-shadow" aria-hidden="true"></div>
+        <div class="product-screen">
+          <img
+            src={product.screenshot.src}
+            width={product.screenshot.width}
+            height={product.screenshot.height}
+            alt={product.screenshot.alt[locale]}
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
       </div>
     </section>
 
@@ -68,10 +77,13 @@ const refundHref = product.refundUrls?.[locale];
       <h2 id="features-heading">{t.features}</h2>
       <ul class="features-grid">
         {
-          product.features.map((feature) => (
-            <li>
+          product.features.map((feature, index) => (
+            <li class="feature">
+              <span class="feature-number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
               <h3>{feature.title[locale]}</h3>
-              <p class="muted">{feature.description[locale]}</p>
+              <p>{feature.description[locale]}</p>
             </li>
           ))
         }

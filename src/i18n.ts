@@ -30,6 +30,8 @@ interface UiStrings {
   emptyCatalog: string;
   footerMaintained: string;
   supportBack: (app: string) => string;
+  learnMore: (product: string) => string;
+  skipContent: string;
   langMenuLabel: string;
 }
 
@@ -49,6 +51,8 @@ export const ui: Record<Locale, UiStrings> = {
     emptyCatalog: 'Apps are on the way.',
     footerMaintained: 'Maintained by Eden',
     supportBack: (app) => `← ${app} Support`,
+    learnMore: (product) => `Learn more about ${product}`,
+    skipContent: 'Skip to content',
     langMenuLabel: 'Language',
   },
   'zh-cn': {
@@ -66,6 +70,8 @@ export const ui: Record<Locale, UiStrings> = {
     emptyCatalog: '更多应用正在路上。',
     footerMaintained: '由 Eden 维护',
     supportBack: (app) => `← ${app} 技术支持`,
+    learnMore: (product) => `了解 ${product}`,
+    skipContent: '跳至主要内容',
     langMenuLabel: '语言',
   },
   'zh-tw': {
@@ -83,6 +89,8 @@ export const ui: Record<Locale, UiStrings> = {
     emptyCatalog: '更多 App 正在路上。',
     footerMaintained: '由 Eden 維護',
     supportBack: (app) => `← ${app} 技術支援`,
+    learnMore: (product) => `了解 ${product}`,
+    skipContent: '跳至主要內容',
     langMenuLabel: '語言',
   },
 };
