@@ -1,0 +1,1270 @@
+/* VirtualLocation v5 landing page. All selectors and theme overrides are VL-only. */
+.vl-page {
+    --page: #f2f2f0;
+    --surface: #ffffff;
+    --text: #1d1f22;
+    --muted: #5f6268;
+    --soft: #e9edf2;
+    --line: rgba(29, 31, 34, 0.12);
+    --header: #f2f2f0;
+    --accent: #006ed7;
+    --link-accent: #005eb8;
+    --on-accent: #ffffff;
+    --selection: rgba(0, 110, 215, 0.22);
+    --card-shadow-hover: 0 24px 60px rgba(20, 23, 28, 0.18), 0 3px 12px rgba(20, 23, 28, 0.08);
+
+    --vl-accent-text: #005eb8;
+    --vl-hero-base: #24282e;
+    --vl-product-text: #f4f6f8;
+    --vl-product-muted: #b8bec7;
+    --vl-hero-line: rgba(244, 246, 248, 0.16);
+    --vl-shadow: 0 24px 60px rgba(20, 23, 28, 0.18), 0 3px 12px rgba(20, 23, 28, 0.08);
+
+    color-scheme: light dark;
+    background: var(--page);
+    color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+    .vl-page {
+        --page: #0c0d0f;
+        --surface: #15171a;
+        --text: #f2f3f5;
+        --muted: #a7abb3;
+        --soft: #222d3a;
+        --line: rgba(224, 229, 238, 0.14);
+        --header: #0c0d0f;
+        --link-accent: #83c2ff;
+        --selection: rgba(0, 110, 215, 0.38);
+        --card-shadow-hover: 0 26px 70px rgba(0, 0, 0, 0.38), 0 3px 14px rgba(0, 0, 0, 0.24);
+
+        --vl-accent-text: #83c2ff;
+        --vl-hero-base: #20242a;
+        --vl-product-text: #f4f6f8;
+        --vl-product-muted: #b8bec7;
+        --vl-hero-line: rgba(224, 229, 238, 0.17);
+        --vl-shadow: 0 26px 70px rgba(0, 0, 0, 0.38), 0 3px 14px rgba(0, 0, 0, 0.24);
+    }
+}
+
+.vl-page :focus-visible {
+    outline-color: var(--vl-accent-text);
+}
+
+.vl-page .skip-link {
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.vl-landing section[id],
+.vl-landing details[id] {
+    scroll-margin-top: 24px;
+}
+
+/* Shared Base header, tuned only on this page. */
+.vl-page .site-header {
+    height: 84px;
+    padding-top: 8px;
+}
+
+.vl-page .header-actions {
+    gap: 8px;
+}
+
+.vl-page .apps-link,
+.vl-page .lang-menu summary {
+    min-height: 44px;
+    padding: 0 13px;
+    border-radius: 12px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.vl-page .apps-link:hover,
+.vl-page .lang-menu summary:hover,
+.vl-page .lang-menu details[open] summary {
+    background: var(--surface);
+    color: var(--text);
+}
+
+.vl-page .lang-menu ul {
+    top: calc(100% + 8px);
+    min-width: 184px;
+    padding: 8px;
+    border-radius: 18px;
+}
+
+.vl-page .lang-menu li a,
+.vl-page .lang-menu li .current {
+    border-radius: 10px;
+}
+
+.vl-page .lang-menu li .current {
+    color: var(--vl-accent-text);
+}
+
+/* Shared controls */
+.vl-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 52px;
+    padding: 0 21px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.vl-button:hover {
+    transform: translateY(-2px);
+}
+
+.vl-button-primary,
+.vl-button-primary:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: 0 9px 22px rgba(0, 110, 215, 0.18);
+}
+
+.vl-button-primary:hover {
+    box-shadow: 0 12px 26px rgba(0, 110, 215, 0.25);
+}
+
+.vl-button-secondary,
+.vl-button-secondary:hover {
+    border-color: var(--line);
+    background: var(--surface);
+    color: var(--text);
+}
+
+.vl-text-link,
+.vl-setup-note a,
+.vl-trust-link,
+.vl-plan-note a,
+.vl-faq-answer a,
+.vl-footer-links a,
+.vl-closing-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+/* Hero */
+.vl-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    align-items: center;
+    gap: 48px;
+    margin-top: 12px;
+    padding: 52px;
+    overflow: hidden;
+    border: 1px solid var(--vl-hero-line);
+    border-radius: 34px;
+    background:
+        radial-gradient(circle at 91% 4%, rgba(136, 151, 170, 0.34), transparent 38%),
+        radial-gradient(circle at 12% 108%, rgba(143, 125, 105, 0.18), transparent 46%),
+        var(--vl-hero-base);
+    color: var(--vl-product-text);
+}
+
+.vl-hero-copy,
+.vl-hero-media {
+    min-width: 0;
+}
+
+.vl-product-lockup {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.vl-product-icon {
+    width: 88px;
+    height: 88px;
+    flex: 0 0 88px;
+}
+
+.vl-product-name {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+}
+
+.vl-eyebrow,
+.vl-section-kicker {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+}
+
+.vl-eyebrow {
+    color: var(--vl-product-muted);
+}
+
+.vl-hero h1 {
+    max-width: 540px;
+    margin: 30px 0 22px;
+    font-size: clamp(2.65rem, 4.15vw, 3.75rem);
+    font-weight: 740;
+    letter-spacing: -0.052em;
+    line-height: 1.035;
+}
+
+html[lang^="zh"] .vl-hero h1 {
+    letter-spacing: -0.035em;
+    line-height: 1.12;
+}
+
+.vl-hero-body {
+    max-width: 470px;
+    margin: 0;
+    color: var(--vl-product-muted);
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+.vl-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.vl-trust-link {
+    width: fit-content;
+    margin-top: 10px;
+    color: var(--vl-product-muted);
+    font-size: 12.5px;
+    line-height: 1.45;
+    text-decoration: none;
+}
+
+.vl-trust-link:hover {
+    color: var(--vl-product-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.vl-hero-media {
+    align-self: center;
+}
+
+.vl-hero-shot {
+    --vl-media-fit: contain;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    background: var(--surface);
+    box-shadow: var(--vl-shadow);
+}
+
+.vl-hero-shot img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 14 / 9;
+    border-radius: 16px;
+    object-fit: var(--vl-media-fit);
+}
+
+.vl-free-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 17px auto 0;
+    padding: 8px 13px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.vl-free-badge span {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+/* Three-step setup */
+.vl-steps {
+    margin-top: 18px;
+    padding: 30px 34px;
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    background: var(--surface);
+}
+
+.vl-section-kicker {
+    margin-bottom: 10px;
+    color: var(--vl-accent-text);
+}
+
+.vl-steps-heading h2 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.vl-steps-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 25px 0 16px;
+    padding: 0;
+    list-style: none;
+}
+
+.vl-steps-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.vl-steps-list p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.vl-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 50%;
+    background: var(--vl-hero-base);
+    color: var(--vl-product-text);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.vl-setup-note {
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.vl-setup-note a {
+    margin-left: 4px;
+    color: var(--text);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Section headings */
+.vl-section {
+    padding-top: 78px;
+}
+
+.vl-section-heading {
+    max-width: 700px;
+    margin-bottom: 28px;
+}
+
+.vl-section-heading h2 {
+    margin: 0;
+    font-size: clamp(2rem, 3.25vw, 2.75rem);
+    font-weight: 730;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+html[lang^="zh"] .vl-section-heading h2,
+html[lang^="zh"] .vl-closing-copy h2 {
+    letter-spacing: -0.025em;
+    line-height: 1.18;
+}
+
+.vl-section-heading > p:last-child:not(.vl-section-kicker) {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Feature cards */
+.vl-feature-free {
+    display: grid;
+    grid-template-columns: minmax(0, 0.76fr) minmax(0, 1.24fr);
+    align-items: center;
+    gap: 36px;
+    padding: 34px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    background: var(--surface);
+}
+
+.vl-feature-free-copy {
+    min-width: 0;
+    padding-left: 10px;
+}
+
+.vl-card-label {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 16px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.vl-card-label span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+}
+
+.vl-label-free {
+    background: var(--soft);
+    color: var(--vl-accent-text);
+}
+
+.vl-label-vip {
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.vl-feature-free h3,
+.vl-feature-mini h3 {
+    margin: 0;
+    color: var(--text);
+    font-weight: 720;
+    letter-spacing: -0.035em;
+}
+
+.vl-feature-free h3 {
+    font-size: 32px;
+    line-height: 1.1;
+}
+
+.vl-feature-free-copy > p:not(.vl-card-label) {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.vl-text-link {
+    gap: 7px;
+    width: fit-content;
+    margin-top: 14px;
+    color: var(--vl-accent-text);
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.vl-text-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.vl-feature-free-shot {
+    --vl-media-fit: contain;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--vl-hero-base);
+}
+
+.vl-feature-free-shot img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 14 / 9;
+    object-fit: var(--vl-media-fit);
+}
+
+.vl-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.vl-feature-mini {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    background: var(--surface);
+}
+
+.vl-feature-mini-media {
+    --vl-media-fit: cover;
+    --vl-media-position: center top;
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: var(--vl-hero-base);
+}
+
+.vl-feature-mini-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: var(--vl-media-fit);
+    object-position: var(--vl-media-position);
+}
+
+.vl-feature-mini-body {
+    padding: 24px 26px 25px;
+}
+
+.vl-feature-mini h3 {
+    font-size: 24px;
+    line-height: 1.15;
+}
+
+.vl-feature-mini-body > p:not(.vl-card-label):not(.vl-interface-note) {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.vl-interface-note {
+    margin: 18px 0 0;
+    padding-top: 13px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 1.45;
+}
+
+/* Free and VIP plans */
+.vl-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.vl-plan-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 32px;
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    background: var(--surface);
+}
+
+.vl-plan-vip {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.vl-plan-label {
+    margin: 0 0 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.vl-plan-label span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin-left: 6px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--vl-accent-text);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    vertical-align: middle;
+}
+
+.vl-plan-price {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 730;
+    letter-spacing: -0.05em;
+    line-height: 1.1;
+}
+
+.vl-plan-price small {
+    margin-left: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 550;
+    letter-spacing: 0;
+}
+
+.vl-plan-intro {
+    margin: 13px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.vl-plan-list {
+    display: grid;
+    gap: 14px;
+    flex: 1;
+    margin: 28px 0 30px;
+    padding: 0;
+    list-style: none;
+}
+
+.vl-plan-list li {
+    position: relative;
+    padding-left: 26px;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.vl-plan-list li::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: "✓";
+    color: var(--vl-accent-text);
+    font-weight: 850;
+}
+
+.vl-plan-button {
+    width: 100%;
+}
+
+.vl-plan-note {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.vl-plan-note a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Native FAQ */
+.vl-faq-list {
+    padding: 0 30px;
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    background: var(--surface);
+}
+
+.vl-faq-list details + details {
+    border-top: 1px solid var(--line);
+}
+
+.vl-faq-list summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 72px;
+    padding: 22px 52px 22px 0;
+    cursor: pointer;
+    list-style: none;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    touch-action: manipulation;
+}
+
+.vl-faq-list summary::-webkit-details-marker {
+    display: none;
+}
+
+.vl-faq-list summary::after {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    content: "+";
+    color: var(--muted);
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1;
+    transform: translateY(-50%);
+}
+
+.vl-faq-list details[open] summary::after {
+    content: "−";
+}
+
+.vl-faq-list details:target summary {
+    color: var(--vl-accent-text);
+}
+
+.vl-faq-answer p {
+    max-width: 850px;
+    margin: 0;
+    padding: 0 52px 24px 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.vl-faq-answer a {
+    color: var(--text);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+}
+
+/* Closing panel and dedicated footer */
+.vl-closing-section {
+    padding-bottom: 78px;
+}
+
+.vl-closing-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    align-items: center;
+    gap: 48px;
+    padding: 46px;
+    border-radius: 34px;
+    background: #24282e;
+    color: #f4f6f8;
+}
+
+.vl-closing-panel .vl-section-kicker {
+    color: #b8bec7;
+}
+
+.vl-closing-copy h2 {
+    max-width: 650px;
+    margin: 0;
+    font-size: clamp(2rem, 3.2vw, 2.65rem);
+    font-weight: 720;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+
+.vl-closing-copy > p:last-child {
+    max-width: 650px;
+    margin: 16px 0 0;
+    color: #b8bec7;
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.vl-closing-buttons {
+    display: grid;
+    gap: 12px;
+}
+
+.vl-button-ink,
+.vl-button-ink:hover {
+    border-color: rgba(244, 246, 248, 0.34);
+    background: transparent;
+    color: #f4f6f8;
+}
+
+.vl-button-ink:hover {
+    background: rgba(244, 246, 248, 0.08);
+}
+
+.vl-closing-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.vl-closing-links a {
+    padding: 0 11px;
+    color: #f4f6f8;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.vl-site-footer {
+    border-top: 1px solid var(--line);
+}
+
+.vl-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 92px;
+    padding-block: 18px;
+}
+
+.vl-footer-inner p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.vl-footer-inner p strong {
+    color: var(--text);
+    font-size: 16px;
+    letter-spacing: -0.03em;
+}
+
+.vl-footer-inner p span {
+    margin: 0 8px;
+}
+
+.vl-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.vl-footer-links a {
+    padding: 0 12px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.vl-footer-links a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+@media (max-width: 1100px) {
+    .vl-hero {
+        gap: 34px;
+        padding: 42px;
+    }
+
+    .vl-hero h1 {
+        font-size: clamp(2.55rem, 4.8vw, 3.4rem);
+    }
+
+    .vl-feature-free {
+        gap: 26px;
+    }
+
+    .vl-feature-mini-body {
+        padding-inline: 22px;
+    }
+}
+
+@media (max-width: 960px) {
+    .vl-hero {
+        grid-template-columns: 1fr;
+        gap: 38px;
+        padding: 44px;
+    }
+
+    .vl-hero-copy {
+        max-width: 760px;
+    }
+
+    .vl-hero h1 {
+        max-width: 760px;
+    }
+
+    .vl-hero-body {
+        max-width: 650px;
+    }
+
+    .vl-hero-shot {
+        max-width: 790px;
+        margin-inline: auto;
+    }
+
+    .vl-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vl-feature-mini {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    }
+
+    .vl-feature-mini-media {
+        height: auto;
+        min-height: 230px;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+    }
+
+    .vl-feature-mini-body {
+        align-self: center;
+        padding: 28px;
+    }
+
+    .vl-closing-panel {
+        gap: 30px;
+        padding: 40px;
+    }
+}
+
+@media (max-width: 760px) {
+    .vl-steps-list {
+        grid-template-columns: 1fr;
+        gap: 17px;
+    }
+
+    .vl-feature-free {
+        grid-template-columns: 1fr;
+        gap: 26px;
+        padding: 28px;
+    }
+
+    .vl-feature-free-copy {
+        padding-left: 0;
+    }
+
+    .vl-plan-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vl-closing-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .vl-closing-actions {
+        width: 100%;
+        max-width: 430px;
+    }
+}
+
+@media (max-width: 640px) {
+    .vl-page .site-header {
+        height: 72px;
+        padding-top: 2px;
+    }
+
+    .vl-page .header-inner {
+        gap: 12px;
+    }
+
+    .vl-page .header-actions {
+        gap: 2px;
+    }
+
+    .vl-page .apps-link,
+    .vl-page .lang-menu summary {
+        padding-inline: 10px;
+    }
+
+    .vl-hero {
+        gap: 30px;
+        margin-top: 6px;
+        padding: 26px 22px;
+    }
+
+    .vl-product-lockup {
+        gap: 15px;
+    }
+
+    .vl-product-icon {
+        width: 80px;
+        height: 80px;
+        flex-basis: 80px;
+    }
+
+    .vl-product-name {
+        font-size: 20px;
+    }
+
+    .vl-eyebrow {
+        font-size: 10px;
+    }
+
+    .vl-hero h1 {
+        margin: 26px 0 18px;
+        font-size: 38px;
+        line-height: 1.04;
+    }
+
+    html[lang^="zh"] .vl-hero h1 {
+        line-height: 1.14;
+    }
+
+    .vl-hero-body {
+        font-size: 16px;
+    }
+
+    .vl-hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        margin-top: 24px;
+    }
+
+    .vl-hero-actions .vl-button {
+        width: 100%;
+    }
+
+    .vl-trust-link {
+        font-size: 12px;
+    }
+
+    .vl-hero-shot {
+        padding: 6px;
+        border-radius: 20px;
+    }
+
+    .vl-hero-shot img {
+        border-radius: 14px;
+    }
+
+    .vl-free-badge {
+        justify-content: center;
+        padding-inline: 11px;
+        font-size: 11.5px;
+        text-align: center;
+    }
+
+    .vl-steps {
+        margin-top: 14px;
+        padding: 24px 22px;
+    }
+
+    .vl-steps-heading h2 {
+        font-size: 23px;
+    }
+
+    .vl-setup-note a {
+        margin-left: 0;
+    }
+
+    .vl-section {
+        padding-top: 58px;
+    }
+
+    .vl-section-heading {
+        margin-bottom: 22px;
+    }
+
+    .vl-section-heading h2 {
+        font-size: 32px;
+    }
+
+    .vl-feature-free {
+        padding: 22px;
+    }
+
+    .vl-feature-free h3 {
+        font-size: 28px;
+    }
+
+    .vl-feature-mini {
+        display: block;
+    }
+
+    .vl-feature-mini-media {
+        height: 190px;
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .vl-feature-mini-body {
+        padding: 22px;
+    }
+
+    .vl-plan-card {
+        padding: 26px;
+    }
+
+    .vl-plan-price {
+        font-size: clamp(2.25rem, 9vw, 2.875rem);
+    }
+
+    .vl-faq-list {
+        padding-inline: 22px;
+    }
+
+    .vl-faq-list summary {
+        min-height: 68px;
+        padding: 20px 40px 20px 0;
+        font-size: 16px;
+    }
+
+    .vl-faq-answer p {
+        padding: 0 0 20px;
+    }
+
+    .vl-closing-section {
+        padding-bottom: 58px;
+    }
+
+    .vl-closing-panel {
+        padding: 30px 24px;
+    }
+
+    .vl-closing-copy h2 {
+        font-size: 32px;
+    }
+
+    .vl-footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        padding-block: 22px;
+    }
+
+    .vl-footer-links {
+        justify-content: flex-start;
+        margin-left: -12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .vl-hero {
+        padding: 24px 20px;
+    }
+
+    .vl-hero h1 {
+        font-size: 35px;
+    }
+
+    .vl-product-lockup {
+        gap: 13px;
+    }
+
+    .vl-product-name {
+        font-size: 19px;
+    }
+
+    .vl-button {
+        padding-inline: 14px;
+        font-size: 14px;
+        white-space: normal;
+    }
+
+    .vl-steps,
+    .vl-feature-free,
+    .vl-feature-mini-body,
+    .vl-plan-card,
+    .vl-closing-panel {
+        padding-inline: 20px;
+    }
+
+    .vl-plan-price small {
+        display: block;
+        margin: 7px 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vl-page .vl-button {
+        transition-duration: 0.01ms;
+    }
+
+    .vl-page .vl-button:hover {
+        transform: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .vl-page {
+        --page: Canvas;
+        --surface: Canvas;
+        --text: CanvasText;
+        --muted: CanvasText;
+        --soft: Canvas;
+        --line: ButtonBorder;
+        --header: Canvas;
+        --accent: LinkText;
+        --link-accent: LinkText;
+        --on-accent: ButtonText;
+        --vl-accent-text: LinkText;
+        --vl-product-text: CanvasText;
+        --vl-product-muted: CanvasText;
+    }
+
+    .vl-page :focus-visible {
+        outline-color: Highlight;
+    }
+
+    .vl-hero,
+    .vl-steps,
+    .vl-feature-free,
+    .vl-feature-mini,
+    .vl-plan-card,
+    .vl-faq-list,
+    .vl-hero-shot,
+    .vl-feature-free-shot,
+    .vl-feature-mini-media,
+    .vl-closing-panel,
+    .vl-free-badge,
+    .vl-page .lang-menu ul {
+        border-color: CanvasText;
+        background: Canvas;
+        color: CanvasText;
+        box-shadow: none;
+    }
+
+    .vl-button,
+    .vl-button-primary,
+    .vl-button-primary:hover,
+    .vl-button-secondary,
+    .vl-button-secondary:hover,
+    .vl-button-ink,
+    .vl-button-ink:hover {
+        border: 1px solid ButtonText;
+        background: ButtonFace;
+        color: ButtonText;
+        box-shadow: none;
+    }
+
+    .vl-label-vip,
+    .vl-label-free,
+    .vl-step-number {
+        border: 1px solid CanvasText;
+        background: Canvas;
+        color: CanvasText;
+    }
+
+    .vl-closing-panel .vl-section-kicker,
+    .vl-closing-copy > p:last-child,
+    .vl-closing-links a {
+        color: CanvasText;
+    }
+
+    .vl-trust-link,
+    .vl-footer-links a {
+        color: LinkText;
+        text-decoration: underline;
+    }
+
+    .vl-free-badge span {
+        background: CanvasText;
+    }
+}

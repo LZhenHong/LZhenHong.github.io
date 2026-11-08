@@ -1,5 +1,6 @@
 ---
 import ProductPage from '../../../components/ProductPage.astro';
+import VirtualLocationProductPage from '../../../components/VirtualLocationProductPage.astro';
 import { getProducts } from '../../../data/products';
 import { defaultLocale, locales, type Locale } from '../../../i18n';
 
@@ -18,4 +19,10 @@ export function getStaticPaths() {
 const { locale, product } = Astro.props;
 ---
 
-<ProductPage locale={locale} product={product} />
+{
+  product.slug === 'virtual-location' ? (
+    <VirtualLocationProductPage locale={locale} product={product} />
+  ) : (
+    <ProductPage locale={locale} product={product} />
+  )
+}
