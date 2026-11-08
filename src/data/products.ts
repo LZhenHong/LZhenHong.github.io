@@ -323,9 +323,9 @@ const products: Product[] = [
           'zh-tw': '免費傳送',
         },
         description: {
-          en: 'Set a location on a connected iPhone or iPad over USB or Wi-Fi — no Xcode needed.',
-          'zh-cn': '通过 USB 或 Wi-Fi 为连接的 iPhone 或 iPad 设置虚拟定位，Mac 无需安装 Xcode。',
-          'zh-tw': '透過 USB 或 Wi-Fi 為連接的 iPhone 或 iPad 設定虛擬定位，Mac 無需安裝 Xcode。',
+          en: 'Teleport one connected iPhone or iPad over USB for free — no Xcode needed. Wi-Fi Teleport is a VIP feature.',
+          'zh-cn': '通过 USB 免费为单台已连接的 iPhone 或 iPad 设置虚拟定位，Mac 无需安装 Xcode；通过 Wi-Fi 传送属于 VIP 功能。',
+          'zh-tw': '透過 USB 免費為單台已連接的 iPhone 或 iPad 設定虛擬定位，Mac 無需安裝 Xcode；透過 Wi-Fi 傳送屬於 VIP 功能。',
         },
       },
       {
