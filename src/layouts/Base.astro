@@ -29,6 +29,24 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Motion is opt-in so no-JS and reduced-motion users get the final layout.
+      (() => {
+        const root = document.documentElement;
+        try {
+          const query = window.matchMedia('(prefers-reduced-motion: no-preference)');
+          const syncMotion = () => root.classList.toggle('motion-enabled', query.matches);
+          syncMotion();
+          if (typeof query.addEventListener === 'function') {
+            query.addEventListener('change', syncMotion);
+          } else {
+            query.addListener(syncMotion);
+          }
+        } catch {
+          root.classList.remove('motion-enabled');
+        }
+      })();
+    </script>
     {
       locale === defaultLocale && (
         <script define:vars={{ alternates }}>
@@ -125,6 +143,56 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
     </footer>
 
     <script is:inline>
+      // Reveal cards only after every observer registration succeeds. The
+      // language enhancement below is independent and must always run.
+      (() => {
+        const cards = Array.from(document.querySelectorAll('.product-card'));
+        if (!cards.length || !document.documentElement.classList.contains('motion-enabled')) return;
+        if (!('IntersectionObserver' in window)) return;
+
+        let observer;
+        const cleanup = () => {
+          cards.forEach((card) => {
+            card.classList.remove('reveal-pending');
+            card.style.removeProperty('--reveal-delay');
+          });
+          if (observer) {
+            try {
+              observer.disconnect();
+            } catch {}
+          }
+        };
+
+        try {
+          observer = new IntersectionObserver(
+            (entries) => {
+              try {
+                let revealIndex = 0;
+                entries.forEach((entry) => {
+                  if (!entry.isIntersecting) return;
+                  const card = entry.target;
+                  const delay = Math.min(revealIndex * 70, 210);
+                  revealIndex += 1;
+                  card.style.setProperty('--reveal-delay', `${delay}ms`);
+                  card.classList.add('is-visible');
+                  card.classList.remove('reveal-pending');
+                  observer.unobserve(card);
+                });
+              } catch {
+                cleanup();
+              }
+            },
+            { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+          );
+          cards.forEach((card) => observer.observe(card));
+          cards.forEach((card) => {
+            if (!card.classList.contains('is-visible')) card.classList.add('reveal-pending');
+          });
+        } catch {
+          cleanup();
+        }
+      })();
+
       // Progressive enhancement: the <details> language menu already works
       // without JS; this adds outside-click and Escape dismissal, plus
       // remembering explicit picks for the head auto-locale script.

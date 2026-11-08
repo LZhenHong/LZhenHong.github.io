@@ -479,7 +479,6 @@ html[lang^="zh"] .hero-copy h1 {
     border-radius: 21px;
     box-shadow: 0 38px 75px rgba(0, 0, 0, 0.36), 0 8px 24px rgba(0, 31, 76, 0.24);
     backdrop-filter: blur(14px);
-    animation: screen-float 8s ease-in-out infinite;
 }
 
 .hero-screen img {
@@ -493,6 +492,7 @@ html[lang^="zh"] .hero-copy h1 {
 .hero-float-icon {
     --angle: 0deg;
     --duration: 7s;
+    --float-delay: 0s;
     position: absolute;
     z-index: 3;
     padding: 6px;
@@ -502,7 +502,6 @@ html[lang^="zh"] .hero-copy h1 {
     border-radius: 25%;
     box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
     backdrop-filter: blur(14px);
-    animation: icon-float var(--duration) ease-in-out infinite;
 }
 
 .hero-float-icon img {
@@ -525,7 +524,7 @@ html[lang^="zh"] .hero-copy h1 {
     bottom: 7%;
     left: 0;
     width: 86px;
-    animation-delay: -2.2s;
+    --float-delay: -2.2s;
 }
 
 .hero-float-icon--settingshop {
@@ -534,7 +533,7 @@ html[lang^="zh"] .hero-copy h1 {
     top: 8%;
     left: 0;
     width: 74px;
-    animation-delay: -4.1s;
+    --float-delay: -4.1s;
 }
 
 .hero-float-icon--storehop {
@@ -543,28 +542,70 @@ html[lang^="zh"] .hero-copy h1 {
     right: 4%;
     bottom: 0;
     width: 80px;
-    animation-delay: -1.3s;
+    --float-delay: -1.3s;
 }
 
-@keyframes screen-float {
-    0%,
-    100% {
-        transform: translate3d(0, -45%, 0) rotate(-3.5deg);
+@media (prefers-reduced-motion: no-preference) {
+    html.motion-enabled .hero-copy {
+        animation: hero-copy-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
     }
 
-    50% {
-        transform: translate3d(0, calc(-45% - 4px), 0) rotate(-3.5deg);
-    }
-}
-
-@keyframes icon-float {
-    0%,
-    100% {
-        transform: translate3d(0, 0, 0) rotate(var(--angle));
+    html.motion-enabled .hero-art {
+        animation: hero-art-enter 580ms cubic-bezier(0.22, 1, 0.36, 1) 140ms backwards;
     }
 
-    50% {
-        transform: translate3d(0, -6px, 0) rotate(var(--angle));
+    html.motion-enabled .hero-screen {
+        animation: screen-float 8s ease-in-out infinite;
+    }
+
+    html.motion-enabled .hero-float-icon {
+        animation: icon-float var(--duration) ease-in-out var(--float-delay) infinite;
+    }
+
+    @keyframes hero-copy-enter {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes hero-art-enter {
+        from {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes screen-float {
+        0%,
+        100% {
+            transform: translate3d(0, -45%, 0) rotate(-3.5deg);
+        }
+
+        50% {
+            transform: translate3d(0, calc(-45% - 4px), 0) rotate(-3.5deg);
+        }
+    }
+
+    @keyframes icon-float {
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0) rotate(var(--angle));
+        }
+
+        50% {
+            transform: translate3d(0, -8px, 0) rotate(var(--angle)) scale(1.03);
+        }
     }
 }
 
@@ -591,12 +632,16 @@ html[lang^="zh"] .hero-copy h1 {
 
 .product-card {
     min-width: 0;
+    opacity: 1;
     overflow: hidden;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 26px;
     box-shadow: var(--card-shadow);
-    transition: transform 240ms ease, box-shadow 240ms ease;
+    transition:
+        opacity 420ms ease var(--reveal-delay, 0ms),
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 240ms ease;
 }
 
 .card-link {
@@ -605,6 +650,7 @@ html[lang^="zh"] .hero-copy h1 {
     color: inherit;
     border-radius: 26px;
     text-decoration: none;
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
 }
 
 .card-link:focus-visible {
@@ -647,7 +693,7 @@ html[lang^="zh"] .hero-copy h1 {
     border: 1px solid rgba(255, 255, 255, 0.50);
     border-radius: 14px;
     box-shadow: 0 22px 38px rgba(30, 36, 49, 0.15), 0 3px 8px rgba(30, 36, 49, 0.07);
-    transition: transform 240ms ease;
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .shot-frame img {
@@ -731,7 +777,7 @@ html[lang^="zh"] .hero-copy h1 {
     font-size: 27px;
     font-weight: 520;
     line-height: 1;
-    transition: transform 220ms ease;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .empty-catalog {
@@ -747,16 +793,31 @@ html[lang^="zh"] .hero-copy h1 {
 
 @media (hover: hover) and (pointer: fine) {
     .product-card:hover {
-        transform: translateY(-4px);
         box-shadow: var(--card-shadow-hover);
     }
+}
 
-    .product-card:hover .shot-frame {
-        transform: translateY(-2px) scale(1.012);
+@media (prefers-reduced-motion: no-preference) {
+    html.motion-enabled .product-card.reveal-pending {
+        opacity: 0;
     }
 
-    .product-card:hover .card-arrow {
-        transform: translateX(3px);
+    html.motion-enabled .product-card.reveal-pending .card-link {
+        transform: translate3d(0, 18px, 0);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    html.motion-enabled .product-card:hover {
+        transform: translateY(-6px);
+    }
+
+    html.motion-enabled .product-card:hover .shot-frame {
+        transform: translateY(-3px) scale(1.025);
+    }
+
+    html.motion-enabled .product-card:hover .card-arrow {
+        transform: translateX(4px);
     }
 }
 
@@ -907,8 +968,10 @@ html[lang^="zh"] .hero-copy h1 {
     transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
-.product-action:hover {
-    transform: translateY(-2px);
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    html.motion-enabled .product-action:hover {
+        transform: translateY(-2px);
+    }
 }
 
 .primary-action {
@@ -998,6 +1061,72 @@ html[lang^="zh"] .hero-copy h1 {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html.motion-enabled .product-hero__text {
+        animation: product-text-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
+    }
+
+    html.motion-enabled .product-visual::before {
+        animation: product-ring-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) 80ms backwards;
+    }
+
+    html.motion-enabled .product-screen-shadow {
+        animation: product-shadow-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) 140ms backwards;
+    }
+
+    html.motion-enabled .product-screen {
+        animation: product-screen-enter 580ms cubic-bezier(0.22, 1, 0.36, 1) 180ms backwards;
+    }
+
+    @keyframes product-text-enter {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes product-ring-enter {
+        from {
+            opacity: 0;
+            transform: scale(0.94);
+        }
+
+        to {
+            opacity: 0.55;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes product-shadow-enter {
+        from {
+            opacity: 0;
+            translate: 8px 10px;
+        }
+
+        to {
+            opacity: 1;
+            translate: 0 0;
+        }
+    }
+
+    @keyframes product-screen-enter {
+        from {
+            opacity: 0;
+            translate: 0 18px;
+        }
+
+        to {
+            opacity: 1;
+            translate: 0 0;
+        }
+    }
 }
 
 .product-features {
@@ -1599,6 +1728,11 @@ article code {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+
+    .product-card,
+    .product-card .card-link {
+        transition: none !important;
     }
 }
 
