@@ -1,0 +1,141 @@
+---
+import Base from '../layouts/Base.astro';
+import { localePrefix, pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import type { Product } from '../data/products';
+import storehopCss from '../styles/storehop.css?raw';
+
+interface Props {
+  locale: Locale;
+  product: Product;
+}
+
+const { locale, product } = Astro.props;
+if (product.slug !== 'storehop' || !product.secondaryScreenshot || !product.featureChips) {
+  throw new Error('StoreHopProductPage requires both StoreHop screenshots and feature chips.');
+}
+
+const t = ui[locale];
+const supportHref = product.supportUrls?.[locale] ?? pageUrls(product.slug)[locale];
+const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, 'privacy')[locale];
+const secondaryScreenshot = product.secondaryScreenshot;
+const featureChips = product.featureChips[locale];
+---
+
+<Base
+  title={`${product.name} — Eden`}
+  description={product.tagline[locale]}
+  locale={locale}
+  alternates={productPageUrls(product.slug)}
+>
+  <div class="site-width sh-page">
+    <style is:inline set:html={storehopCss}></style>
+    <a class="back-link" href={`${localePrefix(locale)}/#apps`}>{t.allApps}</a>
+
+    <section class="sh-hero" aria-labelledby="product-title">
+      <div class="sh-hero-copy">
+        <img
+          class="sh-product-icon"
+          src={product.icon.src}
+          width={product.icon.width}
+          height={product.icon.height}
+          alt=""
+          fetchpriority="high"
+          decoding="async"
+        />
+        <h1 id="product-title">{product.name}</h1>
+        <p class="sh-tagline">{product.tagline[locale]}</p>
+        <p class="sh-platform">{product.platform}</p>
+        <div class="sh-actions">
+          <a class="sh-action sh-action-primary" href={product.primaryAction.href}>
+            {product.primaryAction.label[locale]}
+          </a>
+          {
+            product.secondaryAction && (
+              <a class="sh-action sh-action-secondary" href={product.secondaryAction.href}>
+                {product.secondaryAction.label[locale]}
+              </a>
+            )
+          }
+          <a class="sh-action sh-action-secondary" href={supportHref}>{t.support}</a>
+        </div>
+      </div>
+
+      <div class="sh-hero-visual">
+        <div class="sh-phone sh-phone-first">
+          <img
+            src={product.screenshot.src}
+            width={product.screenshot.width}
+            height={product.screenshot.height}
+            alt={product.screenshot.alt[locale]}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        <div class="sh-phone sh-phone-second">
+          <img
+            src={secondaryScreenshot.src}
+            width={secondaryScreenshot.width}
+            height={secondaryScreenshot.height}
+            alt={secondaryScreenshot.alt[locale]}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="sh-features" aria-labelledby="features-heading">
+      <h2 id="features-heading">{t.features}</h2>
+      <ul class="sh-feature-grid">
+        {
+          product.features.map((feature, index) => (
+            <li class={`sh-feature sh-feature-${index + 1}`}>
+              <span class="sh-feature-number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div class="sh-feature-content">
+                <div class="sh-feature-copy">
+                  <h3>{feature.title[locale]}</h3>
+                  <p>{feature.description[locale]}</p>
+                </div>
+                {
+                  index === 2 && (
+                    <ul class="sh-chips">
+                      {featureChips.map((chip) => <li>{chip}</li>)}
+                    </ul>
+                  )
+                }
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="sh-closing" aria-labelledby="sh-closing-title">
+      <img
+        class="sh-closing-icon"
+        src={product.icon.src}
+        width={product.icon.width}
+        height={product.icon.height}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="sh-closing-copy">
+        <h2 id="sh-closing-title">{product.name}</h2>
+        <p>{product.tagline[locale]}</p>
+      </div>
+      <a class="sh-action sh-action-primary" href={product.primaryAction.href}>
+        {product.primaryAction.label[locale]}
+      </a>
+    </section>
+
+    <div class="product-utility-row sh-resources">
+      <a href={supportHref}>{t.support}</a>
+      <a href={privacyHref}>{t.privacy}</a>
+    </div>
+  </div>
+</Base>
