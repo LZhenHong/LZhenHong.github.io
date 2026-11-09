@@ -4,7 +4,7 @@ Guidance for AI coding agents working in this repository.
 
 ## Project overview
 
-Static site hosted on GitHub Pages at `https://lzhenhong.github.io`. Its sole
+Static site hosted on GitHub Pages at `https://edenapps.site`. Its sole
 purpose is to serve the **Support URL** and **Privacy Policy URL** that App
 Store Connect requires for each of the author's apps. There is one content
 folder per app, each holding a support page and a privacy policy written in
@@ -31,7 +31,7 @@ An explicit pick in the language menu is stored in `localStorage`
   aware via `prefers-color-scheme`, inlined into each page at build time.
 - TypeScript: `astro/tsconfigs/strict` (see `tsconfig.json`); used only for the
   small amount of frontmatter code in `.astro` files and `src/*.ts`.
-- `astro.config.mjs` only sets `site: 'https://lzhenhong.github.io'`.
+- `astro.config.mjs` only sets `site: 'https://edenapps.site'`.
 
 Historical note: the author's previous Gridea blog lives on the `master`
 branch; this site is developed on `main`.
@@ -140,8 +140,8 @@ Locale rules:
 3. Preview with `npm run dev`; the landing pages pick up the new app
    automatically (no manual registration anywhere).
 4. The App Store Connect URLs for the app are:
-   - Support URL: `https://lzhenhong.github.io/apps/<app-slug>/`
-   - Privacy Policy URL: `https://lzhenhong.github.io/apps/<app-slug>/privacy/`
+   - Support URL: `https://edenapps.site/apps/<app-slug>/`
+   - Privacy Policy URL: `https://edenapps.site/apps/<app-slug>/privacy/`
 
 ## Code style
 
