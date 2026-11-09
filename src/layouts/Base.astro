@@ -78,6 +78,9 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     {
       locales.map((l) => (
         <link rel="alternate" hreflang={htmlLang[l]} href={new URL(alternates[l], Astro.site)} />
