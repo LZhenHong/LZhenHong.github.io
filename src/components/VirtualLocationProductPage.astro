@@ -29,7 +29,6 @@ const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, 'pri
 const termsHref = product.termsUrls?.[locale] ?? pageUrls(product.slug, 'terms')[locale];
 const refundHref = product.refundUrls?.[locale] ?? pageUrls(product.slug, 'refund')[locale];
 const refundMailto = 'mailto:leeden.dev@gmail.com';
-const supportLegalLabel = `${t.support}, ${t.terms}, ${t.refund}`;
 const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}`;
 const miniFeatures = [
   { copy: copy.features.move, media: media.move, crop: 'move' },
@@ -307,11 +306,6 @@ const miniFeatures = [
             </a>
             <a class="vl-button vl-button-ink vl-button-vip" href={buyHref}>{copy.closing.buy}</a>
           </div>
-          <nav class="vl-closing-links" aria-label={supportLegalLabel}>
-            <a href={supportHref}>{t.support}</a>
-            <a href={termsHref}>{t.terms}</a>
-            <a href={refundHref}>{t.refund}</a>
-          </nav>
         </div>
       </div>
     </section>
