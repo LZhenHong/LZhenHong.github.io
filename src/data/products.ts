@@ -39,6 +39,177 @@ export interface Product {
 // Source order is the curated homepage order; do not alphabetize this list.
 const products: Product[] = [
   {
+    slug: 'virtual-location',
+    name: 'VirtualLocation',
+    platform: 'macOS',
+    cardDescription: {
+      en: 'Set a virtual location on a connected iPhone or iPad.',
+      'zh-cn': '为连接到 Mac 的 iPhone 或 iPad 设置虚拟定位。',
+      'zh-tw': '為連接 Mac 的 iPhone 或 iPad 設定虛擬定位。',
+    },
+    tagline: {
+      en: 'Set a virtual location on your iPhone or iPad, right from your Mac.',
+      'zh-cn': '在 Mac 上为 iPhone 或 iPad 设置虚拟定位。',
+      'zh-tw': '在 Mac 上為 iPhone 或 iPad 設定虛擬定位。',
+    },
+    icon: { src: '/apps/virtual-location/icon.webp', width: 1024, height: 1024 },
+    screenshot: {
+      src: '/apps/virtual-location/screenshot-1.jpg',
+      width: 1400,
+      height: 900,
+      alt: {
+        en: 'VirtualLocation’s main window, with an East Asia map, a device list, and Teleport controls.',
+        'zh-cn': 'VirtualLocation 主窗口，显示东亚地图、设备列表和传送控制。',
+        'zh-tw': 'VirtualLocation 主視窗，顯示東亞地圖、裝置列表和傳送控制。',
+      },
+    },
+    primaryAction: {
+      href: 'https://checkout.dodopayments.com/buy/pdt_0NqlGfMb75EYgipJrnzOp',
+      label: {
+        en: 'Buy VIP — US$19.99',
+        'zh-cn': '购买 VIP — US$19.99',
+        'zh-tw': '購買 VIP — US$19.99',
+      },
+    },
+    secondaryAction: {
+      href: 'https://github.com/LZhenHong/LZhenHong.github.io/releases/tag/virtual-location-updates',
+      label: {
+        en: 'Download for Mac',
+        'zh-cn': '下载 Mac 版',
+        'zh-tw': '下載 Mac 版',
+      },
+    },
+    supportUrls: {
+      en: '/apps/virtual-location/',
+      'zh-cn': '/zh-cn/apps/virtual-location/',
+      'zh-tw': '/zh-tw/apps/virtual-location/',
+    },
+    privacyUrls: {
+      en: '/apps/virtual-location/privacy/',
+      'zh-cn': '/zh-cn/apps/virtual-location/privacy/',
+      'zh-tw': '/zh-tw/apps/virtual-location/privacy/',
+    },
+    termsUrls: {
+      en: '/apps/virtual-location/terms/',
+      'zh-cn': '/zh-cn/apps/virtual-location/terms/',
+      'zh-tw': '/zh-tw/apps/virtual-location/terms/',
+    },
+    refundUrls: {
+      en: '/apps/virtual-location/refund/',
+      'zh-cn': '/zh-cn/apps/virtual-location/refund/',
+      'zh-tw': '/zh-tw/apps/virtual-location/refund/',
+    },
+    features: [
+      {
+        title: {
+          en: 'Teleport, for free',
+          'zh-cn': '免费传送',
+          'zh-tw': '免費傳送',
+        },
+        description: {
+          en: 'Teleport one connected iPhone or iPad over USB for free — no Xcode needed. Wi-Fi Teleport is a VIP feature.',
+          'zh-cn': '通过 USB 免费为单台已连接的 iPhone 或 iPad 设置虚拟定位，Mac 无需安装 Xcode；通过 Wi-Fi 传送属于 VIP 功能。',
+          'zh-tw': '透過 USB 免費為單台已連接的 iPhone 或 iPad 設定虛擬定位，Mac 無需安裝 Xcode；透過 Wi-Fi 傳送屬於 VIP 功能。',
+        },
+      },
+      {
+        title: {
+          en: 'Move or take the joystick',
+          'zh-cn': '移动或摇杆控制',
+          'zh-tw': '移動或搖桿控制',
+        },
+        description: {
+          en: 'Follow a route with Move, or drive in real time with Joystick — both are VIP features.',
+          'zh-cn': '使用「移动」沿路线前进，或用「摇杆」实时控制；两种模式均为 VIP 功能。',
+          'zh-tw': '使用「移動」沿路線前進，或用「搖桿」即時控制；兩種模式皆為 VIP 功能。',
+        },
+      },
+      {
+        title: {
+          en: 'Multiple devices at once',
+          'zh-cn': '批量控制多台设备',
+          'zh-tw': '批次控制多台裝置',
+        },
+        description: {
+          en: 'Teleport or move a selected group of devices together with VIP batch controls.',
+          'zh-cn': '通过 VIP 批量功能，同时传送或移动多台选定的设备。',
+          'zh-tw': '透過 VIP 批次功能，同時傳送或移動多台選定的裝置。',
+        },
+      },
+    ],
+  },  {
+    slug: 'storehop',
+    name: 'StoreHop',
+    platform: 'macOS · iOS · iPadOS',
+    cardDescription: {
+      en: 'Browse other regional App Store storefronts without changing your Apple ID region.',
+      'zh-cn': '无需更改 Apple ID 地区，即可浏览其他地区的 App Store 商店。',
+      'zh-tw': '無需更改 Apple ID 地區，即可瀏覽其他地區的 App Store 商店。',
+    },
+    tagline: {
+      en: 'Explore App Store storefronts around the world while your Apple ID stays put.',
+      'zh-cn': '浏览世界各地的 App Store 商店，Apple ID 地区保持不变。',
+      'zh-tw': '瀏覽世界各地的 App Store 商店，Apple ID 地區保持不變。',
+    },
+    icon: { src: '/apps/storehop/icon.webp', width: 1024, height: 1024 },
+    screenshot: {
+      src: '/apps/storehop/screenshot-1.jpg',
+      width: 736,
+      height: 1600,
+      alt: {
+        en: 'StoreHop on iPhone, showing a searchable grid of App Store countries and regions.',
+        'zh-cn': 'iPhone 上的 StoreHop，展示可搜索的 App Store 国家和地区网格。',
+        'zh-tw': 'iPhone 上的 StoreHop，顯示可搜尋的 App Store 國家與地區網格。',
+      },
+    },
+    primaryAction: {
+      href: 'https://apps.apple.com/us/app/storehop-switch-storefronts/id6803034297',
+      label: {
+        en: 'View on the App Store',
+        'zh-cn': '在 App Store 查看',
+        'zh-tw': '在 App Store 檢視',
+      },
+    },
+    features: [
+      {
+        title: {
+          en: 'Browse other regions',
+          'zh-cn': '浏览其他地区',
+          'zh-tw': '瀏覽其他地區',
+        },
+        description: {
+          en: 'Open another regional storefront without changing your Apple ID’s country or region.',
+          'zh-cn': '无需更改 Apple ID 的国家或地区，即可打开其他地区的商店。',
+          'zh-tw': '無需更改 Apple ID 的國家或地區，即可打開其他地區的商店。',
+        },
+      },
+      {
+        title: {
+          en: 'Quick switching',
+          'zh-cn': '快速切换',
+          'zh-tw': '快速切換',
+        },
+        description: {
+          en: 'Set a Primary storefront and use Recent or Previous Storefront to go back.',
+          'zh-cn': '设置常用商店地区，并通过最近记录或“上一个商店地区”返回。',
+          'zh-tw': '設定常用商店地區，並透過最近記錄或「上一個商店地區」返回。',
+        },
+      },
+      {
+        title: {
+          en: 'Where you need it',
+          'zh-cn': '多种入口',
+          'zh-tw': '多種入口',
+        },
+        description: {
+          en: 'Use Siri, Spotlight, Shortcuts, widgets, and Control Center.',
+          'zh-cn': '可通过 Siri、Spotlight、快捷指令、小组件和控制中心使用。',
+          'zh-tw': '可透過 Siri、Spotlight、捷徑、小工具和控制中心使用。',
+        },
+      },
+    ],
+  },
+  {
     slug: 'americano',
     name: 'Americano',
     platform: 'macOS',
@@ -182,178 +353,7 @@ const products: Product[] = [
       },
     ],
   },
-  {
-    slug: 'storehop',
-    name: 'StoreHop',
-    platform: 'macOS · iOS · iPadOS',
-    cardDescription: {
-      en: 'Browse other regional App Store storefronts without changing your Apple ID region.',
-      'zh-cn': '无需更改 Apple ID 地区，即可浏览其他地区的 App Store 商店。',
-      'zh-tw': '無需更改 Apple ID 地區，即可瀏覽其他地區的 App Store 商店。',
-    },
-    tagline: {
-      en: 'Explore App Store storefronts around the world while your Apple ID stays put.',
-      'zh-cn': '浏览世界各地的 App Store 商店，Apple ID 地区保持不变。',
-      'zh-tw': '瀏覽世界各地的 App Store 商店，Apple ID 地區保持不變。',
-    },
-    icon: { src: '/apps/storehop/icon.webp', width: 1024, height: 1024 },
-    screenshot: {
-      src: '/apps/storehop/screenshot-1.jpg',
-      width: 736,
-      height: 1600,
-      alt: {
-        en: 'StoreHop on iPhone, showing a searchable grid of App Store countries and regions.',
-        'zh-cn': 'iPhone 上的 StoreHop，展示可搜索的 App Store 国家和地区网格。',
-        'zh-tw': 'iPhone 上的 StoreHop，顯示可搜尋的 App Store 國家與地區網格。',
-      },
-    },
-    primaryAction: {
-      href: 'https://apps.apple.com/us/app/storehop-switch-storefronts/id6803034297',
-      label: {
-        en: 'View on the App Store',
-        'zh-cn': '在 App Store 查看',
-        'zh-tw': '在 App Store 檢視',
-      },
-    },
-    features: [
-      {
-        title: {
-          en: 'Browse other regions',
-          'zh-cn': '浏览其他地区',
-          'zh-tw': '瀏覽其他地區',
-        },
-        description: {
-          en: 'Open another regional storefront without changing your Apple ID’s country or region.',
-          'zh-cn': '无需更改 Apple ID 的国家或地区，即可打开其他地区的商店。',
-          'zh-tw': '無需更改 Apple ID 的國家或地區，即可打開其他地區的商店。',
-        },
-      },
-      {
-        title: {
-          en: 'Quick switching',
-          'zh-cn': '快速切换',
-          'zh-tw': '快速切換',
-        },
-        description: {
-          en: 'Set a Primary storefront and use Recent or Previous Storefront to go back.',
-          'zh-cn': '设置常用商店地区，并通过最近记录或“上一个商店地区”返回。',
-          'zh-tw': '設定常用商店地區，並透過最近記錄或「上一個商店地區」返回。',
-        },
-      },
-      {
-        title: {
-          en: 'Where you need it',
-          'zh-cn': '多种入口',
-          'zh-tw': '多種入口',
-        },
-        description: {
-          en: 'Use Siri, Spotlight, Shortcuts, widgets, and Control Center.',
-          'zh-cn': '可通过 Siri、Spotlight、快捷指令、小组件和控制中心使用。',
-          'zh-tw': '可透過 Siri、Spotlight、捷徑、小工具和控制中心使用。',
-        },
-      },
-    ],
-  },
-  {
-    slug: 'virtual-location',
-    name: 'VirtualLocation',
-    platform: 'macOS',
-    cardDescription: {
-      en: 'Set a virtual location on a connected iPhone or iPad.',
-      'zh-cn': '为连接到 Mac 的 iPhone 或 iPad 设置虚拟定位。',
-      'zh-tw': '為連接 Mac 的 iPhone 或 iPad 設定虛擬定位。',
-    },
-    tagline: {
-      en: 'Set a virtual location on your iPhone or iPad, right from your Mac.',
-      'zh-cn': '在 Mac 上为 iPhone 或 iPad 设置虚拟定位。',
-      'zh-tw': '在 Mac 上為 iPhone 或 iPad 設定虛擬定位。',
-    },
-    icon: { src: '/apps/virtual-location/icon.webp', width: 1024, height: 1024 },
-    screenshot: {
-      src: '/apps/virtual-location/screenshot-1.jpg',
-      width: 1400,
-      height: 900,
-      alt: {
-        en: 'VirtualLocation’s main window, with an East Asia map, a device list, and Teleport controls.',
-        'zh-cn': 'VirtualLocation 主窗口，显示东亚地图、设备列表和传送控制。',
-        'zh-tw': 'VirtualLocation 主視窗，顯示東亞地圖、裝置列表和傳送控制。',
-      },
-    },
-    primaryAction: {
-      href: 'https://checkout.dodopayments.com/buy/pdt_0NqlGfMb75EYgipJrnzOp',
-      label: {
-        en: 'Buy VIP — US$19.99',
-        'zh-cn': '购买 VIP — US$19.99',
-        'zh-tw': '購買 VIP — US$19.99',
-      },
-    },
-    secondaryAction: {
-      href: 'https://github.com/LZhenHong/LZhenHong.github.io/releases/tag/virtual-location-updates',
-      label: {
-        en: 'Download for Mac',
-        'zh-cn': '下载 Mac 版',
-        'zh-tw': '下載 Mac 版',
-      },
-    },
-    supportUrls: {
-      en: '/apps/virtual-location/',
-      'zh-cn': '/zh-cn/apps/virtual-location/',
-      'zh-tw': '/zh-tw/apps/virtual-location/',
-    },
-    privacyUrls: {
-      en: '/apps/virtual-location/privacy/',
-      'zh-cn': '/zh-cn/apps/virtual-location/privacy/',
-      'zh-tw': '/zh-tw/apps/virtual-location/privacy/',
-    },
-    termsUrls: {
-      en: '/apps/virtual-location/terms/',
-      'zh-cn': '/zh-cn/apps/virtual-location/terms/',
-      'zh-tw': '/zh-tw/apps/virtual-location/terms/',
-    },
-    refundUrls: {
-      en: '/apps/virtual-location/refund/',
-      'zh-cn': '/zh-cn/apps/virtual-location/refund/',
-      'zh-tw': '/zh-tw/apps/virtual-location/refund/',
-    },
-    features: [
-      {
-        title: {
-          en: 'Teleport, for free',
-          'zh-cn': '免费传送',
-          'zh-tw': '免費傳送',
-        },
-        description: {
-          en: 'Teleport one connected iPhone or iPad over USB for free — no Xcode needed. Wi-Fi Teleport is a VIP feature.',
-          'zh-cn': '通过 USB 免费为单台已连接的 iPhone 或 iPad 设置虚拟定位，Mac 无需安装 Xcode；通过 Wi-Fi 传送属于 VIP 功能。',
-          'zh-tw': '透過 USB 免費為單台已連接的 iPhone 或 iPad 設定虛擬定位，Mac 無需安裝 Xcode；透過 Wi-Fi 傳送屬於 VIP 功能。',
-        },
-      },
-      {
-        title: {
-          en: 'Move or take the joystick',
-          'zh-cn': '移动或摇杆控制',
-          'zh-tw': '移動或搖桿控制',
-        },
-        description: {
-          en: 'Follow a route with Move, or drive in real time with Joystick — both are VIP features.',
-          'zh-cn': '使用「移动」沿路线前进，或用「摇杆」实时控制；两种模式均为 VIP 功能。',
-          'zh-tw': '使用「移動」沿路線前進，或用「搖桿」即時控制；兩種模式皆為 VIP 功能。',
-        },
-      },
-      {
-        title: {
-          en: 'Multiple devices at once',
-          'zh-cn': '批量控制多台设备',
-          'zh-tw': '批次控制多台裝置',
-        },
-        description: {
-          en: 'Teleport or move a selected group of devices together with VIP batch controls.',
-          'zh-cn': '通过 VIP 批量功能，同时传送或移动多台选定的设备。',
-          'zh-tw': '透過 VIP 批次功能，同時傳送或移動多台選定的裝置。',
-        },
-      },
-    ],
-  },
+
 ];
 
 function validateLocalizedText(product: Product, field: string, value: LocalizedText): void {
