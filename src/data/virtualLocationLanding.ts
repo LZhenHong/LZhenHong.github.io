@@ -1,4 +1,33 @@
 import type { Locale } from '../i18n';
+import release from './virtualLocationRelease.json';
+
+// The publisher rewrites this file together with the appcast, so the version
+// number and the download button can never point at different releases.
+const requirements: Record<Locale, string> = {
+  en: 'requirements: macOS {macOS} or later, and an iPhone or iPad with iOS 17.4.1 or later.',
+  'zh-cn': '系统要求：macOS {macOS} 或更高版本，以及 iOS 17.4.1 或更高版本的 iPhone / iPad。',
+  'zh-tw': '系統需求：macOS {macOS} 或以上版本，以及 iOS 17.4.1 或以上版本的 iPhone / iPad。',
+};
+
+function macosLabel(minimum: string): string {
+  const match = /^(\d+)(?:\.0)?$/.exec(minimum);
+  if (!match) {
+    throw new Error(`[release] unsupported minimumSystemVersion: ${minimum}`);
+  }
+  return match[1];
+}
+
+function versionCopy(locale: Locale) {
+  const macOS = macosLabel(release.minimumSystemVersion);
+  return {
+    download: locale === 'en'
+      ? `Download ${release.version} (macOS ${macOS}+)`
+      : locale === 'zh-cn'
+        ? `下载 ${release.version}（macOS ${macOS}+）`
+        : `下載 ${release.version}（macOS ${macOS}+）`,
+    requirements: `${release.version} ${requirements[locale].replace('{macOS}', macOS)}`,
+  };
+}
 
 interface FeatureCopy {
   badge: string;
@@ -187,10 +216,7 @@ export const virtualLocationMedia: Record<Locale, {
 
 export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   en: {
-    version: {
-      download: 'Download 0.1.1 (macOS 26+)',
-      requirements: '0.1.1 requirements: macOS 26 or later, and an iPhone or iPad with iOS 17.4.1 or later.',
-    },
+    version: versionCopy('en'),
     meta: {
       title: 'VirtualLocation — Change your location from your Mac',
       description:
@@ -290,7 +316,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
           answer: 'No. You do not need Xcode or a jailbreak.',
         },
         {
-          question: 'What will I need for 0.1.1?',
+          question: `What will I need for ${release.version}?`,
           answer:
             'Use a compatible Mac and iPhone or iPad. Pair them over USB for the first time, then unlock the device and trust this Mac. Turn on Developer Mode in Settings → Privacy & Security, restart the device, and confirm Developer Mode after it restarts.',
         },
@@ -328,10 +354,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
     },
   },
   'zh-cn': {
-    version: {
-      download: '下载 0.1.1（macOS 26+）',
-      requirements: '0.1.1 系统要求：macOS 26 或更高版本，以及 iOS 17.4.1 或更高版本的 iPhone / iPad。',
-    },
+    version: versionCopy('zh-cn'),
     meta: {
       title: 'VirtualLocation — 在 Mac 上设置 iPhone / iPad 虚拟定位',
       description:
@@ -432,7 +455,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
             '都不需要。VirtualLocation 通过 Apple 的开发者服务、经可信连接工作。Mac 无需安装 Xcode，设备无需越狱，也不用在设备上安装任何应用。',
         },
         {
-          question: '使用 0.1.1 需要准备什么？',
+          question: `使用 ${release.version} 需要准备什么？`,
           answer:
             '首次配对请通过 USB 连接，解锁设备并信任这台 Mac。在「设置 → 隐私与安全性」中开启开发者模式，然后重启设备并在开机后确认。',
         },
@@ -470,10 +493,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
     },
   },
   'zh-tw': {
-    version: {
-      download: '下載 0.1.1（macOS 26+）',
-      requirements: '0.1.1 系統需求：macOS 26 或以上版本，以及 iOS 17.4.1 或以上版本的 iPhone / iPad。',
-    },
+    version: versionCopy('zh-tw'),
     meta: {
       title: 'VirtualLocation — 在 Mac 上設定 iPhone / iPad 虛擬定位',
       description:
@@ -574,7 +594,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
             '都不需要。VirtualLocation 透過 Apple 的開發者服務，經由可信連線運作。Mac 無需安裝 Xcode，裝置無需越獄，也不需在裝置上安裝任何應用程式。',
         },
         {
-          question: '使用 0.1.1 需要準備什麼？',
+          question: `使用 ${release.version} 需要準備什麼？`,
           answer:
             '首次配對請透過 USB 連接，解鎖裝置並信任這台 Mac。在「設定 → 隱私權與安全性」中開啟開發者模式，然後重新啟動裝置並在開機後確認。',
         },

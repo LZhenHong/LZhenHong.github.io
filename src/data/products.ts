@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { locales, type Locale } from '../i18n';
+import release from './virtualLocationRelease.json';
 
 type LocalizedText = Record<Locale, string>;
 
@@ -75,7 +76,7 @@ const products: Product[] = [
       },
     },
     secondaryAction: {
-      href: 'https://github.com/LZhenHong/LZhenHong.github.io/releases/tag/virtual-location-updates',
+      href: release.downloadURL,
       label: {
         en: 'Download for Mac',
         'zh-cn': '下载 Mac 版',
