@@ -28,7 +28,7 @@ const featureChips = product.featureChips[locale];
   alternates={productPageUrls(product.slug)}
 >
   <div class="site-width sh-page">
-    <style is:inline>{storehopCss}</style>
+    <style is:inline set:html={storehopCss}></style>
     <a class="back-link" href={`${localePrefix(locale)}/#apps`}>{t.allApps}</a>
 
     <section class="sh-hero" aria-labelledby="product-title">
