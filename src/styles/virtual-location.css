@@ -228,6 +228,20 @@
     line-height: 1.65;
 }
 
+.vl-version-notice {
+    max-width: 470px;
+    margin: 20px 0 0;
+    padding: 13px 15px;
+    border: 1px solid var(--vl-hero-line);
+    border-left: 3px solid #83c2ff;
+    border-radius: 12px;
+    background: rgba(244, 246, 248, 0.08);
+    color: var(--vl-product-text);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
 .vl-hero-actions {
     display: flex;
     flex-wrap: wrap;
@@ -843,6 +857,17 @@
 
 .vl-footer-inner p span {
     margin: 0 8px;
+}
+
+.vl-footer-version {
+    padding: 0 0 20px;
+}
+
+.vl-footer-version p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.55;
 }
 
 .vl-footer-links {

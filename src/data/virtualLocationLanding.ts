@@ -14,6 +14,11 @@ interface FaqCopy {
 }
 
 interface LandingCopy {
+  version: {
+    preview: string;
+    download: string;
+    requirements: string;
+  };
   meta: {
     title: string;
     description: string;
@@ -183,6 +188,11 @@ export const virtualLocationMedia: Record<Locale, {
 
 export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   en: {
+    version: {
+      preview: 'Preview: The no-Xcode workflow and macOS 26 requirements shown here are for the upcoming 0.1.1 release. The current download is 0.1.0 for macOS 14 or later.',
+      download: 'Download 0.1.0 (macOS 14+)',
+      requirements: '0.1.1 requirements: macOS 26 or later, and an iPhone or iPad with iOS 17.4.1 or later.',
+    },
     meta: {
       title: 'VirtualLocation — Change your location from your Mac',
       description:
@@ -282,7 +292,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
           answer: 'No. You do not need Xcode or a jailbreak.',
         },
         {
-          question: 'How do I get started?',
+          question: 'What will I need for 0.1.1?',
           answer:
             'Use a compatible Mac and iPhone or iPad. Pair them over USB for the first time, then unlock the device and trust this Mac. Turn on Developer Mode in Settings → Privacy & Security, restart the device, and confirm Developer Mode after it restarts.',
         },
@@ -320,6 +330,11 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
     },
   },
   'zh-cn': {
+    version: {
+      preview: '新版本预览：本页展示的免 Xcode 流程和 macOS 26 系统要求属于即将发布的 0.1.1。当前下载仍为 0.1.0，支持 macOS 14 或更高版本。',
+      download: '下载 0.1.0（macOS 14+）',
+      requirements: '0.1.1 系统要求：macOS 26 或更高版本，以及 iOS 17.4.1 或更高版本的 iPhone / iPad。',
+    },
     meta: {
       title: 'VirtualLocation — 在 Mac 上设置 iPhone / iPad 虚拟定位',
       description:
@@ -420,7 +435,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
             '都不需要。VirtualLocation 通过 Apple 的开发者服务、经可信连接工作。Mac 无需安装 Xcode，设备无需越狱，也不用在设备上安装任何应用。',
         },
         {
-          question: '开始使用前需要准备什么？',
+          question: '使用 0.1.1 需要准备什么？',
           answer:
             '首次配对请通过 USB 连接，解锁设备并信任这台 Mac。在「设置 → 隐私与安全性」中开启开发者模式，然后重启设备并在开机后确认。',
         },
@@ -458,6 +473,11 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
     },
   },
   'zh-tw': {
+    version: {
+      preview: '新版本預覽：本頁展示的免 Xcode 流程和 macOS 26 系統需求屬於即將推出的 0.1.1。目前下載仍為 0.1.0，支援 macOS 14 或以上版本。',
+      download: '下載 0.1.0（macOS 14+）',
+      requirements: '0.1.1 系統需求：macOS 26 或以上版本，以及 iOS 17.4.1 或以上版本的 iPhone / iPad。',
+    },
     meta: {
       title: 'VirtualLocation — 在 Mac 上設定 iPhone / iPad 虛擬定位',
       description:
@@ -558,7 +578,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
             '都不需要。VirtualLocation 透過 Apple 的開發者服務，經由可信連線運作。Mac 無需安裝 Xcode，裝置無需越獄，也不需在裝置上安裝任何應用程式。',
         },
         {
-          question: '開始使用前需要準備什麼？',
+          question: '使用 0.1.1 需要準備什麼？',
           answer:
             '首次配對請透過 USB 連接，解鎖裝置並信任這台 Mac。在「設定 → 隱私權與安全性」中開啟開發者模式，然後重新啟動裝置並在開機後確認。',
         },

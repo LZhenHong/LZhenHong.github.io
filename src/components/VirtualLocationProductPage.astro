@@ -73,6 +73,7 @@ const miniFeatures = [
           )}
         </h1>
         <p class="vl-hero-body">{copy.hero.body}</p>
+        <p class="vl-version-notice" role="note">{copy.version.preview}</p>
         <div class="vl-hero-actions">
           <a class="vl-button vl-button-primary" href={downloadAction.href}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
@@ -84,7 +85,7 @@ const miniFeatures = [
                 stroke-linecap="round"
                 stroke-linejoin="round"></path>
             </svg>
-            {downloadAction.label[locale]}
+            {copy.version.download}
           </a>
           <a class="vl-button vl-button-secondary" href={buyHref}>
             {product.primaryAction.label[locale]}
@@ -217,7 +218,7 @@ const miniFeatures = [
             {copy.plans.free.items.map((item) => <li>{item}</li>)}
           </ul>
           <a class="vl-button vl-button-secondary vl-plan-button" href={downloadAction.href}>
-            {downloadAction.label[locale]}
+            {copy.version.download}
           </a>
         </article>
 
@@ -303,7 +304,7 @@ const miniFeatures = [
                   stroke-linecap="round"
                   stroke-linejoin="round"></path>
               </svg>
-              {downloadAction.label[locale]}
+              {copy.version.download}
             </a>
             <a class="vl-button vl-button-ink" href={buyHref}>{copy.closing.buy}</a>
           </div>
@@ -326,6 +327,9 @@ const miniFeatures = [
         <a href={refundHref}>{t.refund}</a>
         <a href={supportHref}>{t.support}</a>
       </nav>
+    </div>
+    <div class="site-width vl-footer-version">
+      <p>{copy.version.requirements}</p>
     </div>
   </footer>
 </Base>
