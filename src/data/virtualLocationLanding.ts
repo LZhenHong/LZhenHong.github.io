@@ -15,7 +15,6 @@ interface FaqCopy {
 
 interface LandingCopy {
   version: {
-    preview: string;
     download: string;
     requirements: string;
   };
@@ -189,8 +188,7 @@ export const virtualLocationMedia: Record<Locale, {
 export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   en: {
     version: {
-      preview: 'Preview: The no-Xcode workflow and macOS 26 requirements shown here are for the upcoming 0.1.1 release. The current download is 0.1.0 for macOS 14 or later.',
-      download: 'Download 0.1.0 (macOS 14+)',
+      download: 'Download 0.1.1 (macOS 26+)',
       requirements: '0.1.1 requirements: macOS 26 or later, and an iPhone or iPad with iOS 17.4.1 or later.',
     },
     meta: {
@@ -331,8 +329,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   },
   'zh-cn': {
     version: {
-      preview: '新版本预览：本页展示的免 Xcode 流程和 macOS 26 系统要求属于即将发布的 0.1.1。当前下载仍为 0.1.0，支持 macOS 14 或更高版本。',
-      download: '下载 0.1.0（macOS 14+）',
+      download: '下载 0.1.1（macOS 26+）',
       requirements: '0.1.1 系统要求：macOS 26 或更高版本，以及 iOS 17.4.1 或更高版本的 iPhone / iPad。',
     },
     meta: {
@@ -474,8 +471,7 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
   },
   'zh-tw': {
     version: {
-      preview: '新版本預覽：本頁展示的免 Xcode 流程和 macOS 26 系統需求屬於即將推出的 0.1.1。目前下載仍為 0.1.0，支援 macOS 14 或以上版本。',
-      download: '下載 0.1.0（macOS 14+）',
+      download: '下載 0.1.1（macOS 26+）',
       requirements: '0.1.1 系統需求：macOS 26 或以上版本，以及 iOS 17.4.1 或以上版本的 iPhone / iPad。',
     },
     meta: {
