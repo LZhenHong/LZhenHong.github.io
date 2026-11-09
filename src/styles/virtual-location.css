@@ -801,6 +801,27 @@
     background: rgba(244, 246, 248, 0.08);
 }
 
+.vl-button-vip,
+.vl-button-vip:hover {
+    border-color: rgba(255, 255, 255, 0.30);
+    background: linear-gradient(to bottom, #FFE673 0%, #FFD60A 50%, #F2AD1A 100%);
+    color: rgba(0, 0, 0, 0.82);
+    box-shadow: 0 2px 7px rgba(255, 214, 10, 0.25);
+}
+
+.vl-button-vip:hover {
+    box-shadow: 0 2px 14px rgba(255, 214, 10, 0.40);
+}
+
+.vl-button-vip:active {
+    filter: brightness(0.94);
+}
+
+.vl-button-vip:focus-visible {
+    outline: 3px solid #F5F5F7;
+    outline-offset: 4px;
+}
+
 .vl-closing-links {
     display: flex;
     flex-wrap: wrap;
@@ -1334,5 +1355,9 @@ html[lang="zh-TW"] .hero-title-tail {
 
     .vl-free-badge span {
         background: CanvasText;
+    }
+
+    .vl-page .vl-button-vip:focus-visible {
+        outline-color: Highlight;
     }
 }
