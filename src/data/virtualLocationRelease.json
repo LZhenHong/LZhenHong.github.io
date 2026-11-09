@@ -1,6 +1,6 @@
 {
   "version": "0.1.1",
   "build": "6",
-  "downloadURL": "https://github.com/LZhenHong/homebrew-tap/releases/download/virtual-location-updates/VirtualLocation-0.1.1-6.dmg",
+  "downloadURL": "https://github.com/LZhenHong/homebrew-tap/releases/download/virtual-location-v0.1.1-6/VirtualLocation-0.1.1-6.dmg",
   "minimumSystemVersion": "26.0"
 }
