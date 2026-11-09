@@ -1,16 +1,40 @@
-<?xml version="1.0" standalone="yes"?>
+<?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>VirtualLocation</title>
+        <item>
+            <title>0.1.1</title>
+            <pubDate>Mon, 09 Nov 2026 13:20:42 +0800</pubDate>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown">**系统要求**
+
+- 本版本需要 macOS 26 或更高版本。
+
+**改进**
+
+- Wi-Fi 连接改用 macOS 原生设备配对与系统隧道，Mac 运行无需安装 Xcode；首次配对仍需 USB。
+- 改进 Wi-Fi 设备发现、连接与断线恢复，减少重连中的无效等待。
+- 地图浮层、已存内容面板与路线工坊采用 Liquid Glass；优化窄窗口、设置布局及窗口尺寸调整体验。
+- 改进 iCloud 账号切换确认、离线编辑与删除恢复；手动同步增加进度和结果反馈。
+- 改进应用更新后「这台 Mac」系统组件的切换与恢复，暂时性注册失败会自动重试。
+
+**修复**
+
+- 修复打开或关闭已存内容面板时可能崩溃，以及路线工坊在连接引导页不可见的问题。
+</description>
+            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.1-6.dmg" length="31738967" type="application/octet-stream" sparkle:edSignature="B+d+DiXnS3qHbGBu74w29yCrPgizqMdddpKaWt0twuGyp6dszuS7Oks2NfwXgw64+RsiQXCHquZYey8D9ghnDA==" />
+        </item>
         <item>
             <title>0.1.0</title>
             <pubDate>Tue, 20 Oct 2026 10:27:05 +0800</pubDate>
             <sparkle:version>1</sparkle:version>
             <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[Initial in-app update support.
-]]></description>
-            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.0-1.dmg" length="31760238" type="application/octet-stream" sparkle:edSignature="HkdU6XsT0UA3gTevrNMAU6xUam3MBazcbSArqy7KPPOX1AGw94YfPlSGIONvP9SxU87vShoaRDZIYFQUQeHAAA=="/>
+            <description sparkle:format="markdown">Initial in-app update support.
+</description>
+            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.0-1.dmg" length="31760238" type="application/octet-stream" sparkle:edSignature="HkdU6XsT0UA3gTevrNMAU6xUam3MBazcbSArqy7KPPOX1AGw94YfPlSGIONvP9SxU87vShoaRDZIYFQUQeHAAA==" />
         </item>
     </channel>
 </rss>
