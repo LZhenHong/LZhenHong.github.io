@@ -822,6 +822,16 @@
     outline-offset: 4px;
 }
 
+.vl-plan-vip .vl-button-vip:focus-visible {
+    outline-color: #006ED7;
+}
+
+@media (prefers-color-scheme: dark) {
+    .vl-plan-vip .vl-button-vip:focus-visible {
+        outline-color: #F5F5F7;
+    }
+}
+
 .vl-closing-links {
     display: flex;
     flex-wrap: wrap;
