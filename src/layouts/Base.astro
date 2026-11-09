@@ -16,9 +16,10 @@ interface Props {
   locale: Locale;
   alternates: Record<Locale, string>;
   home?: boolean;
+  bodyClass?: string;
 }
 
-const { title, description = '', locale, alternates, home = false } = Astro.props;
+const { title, description = '', locale, alternates, home = false, bodyClass } = Astro.props;
 const t = ui[locale];
 const homeUrl = `${localePrefix(locale)}/`;
 const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
@@ -83,7 +84,7 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
     }
     <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocale], Astro.site)} />
   </head>
-  <body>
+  <body class={bodyClass}>
     <a class="skip-link" href="#main">{t.skipContent}</a>
 
     <header class="site-header">
@@ -132,15 +133,17 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="site-width footer-inner muted">
-        <span>{t.footerMaintained}</span>
-        <span class="footer-github">
-          <span class="footer-slash" aria-hidden="true">/</span>
-          <a href="https://github.com/LZhenHong">GitHub</a>
-        </span>
-      </div>
-    </footer>
+    <slot name="footer">
+      <footer class="site-footer">
+        <div class="site-width footer-inner muted">
+          <span>{t.footerMaintained}</span>
+          <span class="footer-github">
+            <span class="footer-slash" aria-hidden="true">/</span>
+            <a href="https://github.com/LZhenHong">GitHub</a>
+          </span>
+        </div>
+      </footer>
+    </slot>
 
     <script is:inline>
       // Reveal cards only after every observer registration succeeds. The

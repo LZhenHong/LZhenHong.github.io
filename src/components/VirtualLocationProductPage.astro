@@ -1,0 +1,331 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Product } from '../data/products';
+import {
+  virtualLocationLanding,
+  virtualLocationMedia,
+} from '../data/virtualLocationLanding';
+import { pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import virtualLocationCss from '../styles/virtual-location.css?raw';
+
+interface Props {
+  locale: Locale;
+  product: Product;
+}
+
+const { locale, product } = Astro.props;
+const copy = virtualLocationLanding[locale];
+const media = virtualLocationMedia[locale];
+const t = ui[locale];
+const downloadAction = product.secondaryAction;
+
+if (product.slug !== 'virtual-location' || !downloadAction) {
+  throw new Error('VirtualLocationProductPage requires the VirtualLocation download action.');
+}
+
+const buyHref = product.primaryAction.href;
+const supportHref = product.supportUrls?.[locale] ?? pageUrls(product.slug)[locale];
+const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, 'privacy')[locale];
+const termsHref = product.termsUrls?.[locale] ?? pageUrls(product.slug, 'terms')[locale];
+const refundHref = product.refundUrls?.[locale] ?? pageUrls(product.slug, 'refund')[locale];
+const refundMailto = 'mailto:leeden.dev@gmail.com';
+const supportLegalLabel = `${t.support}, ${t.terms}, ${t.refund}`;
+const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}`;
+const miniFeatures = [
+  { copy: copy.features.move, media: media.move, crop: 'move' },
+  { copy: copy.features.joystick, media: media.joystick, crop: 'joystick' },
+  { copy: copy.features.batch, media: media.batch, crop: 'batch' },
+];
+---
+
+<Base
+  title={copy.meta.title}
+  description={copy.meta.description}
+  locale={locale}
+  alternates={productPageUrls(product.slug)}
+  bodyClass="vl-page"
+>
+  <div class="site-width vl-landing" id="top">
+    <style is:inline set:html={virtualLocationCss}></style>
+    <section class="vl-hero" aria-labelledby="vl-hero-title">
+      <div class="vl-hero-copy">
+        <div class="vl-product-lockup">
+          <img
+            class="vl-product-icon"
+            src={product.icon.src}
+            width="96"
+            height="96"
+            alt=""
+            fetchpriority="high"
+            decoding="async"
+          />
+          <div>
+            <p class="vl-product-name">{product.name}</p>
+            <p class="vl-eyebrow">{copy.hero.eyebrow}</p>
+          </div>
+        </div>
+        <h1 id="vl-hero-title" class={`vl-hero-title vl-hero-title-${locale}`}>
+          {locale === 'en' ? copy.hero.title : (
+            <>
+              <span class="hero-title-lead">{locale === 'zh-cn' ? '在 Mac 上，设置' : '在 Mac 上，設定'}</span>{' '}
+              <span class="hero-title-product">iPhone 的</span><span class="hero-title-tail">{locale === 'zh-cn' ? '虚拟定位。' : '虛擬定位。'}</span>
+            </>
+          )}
+        </h1>
+        <p class="vl-hero-body">{copy.hero.body}</p>
+        <div class="vl-hero-actions">
+          <a class="vl-button vl-button-primary" href={downloadAction.href}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+              <path
+                d="M10 3v9m-3.5-3.5L10 12l3.5-3.5M4 15.5h12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+            {downloadAction.label[locale]}
+          </a>
+          <a class="vl-button vl-button-secondary" href={buyHref}>
+            {product.primaryAction.label[locale]}
+          </a>
+        </div>
+        <a class="vl-trust-link" href="#plans">{copy.hero.trust}</a>
+      </div>
+
+      <div class="vl-hero-media">
+        <div class="vl-hero-shot">
+          <img
+            src={media.teleport.src}
+            width={media.teleport.width}
+            height={media.teleport.height}
+            alt={media.teleport.heroAlt}
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        <p class="vl-free-badge"><span aria-hidden="true"></span>{copy.hero.caption}</p>
+      </div>
+    </section>
+
+    <section class="vl-steps" aria-labelledby="vl-steps-title">
+      <div class="vl-steps-heading">
+        <p class="vl-section-kicker">{copy.steps.kicker}</p>
+        <h2 id="vl-steps-title">{copy.steps.title}</h2>
+      </div>
+      <ol class="vl-steps-list">
+        {
+          copy.steps.items.map((step, index) => (
+            <li>
+              <span class="vl-step-number" aria-hidden="true">{index + 1}</span>
+              <p>{step}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="vl-setup-note">
+        {copy.steps.note}
+        <a href={supportHref}>{t.support}</a>
+      </p>
+    </section>
+
+    <section class="vl-section" id="features" aria-labelledby="vl-features-title">
+      <div class="vl-section-heading">
+        <p class="vl-section-kicker">{copy.features.kicker}</p>
+        <h2 id="vl-features-title">{copy.features.title}</h2>
+        <p>{copy.features.intro}</p>
+      </div>
+
+      <article class="vl-feature-free">
+        <div class="vl-feature-free-copy">
+          <p class="vl-card-label">
+            <span class="vl-label-free">{copy.features.teleport.badge}</span>
+            {copy.features.teleport.name}
+          </p>
+          <h3>{copy.features.teleport.title}</h3>
+          <p>{copy.features.teleport.body}</p>
+          <p>{copy.features.teleport.detail}</p>
+          <a class="vl-text-link" href="#plans">
+            {copy.features.teleport.link}
+            <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false">
+              <path
+                d="M4 9h10m-4-4 4 4-4 4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="vl-feature-free-shot">
+          <img
+            src={media.teleport.src}
+            width={media.teleport.width}
+            height={media.teleport.height}
+            alt={media.teleport.fullAlt}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </article>
+
+      <div class="vl-feature-grid">
+        {
+          miniFeatures.map(({ copy: feature, media, crop }) => (
+            <article class={`vl-feature-mini vl-feature-mini-${crop}`}>
+              <div class={`vl-feature-mini-media vl-crop vl-crop-${crop}`}>
+                <img
+                  src={media.src}
+                  width={media.width}
+                  height={media.height}
+                  alt={media.alt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="vl-feature-mini-body">
+                <p class="vl-card-label">
+                  <span class="vl-label-vip">{feature.badge}</span>
+                  {feature.name}
+                </p>
+                <h3>{feature.title}</h3>
+                <p>{feature.body}</p>
+                <p class="vl-interface-note">{feature.detail}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="vl-section" id="plans" aria-labelledby="vl-plans-title">
+      <div class="vl-section-heading">
+        <p class="vl-section-kicker">{copy.plans.kicker}</p>
+        <h2 id="vl-plans-title">{copy.plans.title}</h2>
+        <p>{copy.plans.intro}</p>
+      </div>
+
+      <div class="vl-plan-grid">
+        <article class="vl-plan-card">
+          <div>
+            <p class="vl-plan-label">{copy.plans.free.label}</p>
+            <p class="vl-plan-price">US$0</p>
+            <p class="vl-plan-intro">{copy.plans.free.intro}</p>
+          </div>
+          <ul class="vl-plan-list">
+            {copy.plans.free.items.map((item) => <li>{item}</li>)}
+          </ul>
+          <a class="vl-button vl-button-secondary vl-plan-button" href={downloadAction.href}>
+            {downloadAction.label[locale]}
+          </a>
+        </article>
+
+        <article class="vl-plan-card vl-plan-vip" id="vip">
+          <div>
+            <p class="vl-plan-label">
+              VIP <span>{copy.plans.vip.badge}</span>
+            </p>
+            <p class="vl-plan-price">
+              US$19.99 <small>{copy.plans.vip.priceSuffix}</small>
+            </p>
+            <p class="vl-plan-intro">{copy.plans.vip.intro}</p>
+          </div>
+          <ul class="vl-plan-list">
+            {copy.plans.vip.items.map((item) => <li>{item}</li>)}
+          </ul>
+          <p class="vl-plan-note">{copy.plans.vip.note}</p>
+          <a class="vl-button vl-button-primary vl-plan-button" href={buyHref}>
+            {product.primaryAction.label[locale]}
+          </a>
+        </article>
+      </div>
+      <p class="vl-plan-note vl-plan-reassurance">
+        <a href={refundHref}>{copy.plans.reassurance.refund}</a>
+        <span> · </span>{copy.plans.reassurance.processor}
+      </p>
+    </section>
+
+    <section class="vl-section" id="faq" aria-labelledby="vl-faq-title">
+      <div class="vl-section-heading">
+        <p class="vl-section-kicker">{copy.faq.kicker}</p>
+        <h2 id="vl-faq-title">{copy.faq.title}</h2>
+      </div>
+      <div class="vl-faq-list">
+        {
+          copy.faq.items.map((item) => (
+            <details>
+              <summary>{item.question}</summary>
+              <div class="vl-faq-answer">
+                <p>{item.answer}</p>
+              </div>
+            </details>
+          ))
+        }
+        <details id="refund">
+          <summary>{copy.faq.refund.question}</summary>
+          <div class="vl-faq-answer">
+            {
+              locale === 'en' ? (
+                <p>
+                  <a href={refundMailto}>{copy.faq.refund.requestLabel}</a>{copy.faq.refund.requestDetail}
+                  <a href={refundHref}>{copy.faq.refund.policyLabel}</a>.
+                </p>
+              ) : (
+                <p>
+                  <a href={refundHref}>{copy.faq.refund.policyPeriod}</a>{copy.faq.refund.emailLead}<a
+                    href={refundMailto}
+                  >leeden.dev@gmail.com</a>{copy.faq.refund.emailDetail}
+                </p>
+              )
+            }
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="vl-section vl-closing-section" aria-labelledby="vl-closing-title">
+      <div class="vl-closing-panel">
+        <div class="vl-closing-copy">
+          <p class="vl-section-kicker">{copy.closing.kicker}</p>
+          <h2 id="vl-closing-title">{copy.closing.title}</h2>
+          <p>{copy.closing.body}</p>
+        </div>
+        <div class="vl-closing-actions">
+          <div class="vl-closing-buttons">
+            <a class="vl-button vl-button-primary" href={downloadAction.href}>
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+                <path
+                  d="M10 3v9m-3.5-3.5L10 12l3.5-3.5M4 15.5h12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+              {downloadAction.label[locale]}
+            </a>
+            <a class="vl-button vl-button-ink" href={buyHref}>{copy.closing.buy}</a>
+          </div>
+          <nav class="vl-closing-links" aria-label={supportLegalLabel}>
+            <a href={supportHref}>{t.support}</a>
+            <a href={termsHref}>{t.terms}</a>
+            <a href={refundHref}>{t.refund}</a>
+          </nav>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="vl-site-footer" slot="footer">
+    <div class="site-width vl-footer-inner">
+      <p><strong>Eden</strong><span aria-hidden="true">/</span>{product.name}</p>
+      <nav class="vl-footer-links" aria-label={footerLabel}>
+        <a href={privacyHref}>{t.privacy}</a>
+        <a href={termsHref}>{t.terms}</a>
+        <a href={refundHref}>{t.refund}</a>
+        <a href={supportHref}>{t.support}</a>
+      </nav>
+    </div>
+  </footer>
+</Base>
