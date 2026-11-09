@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import StoreHopProductPage from './StoreHopProductPage.astro';
 import { localePrefix, pageUrls, productPageUrls, ui, type Locale } from '../i18n';
 import type { Product } from '../data/products';
 
@@ -16,6 +17,9 @@ const termsHref = product.termsUrls?.[locale];
 const refundHref = product.refundUrls?.[locale];
 ---
 
+{product.slug === 'storehop' ? (
+  <StoreHopProductPage locale={locale} product={product} />
+) : (
 <Base
   title={`${product.name} — Eden`}
   description={product.tagline[locale]}
@@ -98,3 +102,4 @@ const refundHref = product.refundUrls?.[locale];
     </div>
   </div>
 </Base>
+)}

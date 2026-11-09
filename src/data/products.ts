@@ -27,6 +27,8 @@ export interface Product {
   tagline: LocalizedText;
   icon: ProductAsset;
   screenshot: ProductAsset & { alt: LocalizedText };
+  secondaryScreenshot?: ProductAsset & { alt: LocalizedText };
+  featureChips?: Record<Locale, string[]>;
   primaryAction: ProductAction;
   secondaryAction?: ProductAction;
   supportUrls?: Record<Locale, string>;
@@ -206,6 +208,21 @@ const products: Product[] = [
         'zh-cn': 'iPhone 上的 StoreHop，展示可搜索的 App Store 国家和地区网格。',
         'zh-tw': 'iPhone 上的 StoreHop，顯示可搜尋的 App Store 國家與地區網格。',
       },
+    },
+    secondaryScreenshot: {
+      src: '/apps/storehop/screenshot-2.jpg',
+      width: 736,
+      height: 1600,
+      alt: {
+        en: 'StoreHop on iPhone, showing search results for ‘land’ in a list of App Store countries and regions.',
+        'zh-cn': 'iPhone 上的 StoreHop，搜索‘land’后显示匹配的 App Store 国家和地区。',
+        'zh-tw': 'iPhone 上的 StoreHop，搜尋‘land’後顯示符合的 App Store 國家與地區。',
+      },
+    },
+    featureChips: {
+      en: ['Siri', 'Spotlight', 'Shortcuts', 'widgets', 'Control Center'],
+      'zh-cn': ['Siri', 'Spotlight', '快捷指令', '小组件', '控制中心'],
+      'zh-tw': ['Siri', 'Spotlight', '捷徑', '小工具', '控制中心'],
     },
     primaryAction: {
       href: 'https://apps.apple.com/us/app/storehop-switch-storefronts/id6803034297',
