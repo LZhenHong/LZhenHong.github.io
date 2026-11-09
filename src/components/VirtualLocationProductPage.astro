@@ -6,7 +6,7 @@ import {
   virtualLocationMedia,
 } from '../data/virtualLocationLanding';
 import { pageUrls, productPageUrls, ui, type Locale } from '../i18n';
-import '../styles/virtual-location.css';
+import virtualLocationCss from '../styles/virtual-location.css?raw';
 
 interface Props {
   locale: Locale;
@@ -46,6 +46,7 @@ const miniFeatures = [
   bodyClass="vl-page"
 >
   <div class="site-width vl-landing" id="top">
+    <style is:inline set:html={virtualLocationCss}></style>
     <section class="vl-hero" aria-labelledby="vl-hero-title">
       <div class="vl-hero-copy">
         <div class="vl-product-lockup">
