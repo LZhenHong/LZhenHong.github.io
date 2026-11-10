@@ -3,6 +3,23 @@
     <channel>
         <title>VirtualLocation</title>
         <item>
+            <title>1.0.0</title>
+            <pubDate>Tue, 10 Nov 2026 10:05:25 +0800</pubDate>
+            <sparkle:version>2611101002</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown">**系统要求**
+
+- macOS 26 或更高版本；iPhone / iPad 需 iOS 17.4.1 或更高版本（首次配对需 USB 连接并开启 Developer Mode）。
+
+**首个正式版本**
+
+- VirtualLocation 发布首个正式版本 1.0.0：通过 USB 或同一局域网 Wi-Fi 修改所连接 iPhone / iPad 上报的定位，支持传送与恢复、路线与摇杆移动、地图搜索、已存内容与 iCloud 同步、应用内更新。
+- 无需越狱，设备上无需安装任何 App，Mac 运行时也无需安装 Xcode。
+</description>
+            <enclosure url="https://github.com/LZhenHong/homebrew-tap/releases/download/virtual-location-v1.0.0-2611101002/VirtualLocation-1.0.0-2611101002.dmg" length="31738989" type="application/octet-stream" sparkle:edSignature="/FBuvJgf2JoA6NENUcbCvI8+XC+K11t+KCaxxBGqElcubnq4oYWECRYp9AC9E6yZL/W3unsJ+QFPaGvIUyuQDQ==" />
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Mon, 09 Nov 2026 13:20:42 +0800</pubDate>
             <sparkle:version>6</sparkle:version>
