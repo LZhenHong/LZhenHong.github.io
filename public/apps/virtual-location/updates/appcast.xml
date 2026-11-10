@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>VirtualLocation</title>
@@ -8,16 +8,40 @@
             <sparkle:version>2611101002</sparkle:version>
             <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown">**系统要求**
+            <description sparkle:format="markdown"><![CDATA[## English
 
-- macOS 26 或更高版本；iPhone / iPad 需 iOS 17.4.1 或更高版本（首次配对需 USB 连接并开启 Developer Mode）。
+**Requirements**
+
+- macOS 26 or later; iPhone / iPad requires iOS 17.4.1 or later (first pairing needs a USB connection and Developer Mode enabled).
+
+**First Official Release**
+
+- VirtualLocation 1.0.0 is the first official release: change the location reported by a connected iPhone / iPad over USB or the same local Wi-Fi network, with teleport and restore, route and joystick movement, map search, saved content, iCloud sync, and in-app updates.
+- No jailbreak required, no app to install on the device, and no Xcode needed on the Mac.
+
+## 简体中文
+
+**系统要求**
+
+- macOS 26 或更高版本；iPhone / iPad 需 iOS 17.4.1 或更高版本（首次配对需 USB 连接并开启开发者模式）。
 
 **首个正式版本**
 
 - VirtualLocation 发布首个正式版本 1.0.0：通过 USB 或同一局域网 Wi-Fi 修改所连接 iPhone / iPad 上报的定位，支持传送与恢复、路线与摇杆移动、地图搜索、已存内容与 iCloud 同步、应用内更新。
 - 无需越狱，设备上无需安装任何 App，Mac 运行时也无需安装 Xcode。
-</description>
-            <enclosure url="https://github.com/LZhenHong/homebrew-tap/releases/download/virtual-location-v1.0.0-2611101002/VirtualLocation-1.0.0-2611101002.dmg" length="31738989" type="application/octet-stream" sparkle:edSignature="/FBuvJgf2JoA6NENUcbCvI8+XC+K11t+KCaxxBGqElcubnq4oYWECRYp9AC9E6yZL/W3unsJ+QFPaGvIUyuQDQ==" />
+
+## 繁體中文
+
+**系統需求**
+
+- macOS 26 或以上版本；iPhone／iPad 需 iOS 17.4.1 或以上版本（首次配對需 USB 連接並開啟開發者模式）。
+
+**首個正式版本**
+
+- VirtualLocation 發佈首個正式版本 1.0.0：透過 USB 或同一區域網路 Wi-Fi 修改所連接 iPhone／iPad 回報的定位，支援傳送與恢復、路線與搖桿移動、地圖搜尋、已儲存內容與 iCloud 同步、App 內更新。
+- 無需越獄，裝置上無需安裝任何 App，Mac 執行時也無需安裝 Xcode。
+]]></description>
+            <enclosure url="https://github.com/LZhenHong/homebrew-tap/releases/download/virtual-location-v1.0.0-2611101002/VirtualLocation-1.0.0-2611101002.dmg" length="31738989" type="application/octet-stream" sparkle:edSignature="/FBuvJgf2JoA6NENUcbCvI8+XC+K11t+KCaxxBGqElcubnq4oYWECRYp9AC9E6yZL/W3unsJ+QFPaGvIUyuQDQ=="/>
         </item>
         <item>
             <title>0.1.1</title>
@@ -41,7 +65,7 @@
 
 - 修复打开或关闭已存内容面板时可能崩溃，以及路线工坊在连接引导页不可见的问题。
 </description>
-            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.1-6.dmg" length="31738967" type="application/octet-stream" sparkle:edSignature="B+d+DiXnS3qHbGBu74w29yCrPgizqMdddpKaWt0twuGyp6dszuS7Oks2NfwXgw64+RsiQXCHquZYey8D9ghnDA==" />
+            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.1-6.dmg" length="31738967" type="application/octet-stream" sparkle:edSignature="B+d+DiXnS3qHbGBu74w29yCrPgizqMdddpKaWt0twuGyp6dszuS7Oks2NfwXgw64+RsiQXCHquZYey8D9ghnDA=="/>
         </item>
         <item>
             <title>0.1.0</title>
@@ -51,7 +75,7 @@
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <description sparkle:format="markdown">Initial in-app update support.
 </description>
-            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.0-1.dmg" length="31760238" type="application/octet-stream" sparkle:edSignature="HkdU6XsT0UA3gTevrNMAU6xUam3MBazcbSArqy7KPPOX1AGw94YfPlSGIONvP9SxU87vShoaRDZIYFQUQeHAAA==" />
+            <enclosure url="https://github.com/LZhenHong/LZhenHong.github.io/releases/download/virtual-location-updates/VirtualLocation-0.1.0-1.dmg" length="31760238" type="application/octet-stream" sparkle:edSignature="HkdU6XsT0UA3gTevrNMAU6xUam3MBazcbSArqy7KPPOX1AGw94YfPlSGIONvP9SxU87vShoaRDZIYFQUQeHAAA=="/>
         </item>
     </channel>
 </rss>
