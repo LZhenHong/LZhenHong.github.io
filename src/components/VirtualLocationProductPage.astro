@@ -6,6 +6,7 @@ import {
   virtualLocationMedia,
 } from '../data/virtualLocationLanding';
 import { pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import { productJsonLd } from '../lib/structuredData';
 import virtualLocationCss from '../styles/virtual-location.css?raw';
 
 interface Props {
@@ -42,6 +43,13 @@ const miniFeatures = [
   description={copy.meta.description}
   locale={locale}
   alternates={productPageUrls(product.slug)}
+  jsonLd={productJsonLd(product, locale, productPageUrls(product.slug)[locale])}
+  ogImage={{
+    src: '/apps/virtual-location/share-1200x630.png',
+    width: 1200,
+    height: 630,
+    alt: 'VirtualLocation Mac app with the Teleport map window',
+  }}
   bodyClass="vl-page"
 >
   <div class="site-width vl-landing" id="top">

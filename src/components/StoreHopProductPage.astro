@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { localePrefix, pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import { productJsonLd } from '../lib/structuredData';
 import type { Product } from '../data/products';
 import storehopCss from '../styles/storehop.css?raw';
 
@@ -26,6 +27,7 @@ const featureChips = product.featureChips[locale];
   description={product.tagline[locale]}
   locale={locale}
   alternates={productPageUrls(product.slug)}
+  jsonLd={productJsonLd(product, locale, productPageUrls(product.slug)[locale])}
 >
   <div class="site-width sh-page">
     <style is:inline set:html={storehopCss}></style>
