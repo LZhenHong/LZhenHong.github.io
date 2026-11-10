@@ -118,3 +118,8 @@ export function pageUrls(appSlug?: string, kind: AppPageKind = 'support'): Recor
 export function productPageUrls(productSlug: string): Record<Locale, string> {
   return urlsForPath(`/products/${productSlug}/`);
 }
+
+/** Every locale's URL for a guide. */
+export function guidePageUrls(guideSlug: string): Record<Locale, string> {
+  return urlsForPath(`/guides/${guideSlug}/`);
+}

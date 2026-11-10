@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getProducts } from '../data/products';
+import { guideSlugs } from '../data/guides';
 import { getAppPageProps } from '../lib/content';
-import { htmlLang, localePrefix, locales, type Locale } from '../i18n';
+import { guidePageUrls, htmlLang, localePrefix, locales, type Locale } from '../i18n';
 
 /**
  * One <url> per route, with the three locales linked as alternates so a
@@ -20,6 +21,9 @@ export const GET: APIRoute = async ({ site }) => {
         locales.map((locale) => [locale, `${localePrefix(locale)}/products/${product.slug}/`]),
       ),
     );
+  }
+  for (const slug of guideSlugs) {
+    groups.push(guidePageUrls(slug));
   }
 
   const appGroups = new Map<string, Partial<Record<Locale, string>>>();

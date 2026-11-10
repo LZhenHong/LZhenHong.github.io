@@ -1,0 +1,207 @@
+---
+import Base from '../layouts/Base.astro';
+import { guideFacts, guideLabels, guides, guideSlugs, type GuideSlug } from '../data/guides';
+import { guidePageUrls, localePrefix, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  slug: GuideSlug;
+}
+
+const { locale, slug } = Astro.props;
+const copy = guides[slug][locale];
+const labels = guideLabels[locale];
+const relatedGuides = guideSlugs.filter((guideSlug) => guideSlug !== slug);
+const productHref = `${localePrefix(locale)}/products/virtual-location/`;
+---
+
+<Base
+  title={copy.seoTitle}
+  description={copy.metaDescription}
+  locale={locale}
+  alternates={guidePageUrls(slug)}
+  ogImage={{
+    src: '/apps/virtual-location/share-1200x630.png',
+    width: 1200,
+    height: 630,
+    alt: 'VirtualLocation Mac app with the Teleport map window',
+  }}
+>
+  <div class="site-width guide-page">
+    <article class="guide-article">
+      <header class="guide-header">
+        <h1>{copy.h1}</h1>
+        <p class="guide-lead">{copy.lead}</p>
+      </header>
+
+      {
+        copy.sections.map((section, sectionIndex) => (
+          <section class="guide-section" aria-labelledby={`guide-section-${sectionIndex}`}>
+            <h2 id={`guide-section-${sectionIndex}`}>{section.heading}</h2>
+            {
+              section.blocks.map((block) => {
+                if (block.type === 'ordered-list') {
+                  return <ol>{block.items.map((item) => <li>{item}</li>)}</ol>;
+                }
+                if (block.type === 'unordered-list') {
+                  return <ul>{block.items.map((item) => <li>{item}</li>)}</ul>;
+                }
+                return <p>{block.text}</p>;
+              })
+            }
+          </section>
+        ))
+      }
+
+      <div class="guide-cta">
+        <a class="product-action primary-action" href={productHref}>{copy.ctaLabel}</a>
+      </div>
+
+      <section class="guide-facts" aria-labelledby="guide-facts">
+        <h2 id="guide-facts">{labels.facts}</h2>
+        <p>{guideFacts[locale]}</p>
+      </section>
+    </article>
+
+    <nav class="guide-related" aria-labelledby="related-guides">
+      <h2 id="related-guides">{labels.related}</h2>
+      <ul>
+        {
+          relatedGuides.map((relatedSlug) => (
+            <li>
+              <a href={guidePageUrls(relatedSlug)[locale]}>{guides[relatedSlug][locale].h1}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .guide-page {
+    max-width: 44rem;
+    padding-top: var(--space-8);
+  }
+
+  .guide-header {
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .guide-header h1 {
+    margin: 0;
+    font-size: clamp(2.25rem, 5vw, 3rem);
+    font-weight: 740;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+    overflow-wrap: break-word;
+  }
+
+  .guide-lead {
+    margin: var(--space-6) 0 0;
+    color: var(--muted);
+    font-size: 1.25rem;
+    line-height: 1.65;
+  }
+
+  .guide-section {
+    margin-top: var(--space-10);
+  }
+
+  .guide-section h2,
+  .guide-facts h2 {
+    margin: 0 0 var(--space-4);
+    font-size: 1.5rem;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+
+  .guide-section p,
+  .guide-facts p {
+    margin: var(--space-4) 0 0;
+  }
+
+  .guide-section ul,
+  .guide-section ol {
+    margin: 0;
+    padding-left: 1.5em;
+  }
+
+  .guide-section li + li {
+    margin-top: var(--space-2);
+  }
+
+  .guide-cta {
+    margin-top: var(--space-10);
+  }
+
+  .guide-cta a {
+    text-decoration: none;
+  }
+
+  .guide-facts {
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--line);
+  }
+
+  .guide-related {
+    margin-top: var(--space-10);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--line);
+    font-size: 0.875rem;
+  }
+
+  .guide-related h2 {
+    margin: 0 0 var(--space-3);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .guide-related ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .guide-related li + li {
+    margin-top: var(--space-2);
+  }
+
+  .guide-related a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: var(--space-1);
+    color: var(--muted);
+    line-height: 1.6;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    text-underline-offset: 3px;
+  }
+
+  .guide-related a:hover {
+    color: var(--link-accent);
+    text-decoration-color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .guide-page {
+      padding-top: var(--space-6);
+    }
+
+    .guide-header {
+      padding-bottom: var(--space-6);
+    }
+
+    .guide-header h1 {
+      line-height: 1.18;
+    }
+
+    .guide-lead {
+      margin-top: var(--space-5);
+      font-size: 1.125rem;
+    }
+  }
+</style>
