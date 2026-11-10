@@ -1371,3 +1371,42 @@ html[lang="zh-TW"] .hero-title-tail {
         outline-color: Highlight;
     }
 }
+
+/* Guide entry points: keep these pages reachable from the product page. */
+.vl-guides {
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+.vl-guides h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.vl-guides ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.vl-guides a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    max-width: 100%;
+    color: var(--muted);
+    line-height: 1.5;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    text-underline-offset: 3px;
+}
+
+.vl-guides a:hover {
+    color: var(--link-accent);
+    text-decoration-color: var(--accent);
+}

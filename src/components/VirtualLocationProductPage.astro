@@ -5,7 +5,8 @@ import {
   virtualLocationLanding,
   virtualLocationMedia,
 } from '../data/virtualLocationLanding';
-import { pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import { guidePageUrls, pageUrls, productPageUrls, ui, type Locale } from '../i18n';
+import { guides, guideSlugs } from '../data/guides';
 import { productJsonLd } from '../lib/structuredData';
 import virtualLocationCss from '../styles/virtual-location.css?raw';
 
@@ -31,6 +32,7 @@ const termsHref = product.termsUrls?.[locale] ?? pageUrls(product.slug, 'terms')
 const refundHref = product.refundUrls?.[locale] ?? pageUrls(product.slug, 'refund')[locale];
 const refundMailto = 'mailto:leeden.dev@gmail.com';
 const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}`;
+const guidesHeading = { en: 'Guides', 'zh-cn': '指南', 'zh-tw': '指南' }[locale];
 const miniFeatures = [
   { copy: copy.features.move, media: media.move, crop: 'move' },
   { copy: copy.features.joystick, media: media.joystick, crop: 'joystick' },
@@ -290,6 +292,19 @@ const miniFeatures = [
         </details>
       </div>
     </section>
+
+    <nav class="vl-guides" aria-labelledby="vl-guides-title">
+      <h2 id="vl-guides-title">{guidesHeading}</h2>
+      <ul>
+        {
+          guideSlugs.map((guideSlug) => (
+            <li>
+              <a href={guidePageUrls(guideSlug)[locale]}>{guides[guideSlug][locale].h1}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
 
     <section class="vl-section vl-closing-section" aria-labelledby="vl-closing-title">
       <div class="vl-closing-panel">
