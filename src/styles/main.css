@@ -1227,7 +1227,7 @@ html[lang^="zh"] .hero-copy h1 {
     color: var(--soft);
 }
 
-.footer-github {
+.footer-social {
     display: inline-flex;
     align-items: center;
 }

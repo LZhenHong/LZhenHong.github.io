@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import type { Product } from '../data/products';
+import { xProfile } from '../data/social';
 import {
   virtualLocationLanding,
   virtualLocationMedia,
@@ -31,7 +32,7 @@ const privacyHref = product.privacyUrls?.[locale] ?? pageUrls(product.slug, 'pri
 const termsHref = product.termsUrls?.[locale] ?? pageUrls(product.slug, 'terms')[locale];
 const refundHref = product.refundUrls?.[locale] ?? pageUrls(product.slug, 'refund')[locale];
 const refundMailto = 'mailto:leeden.dev@gmail.com';
-const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}`;
+const footerLabel = `${t.privacy}, ${t.terms}, ${t.refund}, ${t.support}, X`;
 const guidesHeading = { en: 'Guides', 'zh-cn': '指南', 'zh-tw': '指南' }[locale];
 const miniFeatures = [
   { copy: copy.features.move, media: media.move, crop: 'move' },
@@ -342,6 +343,7 @@ const miniFeatures = [
         <a href={termsHref}>{t.terms}</a>
         <a href={refundHref}>{t.refund}</a>
         <a href={supportHref}>{t.support}</a>
+        <a href={xProfile.href} rel="me" aria-label={`X (${xProfile.handle})`}>X</a>
       </nav>
     </div>
     <div class="site-width vl-footer-version">

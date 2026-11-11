@@ -1,5 +1,6 @@
 ---
 import '../styles/main.css';
+import { xProfile } from '../data/social';
 import {
   defaultLocale,
   htmlLang,
@@ -172,9 +173,11 @@ const appsUrl = home ? '#apps' : `${homeUrl}#apps`;
       <footer class="site-footer">
         <div class="site-width footer-inner muted">
           <span>{t.footerMaintained}</span>
-          <span class="footer-github">
+          <span class="footer-social">
             <span class="footer-slash" aria-hidden="true">/</span>
             <a href="https://github.com/LZhenHong">GitHub</a>
+            <span class="footer-slash" aria-hidden="true">/</span>
+            <a href={xProfile.href} rel="me" aria-label={`X (${xProfile.handle})`}>X</a>
           </span>
         </div>
       </footer>
