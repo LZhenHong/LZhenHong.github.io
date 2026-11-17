@@ -58,6 +58,12 @@ interface LandingCopy {
     trust: string;
     caption: string;
   };
+  demo: {
+    title: string;
+    body: string;
+    note: string;
+    open: string;
+  };
   steps: {
     kicker: string;
     title: string;
@@ -125,13 +131,27 @@ interface LocalizedMedia {
   alt?: string;
 }
 
+const campaignPath = '/apps/virtual-location/campaign/2026-11-17';
+const demoMedia = {
+  en: {
+    src: `${campaignPath}/en/overview.mp4`,
+    poster: `${campaignPath}/en/overview-poster.jpg`,
+  },
+  'zh-cn': {
+    src: `${campaignPath}/zh-cn/overview.mp4`,
+    poster: `${campaignPath}/zh-cn/overview-poster.jpg`,
+  },
+};
+
 export const virtualLocationMedia: Record<Locale, {
+  demo: { src: string; poster: string };
   teleport: LocalizedMedia;
   move: LocalizedMedia;
   joystick: LocalizedMedia;
   batch: LocalizedMedia;
 }> = {
   en: {
+    demo: demoMedia.en,
     teleport: {
       src: '/apps/virtual-location/landing/en/teleport.png',
       width: 1400,
@@ -159,6 +179,7 @@ export const virtualLocationMedia: Record<Locale, {
     },
   },
   'zh-cn': {
+    demo: demoMedia['zh-cn'],
     teleport: {
       src: '/apps/virtual-location/landing/zh-cn/teleport.png',
       width: 1400,
@@ -186,6 +207,7 @@ export const virtualLocationMedia: Record<Locale, {
     },
   },
   'zh-tw': {
+    demo: demoMedia['zh-cn'],
     teleport: {
       src: '/apps/virtual-location/landing/zh-tw/teleport.png',
       width: 1400,
@@ -228,6 +250,12 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
       body: 'Connect an iPhone or iPad, then choose a place on the map. Teleport one device for free over USB — no Xcode, no jailbreak, and nothing to install on the device.',
       trust: 'Free Teleport for one USB device · No Xcode · Restore always free',
       caption: 'One map, three ways to set location: Teleport, Move, and Joystick.',
+    },
+    demo: {
+      title: 'See VirtualLocation in action.',
+      body: 'Teleport, follow a route, steer with the joystick, and control multiple devices. Play the 18-second silent demo.',
+      note: 'Recorded with demo devices. English titles; the app interface is in Simplified Chinese.',
+      open: 'Open video',
     },
     steps: {
       kicker: 'QUICK START',
@@ -367,6 +395,12 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
       trust: '单台 USB 设备免费传送 · 无需 Xcode · 恢复真实位置永远免费',
       caption: '一张地图，三种定位方式：传送、移动和摇杆。',
     },
+    demo: {
+      title: '18 秒，看看它如何操作。',
+      body: '从选点传送，到沿路线移动、摇杆控制和多设备操作。点击播放静音演示。',
+      note: '使用演示设备录制，展示 App 操作界面。',
+      open: '单独打开视频',
+    },
     steps: {
       kicker: '快速开始',
       title: '从 Mac 到新定位，只需三步',
@@ -505,6 +539,12 @@ export const virtualLocationLanding: Record<Locale, LandingCopy> = {
       body: '連接 iPhone 或 iPad，在地圖上選好地點即可。單台 USB 連接裝置可免費傳送；Mac 無需 Xcode，裝置無需越獄或安裝應用程式。',
       trust: '單台 USB 裝置免費傳送 · 無需 Xcode · 恢復真實位置永遠免費',
       caption: '一張地圖，三種定位方式：傳送、移動和搖桿。',
+    },
+    demo: {
+      title: '18 秒，看看它如何操作。',
+      body: '從選點傳送，到沿路線移動、搖桿控制和多裝置操作。點選播放靜音示範。',
+      note: '使用示範裝置錄製；影片文字與 App 介面為簡體中文。',
+      open: '單獨開啟影片',
     },
     steps: {
       kicker: '快速開始',

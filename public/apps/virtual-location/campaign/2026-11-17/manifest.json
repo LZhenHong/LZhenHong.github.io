@@ -1,0 +1,40 @@
+{
+  "source_repository": "VirtualLocation",
+  "source_commit": "a9e3304f7f54c589b108c15cdbf07ff24afc1798",
+  "source_path_base": "marketing/2026-11-17",
+  "delivery_path_base": "/apps/virtual-location/campaign/2026-11-17",
+  "files": [
+    {
+      "asset_id": "film_web",
+      "locale": "en",
+      "source": "en/VirtualLocation-Web-Loop-720p-Silent-EN.mp4",
+      "file": "en/overview.mp4",
+      "bytes": 4823714,
+      "sha256": "56290275dc4da8ec2e85973d3a1079ef4003f8f177e29b049302decf051d99c9"
+    },
+    {
+      "asset_id": "poster_web",
+      "locale": "en",
+      "source": "en/Web-Poster-EN.jpg",
+      "file": "en/overview-poster.jpg",
+      "bytes": 246095,
+      "sha256": "a48dca923a8fb03337f0341550dd0e27c26fe2ae0333415775b917eed78a2002"
+    },
+    {
+      "asset_id": "film_web",
+      "locale": "zh-cn",
+      "source": "zh-Hans/VirtualLocation-网站循环-720p-静音.mp4",
+      "file": "zh-cn/overview.mp4",
+      "bytes": 4825693,
+      "sha256": "fbc035c083bce9af740ae1e5af09a7086d2bf21547cb00d11afa1fd601da2836"
+    },
+    {
+      "asset_id": "poster_web",
+      "locale": "zh-cn",
+      "source": "zh-Hans/网站视频封面.jpg",
+      "file": "zh-cn/overview-poster.jpg",
+      "bytes": 244036,
+      "sha256": "737498d447ff5a76228cd412ef5dd8257fad1b7ffb3d2402ab582c6c33bd3553"
+    }
+  ]
+}

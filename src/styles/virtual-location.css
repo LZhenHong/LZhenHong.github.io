@@ -19,6 +19,10 @@
     --vl-product-muted: #b8bec7;
     --vl-hero-line: rgba(244, 246, 248, 0.16);
     --vl-shadow: 0 24px 60px rgba(20, 23, 28, 0.18), 0 3px 12px rgba(20, 23, 28, 0.08);
+    --vl-vip: #ffd60a;
+    --vl-vip-fill: linear-gradient(to bottom, #ffe673 0%, var(--vl-vip) 50%, #f2ad1a 100%);
+    --vl-on-vip: rgba(0, 0, 0, 0.82);
+    --vl-vip-text: #806b00;
 
     color-scheme: light dark;
     background: var(--page);
@@ -44,6 +48,7 @@
         --vl-product-muted: #b8bec7;
         --vl-hero-line: rgba(224, 229, 238, 0.17);
         --vl-shadow: 0 26px 70px rgba(0, 0, 0, 0.38), 0 3px 14px rgba(0, 0, 0, 0.24);
+        --vl-vip-text: var(--vl-vip);
     }
 }
 
@@ -229,8 +234,10 @@
 }
 
 .vl-hero-actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: fit-content;
+    max-width: 100%;
     gap: 12px;
     margin-top: 30px;
 }
@@ -294,6 +301,49 @@
     flex: 0 0 7px;
     border-radius: 50%;
     background: var(--accent);
+}
+
+/* The campaign player uses the same frame as the hero screenshot. */
+.vl-demo {
+    padding-bottom: var(--space-6);
+}
+
+.vl-demo-figure {
+    margin: 0;
+}
+
+.vl-demo-player video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+    background: var(--vl-hero-base);
+    object-fit: contain;
+}
+
+.vl-demo-caption {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0 var(--space-6);
+    margin-top: var(--space-3);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.vl-demo-caption p {
+    margin: 0;
+}
+
+.vl-demo-caption a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--vl-accent-text);
+    text-underline-offset: 3px;
 }
 
 /* Three-step setup */
@@ -442,8 +492,8 @@
 }
 
 .vl-label-vip {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--vl-vip-fill);
+    color: var(--vl-on-vip);
 }
 
 .vl-feature-free h3,
@@ -588,8 +638,14 @@
 }
 
 .vl-plan-vip {
-    border-color: var(--accent);
-    box-shadow: inset 0 0 0 1px var(--accent);
+    --vl-accent-text: var(--vl-vip-text);
+    border-color: var(--vl-vip);
+    box-shadow: inset 0 0 0 1px var(--vl-vip);
+}
+
+#plans .vl-section-kicker,
+.vl-plan-vip .vl-plan-label {
+    color: var(--vl-vip-text);
 }
 
 .vl-plan-label {
@@ -612,6 +668,11 @@
     font-size: 10px;
     letter-spacing: 0.08em;
     vertical-align: middle;
+}
+
+.vl-plan-vip .vl-plan-label span {
+    background: var(--vl-vip-fill);
+    color: var(--vl-on-vip);
 }
 
 .vl-plan-price {
@@ -804,13 +865,13 @@
 .vl-button-vip,
 .vl-button-vip:hover {
     border-color: rgba(255, 255, 255, 0.30);
-    background: linear-gradient(to bottom, #FFE673 0%, #FFD60A 50%, #F2AD1A 100%);
-    color: rgba(0, 0, 0, 0.82);
-    box-shadow: 0 2px 7px rgba(255, 214, 10, 0.25);
+    background: var(--vl-vip-fill);
+    color: var(--vl-on-vip);
+    box-shadow: 0 2px 7px color-mix(in srgb, var(--vl-vip) 25%, transparent);
 }
 
 .vl-button-vip:hover {
-    box-shadow: 0 2px 14px rgba(255, 214, 10, 0.40);
+    box-shadow: 0 2px 14px color-mix(in srgb, var(--vl-vip) 40%, transparent);
 }
 
 .vl-button-vip:active {
@@ -818,18 +879,12 @@
 }
 
 .vl-button-vip:focus-visible {
-    outline: 3px solid #F5F5F7;
+    outline: 3px solid var(--vl-vip);
     outline-offset: 4px;
 }
 
 .vl-plan-vip .vl-button-vip:focus-visible {
-    outline-color: #006ED7;
-}
-
-@media (prefers-color-scheme: dark) {
-    .vl-plan-vip .vl-button-vip:focus-visible {
-        outline-color: #F5F5F7;
-    }
+    outline-color: var(--vl-vip-text);
 }
 
 .vl-closing-links {
@@ -1079,7 +1134,8 @@
         border-radius: 20px;
     }
 
-    .vl-hero-shot img {
+    .vl-hero-shot img,
+    .vl-demo-player video {
         border-radius: 14px;
     }
 
@@ -1306,6 +1362,10 @@ html[lang="zh-TW"] .hero-title-tail {
         --vl-accent-text: LinkText;
         --vl-product-text: CanvasText;
         --vl-product-muted: CanvasText;
+        --vl-vip: ButtonBorder;
+        --vl-vip-fill: ButtonFace;
+        --vl-on-vip: ButtonText;
+        --vl-vip-text: CanvasText;
     }
 
     .vl-page :focus-visible {

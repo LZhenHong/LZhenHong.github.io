@@ -118,6 +118,35 @@ const miniFeatures = [
       </div>
     </section>
 
+    <section class="vl-section vl-demo" id="demo" aria-labelledby="vl-demo-title">
+      <div class="vl-section-heading">
+        <h2 id="vl-demo-title">{copy.demo.title}</h2>
+        <p>{copy.demo.body}</p>
+      </div>
+      <figure class="vl-demo-figure">
+        <div class="vl-hero-shot vl-demo-player">
+          <video
+            controls
+            muted
+            playsinline
+            preload="none"
+            width="1280"
+            height="720"
+            poster={media.demo.poster}
+            aria-labelledby="vl-demo-title"
+            aria-describedby="vl-demo-note"
+          >
+            <source src={media.demo.src} type="video/mp4" />
+            <a href={media.demo.src}>{copy.demo.open}</a>
+          </video>
+        </div>
+        <figcaption class="vl-demo-caption">
+          <p id="vl-demo-note">{copy.demo.note}</p>
+          <a href={media.demo.src}>{copy.demo.open}</a>
+        </figcaption>
+      </figure>
+    </section>
+
     <section class="vl-steps" aria-labelledby="vl-steps-title">
       <div class="vl-steps-heading">
         <p class="vl-section-kicker">{copy.steps.kicker}</p>
